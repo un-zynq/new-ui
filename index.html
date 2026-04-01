@@ -122,12 +122,7 @@
             "FOR THE REAL ONES","HIGH RISK. HIGH REWARD.","CLUTCH OR KICK","BUILT DIFFERENT"
         ];
 
-        let currentState = {
-            bgUrl: null,
-            tabTitle: null,
-            favicon: null,
-            particles: null
-        };
+        let currentState = { bgUrl: null, tabTitle: null, favicon: null, particles: null };
 
         function syncSettings() {
             const bgUrl = localStorage.getItem('hrn_bg_url');
@@ -141,24 +136,15 @@
                 ambient.style.opacity = bgUrl ? '0.25' : '';
                 currentState.bgUrl = bgUrl;
             }
-
             if (tabTitle !== currentState.tabTitle) {
                 document.getElementById('dynamic-title').textContent = tabTitle || 'HRN | Gaming Hub';
                 currentState.tabTitle = tabTitle;
             }
-
             if (favicon !== currentState.favicon) {
-                let link = document.getElementById('dynamic-favicon');
-                if (!link) {
-                    link = document.createElement('link');
-                    link.id = 'dynamic-favicon';
-                    link.rel = 'icon';
-                    document.head.appendChild(link);
-                }
+                let link = document.getElementById('dynamic-favicon') || document.querySelector("link[rel*='icon']");
                 link.href = favicon || 'favicon.ico';
                 currentState.favicon = favicon;
             }
-
             if (particles !== currentState.particles) {
                 document.getElementById('particles').style.display = particles ? 'block' : 'none';
                 currentState.particles = particles;
@@ -188,18 +174,13 @@
                 if (this.y < 0) this.y = h; if (this.y > h) this.y = 0;
                 if (this.age > this.life) this.reset();
             }
-            getOpacity() {
-                const p = this.age / this.life;
-                return p < 0.15 ? this.baseOpacity * (p / 0.15) : p > 0.80 ? this.baseOpacity * ((1 - p) / 0.20) : this.baseOpacity;
-            }
             draw() {
-                const o = this.getOpacity();
+                const p = this.age / this.life;
+                const o = p < 0.15 ? this.baseOpacity * (p / 0.15) : p > 0.80 ? this.baseOpacity * ((1 - p) / 0.20) : this.baseOpacity;
                 if (o <= 0) return;
                 ctx.save();
                 ctx.globalAlpha = o;
                 ctx.fillStyle = `hsl(${this.hue},75%,94%)`;
-                ctx.shadowBlur = 9;
-                ctx.shadowColor = `hsl(${this.hue},90%,78%)`;
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
                 ctx.fill();
@@ -210,12 +191,6 @@
         function resize() {
             w = window.innerWidth; h = window.innerHeight;
             canvas.width = w; canvas.height = h;
-        }
-
-        function initParticles() {
-            particlesArray = [];
-            const count = Math.floor(Math.min(w * h / 13500, 85));
-            for (let i = 0; i < count; i++) particlesArray.push(new Particle());
         }
 
         function animateParticles() {
@@ -238,9 +213,7 @@
             }
             currentPage = page;
             isHidden = false;
-            document.querySelectorAll('.side-link').forEach(link => {
-                link.classList.toggle('active', link.dataset.page === page);
-            });
+            document.querySelectorAll('.side-link').forEach(link => link.classList.toggle('active', link.dataset.page === page));
             history.pushState({page: page}, '', '#' + page);
             iframeContainer.classList.add('active');
             loading.style.display = 'flex';
@@ -248,7 +221,6 @@
             contentIframe.src = page + '.html';
             contentIframe.onload = () => {
                 loading.style.display = 'none';
-                contentIframe.style.transition = 'opacity .45s ease';
                 contentIframe.style.opacity = '1';
             };
         }
@@ -256,7 +228,10 @@
         function hideIframe() {
             isHidden = true;
             iframeContainer.style.opacity = '0';
-            setTimeout(() => { if (isHidden) iframeContainer.style.visibility = 'hidden'; }, 420);
+            setTimeout(() => { if (isHidden) iframeContainer.style.visibility = 'hidden'; }, 400);
+            currentPage = null;
+            document.querySelectorAll('.side-link').forEach(l => l.classList.remove('active'));
+            history.pushState(null, '', window.location.pathname);
         }
 
         function showIframe() {
@@ -266,34 +241,21 @@
             iframeContainer.style.opacity = '1';
         }
 
-        function handleHash() {
-            const hash = window.location.hash.slice(1);
-            const valid = ['settings','games','bookmarklets','about','add'];
-            if (hash && valid.includes(hash)) openPage(hash);
-            else syncSettings();
-        }
+        window.addEventListener('message', (e) => {
+            if (e.data?.type === 'updateSettings') syncSettings();
+            if (e.data?.type === 'closeIframe') hideIframe();
+        });
 
         document.querySelectorAll('.side-link').forEach(link => {
-            link.addEventListener('click', e => {
-                e.preventDefault();
-                openPage(link.dataset.page);
-            });
+            link.addEventListener('click', e => { e.preventDefault(); openPage(link.dataset.page); });
         });
 
-        iframeContainer.addEventListener('click', e => {
-            if (e.target === iframeContainer) hideIframe();
+        window.addEventListener('popstate', () => {
+            const hash = window.location.hash.slice(1);
+            if (hash) openPage(hash); else hideIframe();
         });
 
-        document.addEventListener('keydown', e => {
-            if (e.key === "Escape" && iframeContainer.classList.contains('active')) hideIframe();
-        });
-
-        window.addEventListener('popstate', handleHash);
         window.addEventListener('focus', syncSettings);
-
-        window.addEventListener('message', (event) => {
-            if (event.data?.type === 'updateSettings') syncSettings();
-        });
 
         function updateDateTime() {
             const now = new Date();
@@ -306,33 +268,29 @@
 
         const glow = document.getElementById('mouse-glow');
         let tx = 0, ty = 0, cx = 0, cy = 0;
-
-        document.addEventListener('mousemove', e => {
-            tx = e.clientX; ty = e.clientY;
-        }, {passive: true});
+        document.addEventListener('mousemove', e => { tx = e.clientX; ty = e.clientY; }, {passive: true});
 
         function animateGlow() {
-            cx += (tx - cx) * 0.09;
-            cy += (ty - cy) * 0.09;
+            cx += (tx - cx) * 0.08; cy += (ty - cy) * 0.08;
             glow.style.transform = `translate3d(${cx}px,${cy}px,0) translate(-50%,-50%)`;
             requestAnimationFrame(animateGlow);
         }
 
         window.addEventListener('load', () => {
             resize();
-            initParticles();
+            const count = Math.floor(Math.min(w * h / 14000, 80));
+            for (let i = 0; i < count; i++) particlesArray.push(new Particle());
             animateParticles();
             syncSettings();
             updateDateTime();
             setInterval(updateDateTime, 1000);
-            document.getElementById('header').classList.toggle('show', window.innerHeight > 620);
-            const el = document.getElementById('tagline');
-            el.textContent = taglines[Math.floor(Math.random() * taglines.length)];
-            setTimeout(() => el.classList.add('show'), 300);
+            document.getElementById('header').classList.toggle('show', window.innerHeight > 600);
+            const tag = document.getElementById('tagline');
+            tag.textContent = taglines[Math.floor(Math.random() * taglines.length)];
+            setTimeout(() => tag.classList.add('show'), 300);
             animateGlow();
-            handleHash();
+            if (window.location.hash) openPage(window.location.hash.slice(1));
         });
-
         window.addEventListener('resize', resize);
     </script>
 </body>
