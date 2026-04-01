@@ -9,18 +9,16 @@
     <style>
         :root {
             --bg: #05070a;
-            --accent: #7fa8f0;
-            --accent-glow: rgba(127, 168, 240, 0.17);
-            --text-main: #f0f2f8;
-            --text-dim: rgba(255, 255, 255, 0.52);
-            --glass: rgba(255, 255, 255, 0.028);
-            --glass-border: rgba(255, 255, 255, 0.065);
-            --transition: all 0.4s cubic-bezier(0.25, 0.95, 0.35, 1);
+            --accent: #89b4fa;
+            --accent-glow: rgba(137, 180, 250, 0.18);
+            --text-main: #f0f4ff;
+            --text-dim: rgba(255, 255, 255, 0.58);
+            --glass: rgba(255, 255, 255, 0.032);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; scrollbar-width: none; }
         *::-webkit-scrollbar { display: none; }
-
         html, body {
             height: 100dvh;
             width: 100%;
@@ -31,263 +29,245 @@
             user-select: none;
             cursor: url('https://cdn.jsdelivr.net/gh/un-zynq/new-ui/cursor-32.png') 16 16, auto;
         }
-
         a, button, .side-link, .discord-pill, .info-pill {
             cursor: url('https://cdn.jsdelivr.net/gh/un-zynq/new-ui/cursor-32.png') 16 16, pointer;
         }
-
         .ambient-bg {
             position: fixed;
             inset: 0;
             z-index: 0;
-            background:
-                radial-gradient(circle at 35% 40%, rgba(127, 168, 240, 0.045) 0%, transparent 60%),
-                radial-gradient(circle at 65% 65%, rgba(127, 168, 240, 0.035) 0%, transparent 65%),
-                #05070a;
+            background: radial-gradient(circle at 40% 30%, rgba(137, 180, 250, 0.05) 0%, transparent 55%),
+                        #05070a;
         }
-
         .ambient-bg::before {
             content: '';
             position: absolute;
             inset: 0;
             background: url('https://wallpapers.com/images/hd/dark-gaming-3475-x-1679-wallpaper-wjdfq8rsvh4lz1dt.jpg') center/cover no-repeat;
-            opacity: 0.085;
+            opacity: 0.09;
             pointer-events: none;
         }
-
-        body.show-bg .ambient-bg::before { opacity: 0.125; }
-
-        /* === Subtiele Particles (zacht en elegant) === */
-        .subtle-particles {
-            position: fixed;
-            inset: 0;
-            z-index: 1;
-            pointer-events: none;
-            overflow: hidden;
-        }
-
-        .particle {
-            position: absolute;
-            background: rgba(127, 168, 240, 0.65);
-            border-radius: 50%;
-            box-shadow: 0 0 12px rgba(127, 168, 240, 0.5);
-            animation: subtleRise linear infinite;
-            opacity: 0;
-        }
-
-        @keyframes subtleRise {
-            0% {
-                transform: translateY(110vh) scale(0.6);
-                opacity: 0;
-            }
-            10% { opacity: 0.6; }
-            90% { opacity: 0.6; }
-            100% {
-                transform: translateY(-80px) scale(1.3);
-                opacity: 0;
-            }
-        }
+        body.show-bg .ambient-bg::before { opacity: 0.13; }
 
         /* Mouse glow */
         .glow {
             position: fixed;
-            width: 450px;
-            height: 450px;
-            background: radial-gradient(circle, var(--accent-glow) 0%, transparent 72%);
+            width: 460px;
+            height: 460px;
+            background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
             border-radius: 50%;
             pointer-events: none;
             z-index: 2;
-            opacity: 0.52;
+            opacity: 0.42;
             filter: blur(52px);
             mix-blend-mode: screen;
             display: none;
         }
-
         @media (hover: hover) { .glow { display: block; } }
 
-        .wrapper { 
-            display: flex; 
-            flex-direction: column; 
-            height: 100dvh; 
-            padding: 32px 40px; 
-            max-width: 1680px; 
-            margin: 0 auto; 
-            position: relative; 
-            z-index: 10; 
+        .wrapper {
+            display: flex;
+            flex-direction: column;
+            height: 100dvh;
+            padding: 32px 40px;
+            max-width: 1680px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
         }
-
-        .header { 
-            display: flex; 
-            justify-content: center; 
-            z-index: 200; 
-            opacity: 0; 
-            transition: opacity 0.4s ease; 
+        .header {
+            display: flex;
+            justify-content: center;
+            z-index: 200;
+            opacity: 0;
+            transition: opacity 0.5s ease;
         }
         .header.show { opacity: 1; }
-
-        #status-pill { 
-            display: flex; 
-            align-items: center; 
-            gap: 14px; 
-            background: var(--glass); 
-            padding: 10px 26px; 
-            border-radius: 9999px; 
-            border: 1px solid var(--glass-border); 
-            backdrop-filter: blur(16px); 
-            font-size: 0.75rem; 
-            font-weight: 500; 
-            letter-spacing: 0.12em; 
-            color: var(--text-dim); 
-            text-transform: uppercase; 
+        #status-pill {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: var(--glass);
+            padding: 11px 28px;
+            border-radius: 9999px;
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(18px);
+            font-size: 0.77rem;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            color: var(--text-dim);
+            text-transform: uppercase;
         }
-
-        .pill-sep { width: 1px; height: 12px; background: var(--glass-border); }
-
-        .main { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            flex-grow: 1; 
-            position: relative; 
-            z-index: 10; 
+        .pill-sep { width: 1px; height: 14px; background: var(--glass-border); }
+        .main {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-grow: 1;
+            position: relative;
+            z-index: 10;
         }
-
-        .side-nav { display: flex; flex-direction: column; gap: 16px; z-index: 300; width: 60px; }
-        .side-link { 
-            width: 56px; 
-            height: 56px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            color: var(--text-main); 
-            background: var(--glass); 
-            border: 1px solid var(--glass-border); 
-            border-radius: 16px; 
-            transition: var(--transition); 
-            text-decoration: none; 
+        .side-nav.desktop-only {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            z-index: 300;
+            width: 66px;
         }
-        .side-link:hover { 
-            background: rgba(127, 168, 240, 0.08); 
-            border-color: var(--accent); 
-            transform: translateY(-4px); 
-            color: var(--accent); 
+        .side-nav.mobile-nav {
+            display: none;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            width: 100%;
+            max-width: 310px;
+            margin: 0 auto;
+            z-index: 300;
         }
-        .side-link svg { width: 23px; height: 23px; stroke-width: 1.8px; }
-
-        .center-brand { 
-            position: absolute; 
-            left: 50%; 
-            top: 50%; 
-            transform: translate(-50%, -50%); 
-            text-align: center; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            gap: 22px; 
-            z-index: 50; 
+        .side-link {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-main);
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 18px;
+            transition: var(--transition);
+            text-decoration: none;
         }
-        .logo { 
-            font-size: clamp(4.1rem, 13vw, 10rem); 
-            font-weight: 900; 
-            letter-spacing: -0.06em; 
-            line-height: 0.85; 
-            background: linear-gradient(180deg, #e5e9f5 30%, #b0c0e8 82%); 
-            -webkit-background-clip: text; 
-            -webkit-text-fill-color: transparent; 
-            filter: drop-shadow(0 14px 38px rgba(127, 168, 240, 0.23)); 
+        .side-link:hover {
+            background: rgba(137, 180, 250, 0.1);
+            border-color: var(--accent);
+            transform: translateY(-4px) scale(1.05);
+            color: var(--accent);
         }
-        .tagline { 
-            font-size: 1.02rem; 
-            font-weight: 400; 
-            letter-spacing: 0.12em; 
-            color: var(--text-dim); 
-            margin-top: -6px; 
+        .side-link svg {
+            width: 25px;
+            height: 25px;
+            stroke-width: 1.8px;
         }
-
+        .center-brand {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 22px;
+            z-index: 50;
+        }
+        .logo {
+            font-size: clamp(4.3rem, 14.5vw, 10.8rem);
+            font-weight: 900;
+            letter-spacing: -0.07em;
+            line-height: 0.81;
+            background: linear-gradient(180deg, #f0f4ff 28%, #a8c4ff 72%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 22px 48px rgba(137, 180, 250, 0.38));
+        }
+        .tagline {
+            font-size: 1.04rem;
+            font-weight: 400;
+            letter-spacing: 0.16em;
+            color: var(--text-dim);
+            margin-top: -8px;
+        }
         .info-pills { display: flex; gap: 14px; margin-top: 8px; flex-wrap: wrap; justify-content: center; }
-        .info-pill { 
-            background: var(--glass); 
-            border: 1px solid var(--glass-border); 
-            border-radius: 9999px; 
-            padding: 9px 20px; 
-            font-size: 0.82rem; 
-            font-weight: 500; 
-            color: var(--text-dim); 
-            display: flex; 
-            align-items: center; 
-            gap: 9px; 
-            backdrop-filter: blur(14px); 
-            transition: var(--transition); 
-            white-space: nowrap; 
-            text-decoration: none; 
+        .info-pill {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 9999px;
+            padding: 9px 21px;
+            font-size: 0.82rem;
+            font-weight: 500;
+            color: var(--text-dim);
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            backdrop-filter: blur(14px);
+            transition: var(--transition);
+            text-decoration: none;
         }
-        .info-pill:hover { 
-            border-color: var(--accent); 
-            color: var(--text-main); 
-            transform: translateY(-2px); 
+        .info-pill:hover {
+            border-color: var(--accent);
+            color: var(--text-main);
+            transform: translateY(-2px);
         }
-        .info-pill i { color: var(--accent); width: 18px; height: 18px; }
-
-        .discord-pill { 
-            display: inline-flex; 
-            align-items: center; 
-            gap: 12px; 
-            padding: 13px 34px; 
-            border-radius: 9999px; 
-            border: 1px solid rgba(255,255,255,0.13); 
-            font-size: 0.81rem; 
-            font-weight: 600; 
-            letter-spacing: 0.04em; 
-            background: var(--glass); 
-            backdrop-filter: blur(18px); 
-            transition: var(--transition); 
-            text-decoration: none; 
-            color: #fff; 
+        .discord-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 13px;
+            padding: 14px 36px;
+            border-radius: 9999px;
+            border: 1px solid rgba(255,255,255,0.15);
+            font-size: 0.83rem;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            background: var(--glass);
+            backdrop-filter: blur(18px);
+            transition: var(--transition);
+            text-decoration: none;
+            color: #fff;
         }
-        .discord-pill:hover { 
-            background: rgba(255,255,255,0.065); 
-            border-color: rgba(255,255,255,0.28); 
-            transform: translateY(-2px); 
+        .discord-pill svg {
+            width: 22px;
+            height: 22px;
+            fill: #c0c8d8;
+            transition: fill 0.3s ease;
         }
-        .discord-pill svg { width: 21px; height: 21px; fill: #ffffff; transition: fill 0.3s ease; }
-        .discord-pill:hover svg { fill: var(--accent); }
-
+        .discord-pill:hover svg {
+            fill: var(--accent);
+        }
         .desktop-only { display: flex; }
-        .mobile-only { display: none; }
-
         @media (max-width: 768px) {
             .wrapper { padding: 20px 16px; }
-            .main { flex-direction: column; justify-content: center; gap: 28px; }
-            .center-brand { position: static; transform: none; order: 1; gap: 18px; }
-            .logo { font-size: clamp(3.7rem, 16.5vw, 8.4rem); }
+            .main {
+                flex-direction: column;
+                justify-content: center;
+                gap: 34px;
+            }
+            .center-brand {
+                position: static;
+                transform: none;
+                order: 1;
+                gap: 20px;
+            }
+            .logo { font-size: clamp(3.9rem, 18vw, 9rem); }
             .tagline { font-size: 0.96rem; }
             .info-pills { display: none; }
-            .discord-pill { 
-                position: fixed; 
-                bottom: 24px; 
-                right: 24px; 
-                width: 52px; 
-                height: 52px; 
-                padding: 0; 
-                justify-content: center; 
-                border-radius: 15px; 
-                background: #121417; 
+            .discord-pill {
+                position: fixed;
+                bottom: 26px;
+                right: 22px;
+                width: 56px;
+                height: 56px;
+                padding: 0;
+                justify-content: center;
+                border-radius: 17px;
+                background: #121417;
             }
             .discord-pill span { display: none; }
-            .side-nav { order: 2; }
+            .side-nav.mobile-nav {
+                display: grid !important;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 12px;
+                width: 100%;
+                max-width: 305px;
+                margin: 0 auto;
+                order: 2;
+            }
             .desktop-only { display: none !important; }
-            .mobile-only { display: flex !important; }
         }
     </style>
 </head>
 <body>
     <div class="ambient-bg"></div>
-    
-    <!-- Subtiele particles -->
-    <div class="subtle-particles" id="subtle-particles"></div>
-    
+    <!-- Planet layer verwijderd -->
     <div class="glow" id="mouse-glow"></div>
-
     <div class="wrapper">
         <header class="header" id="header">
             <div id="status-pill" role="status" aria-live="polite">
@@ -296,36 +276,35 @@
                 <span id="clock"></span>
             </div>
         </header>
-
         <main class="main">
-            <!-- Left Nav (Desktop) -->
+            <!-- Desktop Left Nav -->
             <nav class="side-nav desktop-only" aria-label="Main navigation">
                 <a href="#" class="side-link" aria-label="Shop"><i data-lucide="shopping-cart"></i></a>
                 <a href="#" class="side-link" aria-label="Settings" onclick="toggleBG()"><i data-lucide="settings"></i></a>
                 <a href="#" class="side-link" aria-label="Profile"><i data-lucide="user"></i></a>
             </nav>
-
             <!-- Center -->
             <div class="center-brand">
                 <h1 class="logo" aria-label="HRN Gaming Hub">HRN</h1>
                 <p class="tagline">ELITE GAMING COMMUNITY</p>
                 <div class="info-pills desktop-only" id="info-pills"></div>
-                <a href="https://discord.gg/JAmeRKQzX" target="_blank" rel="noopener noreferrer" class="discord-pill" aria-label="Join our Discord community">
+               
+                <a href="https://discord.gg/JAmeRKQzX" target="_blank" rel="noopener noreferrer"
+                   class="discord-pill" aria-label="Join our Discord community">
                     <svg viewBox="0 0 127.14 96.36" aria-hidden="true">
                         <path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.71,32.65-1.82,56.6.48,80.21h0A105.73,105.73,0,0,0,32.47,96.36,77.7,77.7,0,0,0,39.2,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.73,11.1,105.32,105.32,0,0,0,32.05-16.15h0C129.58,52.84,121,29.22,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5.07-12.73,11.41-12.73S54,46,53.86,53,48.74,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5.07-12.73,11.44-12.73S96.23,46,96.11,53,91,65.69,84.69,65.69Z"/>
                     </svg>
                     <span>JOIN DISCORD</span>
                 </a>
             </div>
-
-            <!-- Navigation -->
-            <nav class="side-nav" id="mobileNav" aria-label="Main navigation">
+            <!-- Mobile Navigation Grid -->
+            <nav class="side-nav mobile-nav" id="mobileNav" aria-label="Main navigation">
                 <a href="#" class="side-link" aria-label="Play"><i data-lucide="play"></i></a>
                 <a href="#" class="side-link" aria-label="Community"><i data-lucide="users"></i></a>
                 <a href="#" class="side-link" aria-label="Tournaments"><i data-lucide="trophy"></i></a>
-                <a href="#" class="side-link mobile-only" aria-label="Shop"><i data-lucide="shopping-cart"></i></a>
-                <a href="#" class="side-link mobile-only" aria-label="Settings" onclick="toggleBG()"><i data-lucide="settings"></i></a>
-                <a href="#" class="side-link mobile-only" aria-label="Profile"><i data-lucide="user"></i></a>
+                <a href="#" class="side-link" aria-label="Shop"><i data-lucide="shopping-cart"></i></a>
+                <a href="#" class="side-link" aria-label="Settings" onclick="toggleBG()"><i data-lucide="settings"></i></a>
+                <a href="#" class="side-link" aria-label="Profile"><i data-lucide="user"></i></a>
             </nav>
         </main>
     </div>
@@ -356,50 +335,19 @@
         let targetX = 0, targetY = 0, currentX = 0, currentY = 0;
         document.addEventListener('mousemove', (e) => { targetX = e.clientX; targetY = e.clientY; }, { passive: true });
         function animateGlow() {
-            currentX += (targetX - currentX) * 0.09;
-            currentY += (targetY - currentY) * 0.09;
+            currentX += (targetX - currentX) * 0.085;
+            currentY += (targetY - currentY) * 0.085;
             if (glow) glow.style.transform = `translate3d(${currentX}px, ${currentY}px, 0) translate(-50%, -50%)`;
             requestAnimationFrame(animateGlow);
         }
         animateGlow();
 
-        // === Subtiele particles ===
-        function createSubtleParticles() {
-            const container = document.getElementById('subtle-particles');
-            for (let i = 0; i < 65; i++) {   // meer deeltjes voor een mooi effect
-                const p = document.createElement('div');
-                p.className = 'particle';
-                
-                const size = Math.random() * 4.5 + 2;
-                p.style.width = `${size}px`;
-                p.style.height = `${size}px`;
-                p.style.left = `${Math.random() * 100}vw`;
-                p.style.animationDuration = `${Math.random() * 38 + 26}s`;
-                p.style.animationDelay = `-${Math.random() * 45}s`;
-                p.style.opacity = Math.random() * 0.45 + 0.15;
-                
-                container.appendChild(p);
-            }
-        }
-        createSubtleParticles();
-
-        // Slimme header visibility
         function checkHeaderVisibility() {
             const header = document.getElementById('header');
-            header.classList.toggle('show', window.innerHeight > 620);
+            header.classList.toggle('show', window.innerHeight > 630);
         }
         window.addEventListener('resize', checkHeaderVisibility);
         window.addEventListener('load', checkHeaderVisibility);
-
-        // Center mobile nav
-        const nav = document.getElementById('mobileNav');
-        function centerNav() {
-            if (window.innerWidth <= 768 && nav) {
-                nav.scrollLeft = (nav.scrollWidth - nav.clientWidth) / 2;
-            }
-        }
-        window.addEventListener('load', centerNav);
-        window.addEventListener('resize', centerNav);
 
         // Random games pills
         async function loadRandomGames() {
@@ -411,7 +359,6 @@
                 let all = [];
                 Object.values(data).forEach(arr => { if (Array.isArray(arr)) all = all.concat(arr); });
                 const shuffled = all.sort(() => 0.5 - Math.random()).slice(0, 3);
-
                 container.innerHTML = `
                     <a href="/game/${shuffled[0]}" class="info-pill">
                         <i data-lucide="play-circle"></i>
