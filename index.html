@@ -18,13 +18,7 @@
             --transition: all 0.4s cubic-bezier(0.25, 0.95, 0.35, 1);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            scrollbar-width: none;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; scrollbar-width: none; }
         *::-webkit-scrollbar { display: none; }
 
         html, body {
@@ -61,11 +55,10 @@
             pointer-events: none;
         }
 
-        body.show-bg .ambient-bg::before {
-            opacity: 0.125;
-        }
+        body.show-bg .ambient-bg::before { opacity: 0.125; }
 
-        .particles {
+        /* === Subtiele Particles (zacht en elegant) === */
+        .subtle-particles {
             position: fixed;
             inset: 0;
             z-index: 1;
@@ -75,16 +68,27 @@
 
         .particle {
             position: absolute;
-            background: rgba(127, 168, 240, 0.4);
+            background: rgba(127, 168, 240, 0.65);
             border-radius: 50%;
-            animation: floatParticle linear infinite;
+            box-shadow: 0 0 12px rgba(127, 168, 240, 0.5);
+            animation: subtleRise linear infinite;
+            opacity: 0;
         }
 
-        @keyframes floatParticle {
-            0% { transform: translateY(110vh) scale(0.5); }
-            100% { transform: translateY(-80px) scale(1.1); }
+        @keyframes subtleRise {
+            0% {
+                transform: translateY(110vh) scale(0.6);
+                opacity: 0;
+            }
+            10% { opacity: 0.6; }
+            90% { opacity: 0.6; }
+            100% {
+                transform: translateY(-80px) scale(1.3);
+                opacity: 0;
+            }
         }
 
+        /* Mouse glow */
         .glow {
             position: fixed;
             width: 450px;
@@ -99,256 +103,178 @@
             display: none;
         }
 
-        @media (hover: hover) {
-            .glow { display: block; }
+        @media (hover: hover) { .glow { display: block; } }
+
+        .wrapper { 
+            display: flex; 
+            flex-direction: column; 
+            height: 100dvh; 
+            padding: 32px 40px; 
+            max-width: 1680px; 
+            margin: 0 auto; 
+            position: relative; 
+            z-index: 10; 
         }
 
-        .wrapper {
-            display: flex;
-            flex-direction: column;
-            height: 100dvh;
-            padding: 32px 40px;
-            max-width: 1680px;
-            margin: 0 auto;
-            position: relative;
-            z-index: 10;
+        .header { 
+            display: flex; 
+            justify-content: center; 
+            z-index: 200; 
+            opacity: 0; 
+            transition: opacity 0.4s ease; 
+        }
+        .header.show { opacity: 1; }
+
+        #status-pill { 
+            display: flex; 
+            align-items: center; 
+            gap: 14px; 
+            background: var(--glass); 
+            padding: 10px 26px; 
+            border-radius: 9999px; 
+            border: 1px solid var(--glass-border); 
+            backdrop-filter: blur(16px); 
+            font-size: 0.75rem; 
+            font-weight: 500; 
+            letter-spacing: 0.12em; 
+            color: var(--text-dim); 
+            text-transform: uppercase; 
         }
 
-        .header {
-            display: flex;
-            justify-content: center;
-            z-index: 200;
+        .pill-sep { width: 1px; height: 12px; background: var(--glass-border); }
+
+        .main { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            flex-grow: 1; 
+            position: relative; 
+            z-index: 10; 
         }
 
-        #status-pill {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            background: var(--glass);
-            padding: 10px 26px;
-            border-radius: 9999px;
-            border: 1px solid var(--glass-border);
-            backdrop-filter: blur(16px);
-            font-size: 0.75rem;
-            font-weight: 500;
-            letter-spacing: 0.12em;
-            color: var(--text-dim);
-            text-transform: uppercase;
+        .side-nav { display: flex; flex-direction: column; gap: 16px; z-index: 300; width: 60px; }
+        .side-link { 
+            width: 56px; 
+            height: 56px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            color: var(--text-main); 
+            background: var(--glass); 
+            border: 1px solid var(--glass-border); 
+            border-radius: 16px; 
+            transition: var(--transition); 
+            text-decoration: none; 
+        }
+        .side-link:hover { 
+            background: rgba(127, 168, 240, 0.08); 
+            border-color: var(--accent); 
+            transform: translateY(-4px); 
+            color: var(--accent); 
+        }
+        .side-link svg { width: 23px; height: 23px; stroke-width: 1.8px; }
+
+        .center-brand { 
+            position: absolute; 
+            left: 50%; 
+            top: 50%; 
+            transform: translate(-50%, -50%); 
+            text-align: center; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            gap: 22px; 
+            z-index: 50; 
+        }
+        .logo { 
+            font-size: clamp(4.1rem, 13vw, 10rem); 
+            font-weight: 900; 
+            letter-spacing: -0.06em; 
+            line-height: 0.85; 
+            background: linear-gradient(180deg, #e5e9f5 30%, #b0c0e8 82%); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+            filter: drop-shadow(0 14px 38px rgba(127, 168, 240, 0.23)); 
+        }
+        .tagline { 
+            font-size: 1.02rem; 
+            font-weight: 400; 
+            letter-spacing: 0.12em; 
+            color: var(--text-dim); 
+            margin-top: -6px; 
         }
 
-        .pill-sep {
-            width: 1px;
-            height: 12px;
-            background: var(--glass-border);
+        .info-pills { display: flex; gap: 14px; margin-top: 8px; flex-wrap: wrap; justify-content: center; }
+        .info-pill { 
+            background: var(--glass); 
+            border: 1px solid var(--glass-border); 
+            border-radius: 9999px; 
+            padding: 9px 20px; 
+            font-size: 0.82rem; 
+            font-weight: 500; 
+            color: var(--text-dim); 
+            display: flex; 
+            align-items: center; 
+            gap: 9px; 
+            backdrop-filter: blur(14px); 
+            transition: var(--transition); 
+            white-space: nowrap; 
+            text-decoration: none; 
         }
-
-        .main {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-grow: 1;
-            position: relative;
-            z-index: 10;
+        .info-pill:hover { 
+            border-color: var(--accent); 
+            color: var(--text-main); 
+            transform: translateY(-2px); 
         }
+        .info-pill i { color: var(--accent); width: 18px; height: 18px; }
 
-        .side-nav {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            z-index: 300;
-            width: 60px;
+        .discord-pill { 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 12px; 
+            padding: 13px 34px; 
+            border-radius: 9999px; 
+            border: 1px solid rgba(255,255,255,0.13); 
+            font-size: 0.81rem; 
+            font-weight: 600; 
+            letter-spacing: 0.04em; 
+            background: var(--glass); 
+            backdrop-filter: blur(18px); 
+            transition: var(--transition); 
+            text-decoration: none; 
+            color: #fff; 
         }
-
-        .side-link {
-            width: 56px;
-            height: 56px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-main);
-            background: var(--glass);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            transition: var(--transition);
-            text-decoration: none;
+        .discord-pill:hover { 
+            background: rgba(255,255,255,0.065); 
+            border-color: rgba(255,255,255,0.28); 
+            transform: translateY(-2px); 
         }
+        .discord-pill svg { width: 21px; height: 21px; fill: #ffffff; transition: fill 0.3s ease; }
+        .discord-pill:hover svg { fill: var(--accent); }
 
-        .side-link:hover {
-            background: rgba(127, 168, 240, 0.08);
-            border-color: var(--accent);
-            transform: translateY(-4px);
-            color: var(--accent);
-        }
-
-        .side-link svg {
-            width: 23px;
-            height: 23px;
-            stroke-width: 1.8px;
-        }
-
-        /* Center Brand */
-        .center-brand {
-            position: absolute;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 22px;
-            z-index: 50;
-        }
-
-        .logo {
-            font-size: clamp(4.1rem, 13vw, 10rem);
-            font-weight: 900;
-            letter-spacing: -0.06em;
-            line-height: 0.85;
-            background: linear-gradient(180deg, #e5e9f5 30%, #b0c0e8 82%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 14px 38px rgba(127, 168, 240, 0.23));
-        }
-
-        .tagline {
-            font-size: 1.02rem;
-            font-weight: 400;
-            letter-spacing: 0.12em;
-            color: var(--text-dim);
-            margin-top: -6px;
-        }
-
-        /* Info Pills - Hidden on mobile */
-        .info-pills {
-            display: flex;
-            gap: 14px;
-            margin-top: 8px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .info-pill {
-            background: var(--glass);
-            border: 1px solid var(--glass-border);
-            border-radius: 9999px;
-            padding: 9px 20px;
-            font-size: 0.82rem;
-            font-weight: 500;
-            color: var(--text-dim);
-            display: flex;
-            align-items: center;
-            gap: 9px;
-            backdrop-filter: blur(14px);
-            transition: var(--transition);
-            white-space: nowrap;
-            text-decoration: none;
-        }
-
-        .info-pill:hover {
-            border-color: var(--accent);
-            color: var(--text-main);
-            transform: translateY(-2px);
-        }
-
-        .info-pill i {
-            color: var(--accent);
-            width: 18px;
-            height: 18px;
-        }
-
-        .discord-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 12px;
-            padding: 13px 34px;
-            border-radius: 9999px;
-            border: 1px solid rgba(255,255,255,0.13);
-            font-size: 0.81rem;
-            font-weight: 600;
-            letter-spacing: 0.04em;
-            background: var(--glass);
-            backdrop-filter: blur(18px);
-            transition: var(--transition);
-            text-decoration: none;
-            color: #fff;
-        }
-
-        .discord-pill:hover {
-            background: rgba(255,255,255,0.065);
-            border-color: rgba(255,255,255,0.28);
-            transform: translateY(-2px);
-        }
-
-        .discord-pill svg {
-            width: 21px;
-            height: 21px;
-            fill: #ffffff;
-            transition: fill 0.3s ease;
-        }
-
-        .discord-pill:hover svg {
-            fill: var(--accent);
-        }
-
-        /* Responsive */
         .desktop-only { display: flex; }
         .mobile-only { display: none; }
 
         @media (max-width: 768px) {
             .wrapper { padding: 20px 16px; }
-           
-            .main {
-                flex-direction: column;
-                justify-content: center;
-                gap: 28px;
-            }
-           
-            .center-brand {
-                position: static;
-                transform: none;
-                order: 1;
-                gap: 18px;
-            }
-           
+            .main { flex-direction: column; justify-content: center; gap: 28px; }
+            .center-brand { position: static; transform: none; order: 1; gap: 18px; }
             .logo { font-size: clamp(3.7rem, 16.5vw, 8.4rem); }
             .tagline { font-size: 0.96rem; }
-           
-            .info-pills {
-                display: none; /* Verwijderd op mobile zoals gevraagd */
+            .info-pills { display: none; }
+            .discord-pill { 
+                position: fixed; 
+                bottom: 24px; 
+                right: 24px; 
+                width: 52px; 
+                height: 52px; 
+                padding: 0; 
+                justify-content: center; 
+                border-radius: 15px; 
+                background: #121417; 
             }
-           
-            .discord-pill {
-                position: fixed;
-                bottom: 24px;
-                right: 24px;
-                width: 52px;
-                height: 52px;
-                padding: 0;
-                justify-content: center;
-                border-radius: 15px;
-                background: #121417;
-            }
-           
             .discord-pill span { display: none; }
-           
-            .side-nav {
-                order: 2;
-                flex-direction: row;
-                width: 100%;
-                justify-content: center;
-                gap: 12px;
-                overflow-x: auto;
-                padding: 10px 30px;
-                -webkit-mask-image: linear-gradient(to right, transparent, black 20%, black 80%, transparent);
-            }
-           
-            .side-link {
-                flex: 0 0 52px;
-                height: 52px;
-                border-radius: 14px;
-            }
-           
+            .side-nav { order: 2; }
             .desktop-only { display: none !important; }
             .mobile-only { display: flex !important; }
         }
@@ -356,11 +282,14 @@
 </head>
 <body>
     <div class="ambient-bg"></div>
-    <div class="particles" id="particles"></div>
+    
+    <!-- Subtiele particles -->
+    <div class="subtle-particles" id="subtle-particles"></div>
+    
     <div class="glow" id="mouse-glow"></div>
 
     <div class="wrapper">
-        <header class="header">
+        <header class="header" id="header">
             <div id="status-pill" role="status" aria-live="polite">
                 <span id="date"></span>
                 <div class="pill-sep"></div>
@@ -380,17 +309,8 @@
             <div class="center-brand">
                 <h1 class="logo" aria-label="HRN Gaming Hub">HRN</h1>
                 <p class="tagline">ELITE GAMING COMMUNITY</p>
-
-                <!-- Info Pills (alleen desktop) -->
-                <div class="info-pills desktop-only" id="info-pills">
-                    <!-- Wordt dynamisch gevuld met JS -->
-                </div>
-
-                <a href="https://discord.gg/JAmeRKQzX"
-                   target="_blank"
-                   rel="noopener noreferrer"
-                   class="discord-pill"
-                   aria-label="Join our Discord community">
+                <div class="info-pills desktop-only" id="info-pills"></div>
+                <a href="https://discord.gg/JAmeRKQzX" target="_blank" rel="noopener noreferrer" class="discord-pill" aria-label="Join our Discord community">
                     <svg viewBox="0 0 127.14 96.36" aria-hidden="true">
                         <path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.71,32.65-1.82,56.6.48,80.21h0A105.73,105.73,0,0,0,32.47,96.36,77.7,77.7,0,0,0,39.2,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.73,11.1,105.32,105.32,0,0,0,32.05-16.15h0C129.58,52.84,121,29.22,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5.07-12.73,11.41-12.73S54,46,53.86,53,48.74,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5.07-12.73,11.44-12.73S96.23,46,96.11,53,91,65.69,84.69,65.69Z"/>
                     </svg>
@@ -413,14 +333,12 @@
     <script>
         lucide.createIcons();
 
-        // Background toggle
         function toggleBG() {
             document.body.classList.toggle('show-bg');
             localStorage.setItem('bg-visible', document.body.classList.contains('show-bg'));
         }
         if (localStorage.getItem('bg-visible') === 'true') document.body.classList.add('show-bg');
 
-        // Clock & Date
         function updateDateTime() {
             const now = new Date();
             const hours = now.getHours() % 12 || 12;
@@ -435,14 +353,8 @@
 
         // Mouse glow
         const glow = document.getElementById('mouse-glow');
-        let targetX = 0, targetY = 0;
-        let currentX = 0, currentY = 0;
-
-        document.addEventListener('mousemove', (e) => {
-            targetX = e.clientX;
-            targetY = e.clientY;
-        }, { passive: true });
-
+        let targetX = 0, targetY = 0, currentX = 0, currentY = 0;
+        document.addEventListener('mousemove', (e) => { targetX = e.clientX; targetY = e.clientY; }, { passive: true });
         function animateGlow() {
             currentX += (targetX - currentX) * 0.09;
             currentY += (targetY - currentY) * 0.09;
@@ -451,23 +363,33 @@
         }
         animateGlow();
 
-        // Floating particles
-        function createParticles() {
-            const container = document.getElementById('particles');
-            for (let i = 0; i < 28; i++) {
+        // === Subtiele particles ===
+        function createSubtleParticles() {
+            const container = document.getElementById('subtle-particles');
+            for (let i = 0; i < 65; i++) {   // meer deeltjes voor een mooi effect
                 const p = document.createElement('div');
                 p.className = 'particle';
-                const size = Math.random() * 3.5 + 1.8;
+                
+                const size = Math.random() * 4.5 + 2;
                 p.style.width = `${size}px`;
                 p.style.height = `${size}px`;
                 p.style.left = `${Math.random() * 100}vw`;
-                p.style.animationDuration = `${Math.random() * 28 + 22}s`;
-                p.style.animationDelay = `-${Math.random() * 35}s`;
-                p.style.opacity = Math.random() * 0.25 + 0.12;
+                p.style.animationDuration = `${Math.random() * 38 + 26}s`;
+                p.style.animationDelay = `-${Math.random() * 45}s`;
+                p.style.opacity = Math.random() * 0.45 + 0.15;
+                
                 container.appendChild(p);
             }
         }
-        createParticles();
+        createSubtleParticles();
+
+        // Slimme header visibility
+        function checkHeaderVisibility() {
+            const header = document.getElementById('header');
+            header.classList.toggle('show', window.innerHeight > 620);
+        }
+        window.addEventListener('resize', checkHeaderVisibility);
+        window.addEventListener('load', checkHeaderVisibility);
 
         // Center mobile nav
         const nav = document.getElementById('mobileNav');
@@ -479,76 +401,36 @@
         window.addEventListener('load', centerNav);
         window.addEventListener('resize', centerNav);
 
-        // === Nieuwe functionaliteit: Random games pills ===
+        // Random games pills
         async function loadRandomGames() {
-            const pillsContainer = document.getElementById('info-pills');
-            if (!pillsContainer) return;
-
+            const container = document.getElementById('info-pills');
+            if (!container) return;
             try {
-                const response = await fetch('https://un-zynq.github.io/games.json');
-                const gamesData = await response.json();
+                const res = await fetch('https://un-zynq.github.io/games.json');
+                const data = await res.json();
+                let all = [];
+                Object.values(data).forEach(arr => { if (Array.isArray(arr)) all = all.concat(arr); });
+                const shuffled = all.sort(() => 0.5 - Math.random()).slice(0, 3);
 
-                // Alle games in één array samenvoegen
-                let allGames = [];
-                Object.keys(gamesData).forEach(key => {
-                    if (Array.isArray(gamesData[key])) {
-                        allGames = allGames.concat(gamesData[key]);
-                    }
-                });
-
-                if (allGames.length === 0) return;
-
-                // Drie unieke random games kiezen
-                const shuffled = allGames.sort(() => 0.5 - Math.random());
-                const selectedGames = shuffled.slice(0, 3);
-
-                // Pills aanmaken
-                pillsContainer.innerHTML = '';
-
-                // Pill 1: Random game (linkt naar /game/{alias})
-                const game1 = selectedGames[0];
-                const pill1 = document.createElement('a');
-                pill1.href = `/game/${game1}`;
-                pill1.className = 'info-pill';
-                pill1.innerHTML = `
-                    <i data-lucide="play-circle"></i>
-                    <span>${game1.replace(/-/g, ' ')}</span>
-                `;
-                pillsContainer.appendChild(pill1);
-
-                // Pill 2: Discord (bestaande knop blijft in HTML, deze is alleen voor desktop pills)
-                // (Discord knop zit al in de HTML)
-
-                // Pill 3: Unblocked link
-                const pill3 = document.createElement('a');
-                pill3.href = '/unblocked/';
-                pill3.className = 'info-pill';
-                pill3.innerHTML = `
-                    <i data-lucide="globe"></i>
-                    <span>Backup Sites</span>
-                `;
-                pillsContainer.appendChild(pill3);
-
-                lucide.createIcons(); // Icons herladen voor nieuwe elementen
-
-            } catch (error) {
-                console.warn('Kon games.json niet laden:', error);
-                // Fallback pills
-                pillsContainer.innerHTML = `
-                    <a href="/game/2048" class="info-pill">
+                container.innerHTML = `
+                    <a href="/game/${shuffled[0]}" class="info-pill">
                         <i data-lucide="play-circle"></i>
-                        <span>2048</span>
+                        <span>${shuffled[0].replace(/-/g, ' ')}</span>
                     </a>
                     <a href="/unblocked/" class="info-pill">
                         <i data-lucide="globe"></i>
-                        <span>Unblocked Games</span>
+                        <span>Backup Sites</span>
                     </a>
+                `;
+                lucide.createIcons();
+            } catch(e) {
+                container.innerHTML = `
+                    <a href="/game/2048" class="info-pill"><i data-lucide="play-circle"></i><span>2048</span></a>
+                    <a href="/unblocked/" class="info-pill"><i data-lucide="globe"></i><span>Backup Sites</span></a>
                 `;
                 lucide.createIcons();
             }
         }
-
-        // Laad random games bij start
         window.addEventListener('load', loadRandomGames);
     </script>
 </body>
