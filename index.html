@@ -15,10 +15,16 @@
             --text-dim: rgba(255, 255, 255, 0.58);
             --glass: rgba(255, 255, 255, 0.032);
             --glass-border: rgba(255, 255, 255, 0.08);
-            --transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            --transition: all 0.35s cubic-bezier(0.23, 1, 0.32, 1);
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; scrollbar-width: none; }
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            scrollbar-width: none; 
+        }
         *::-webkit-scrollbar { display: none; }
+
         html, body {
             height: 100dvh;
             width: 100%;
@@ -27,11 +33,14 @@
             color: var(--text-main);
             overflow: hidden;
             user-select: none;
-            cursor: url('https://cdn.jsdelivr.net/gh/un-zynq/new-ui/cursor-32.png') 16 16, auto;
+            /* Custom cursor verwijderd → standaard cursor */
         }
+
+        /* Verwijder cursor pointer override voor alle interactieve elementen */
         a, button, .side-link, .discord-pill, .info-pill {
-            cursor: url('https://cdn.jsdelivr.net/gh/un-zynq/new-ui/cursor-32.png') 16 16, pointer;
+            cursor: pointer;
         }
+
         .ambient-bg {
             position: fixed;
             inset: 0;
@@ -49,7 +58,6 @@
         }
         body.show-bg .ambient-bg::before { opacity: 0.13; }
 
-        /* Mouse glow */
         .glow {
             position: fixed;
             width: 460px;
@@ -83,22 +91,24 @@
             transition: opacity 0.5s ease;
         }
         .header.show { opacity: 1; }
+
         #status-pill {
             display: flex;
             align-items: center;
             gap: 16px;
             background: var(--glass);
-            padding: 11px 28px;
+            padding: 10px 26px;
             border-radius: 9999px;
             border: 1px solid var(--glass-border);
             backdrop-filter: blur(18px);
-            font-size: 0.77rem;
+            font-size: 0.76rem;
             font-weight: 500;
             letter-spacing: 0.1em;
             color: var(--text-dim);
             text-transform: uppercase;
         }
-        .pill-sep { width: 1px; height: 14px; background: var(--glass-border); }
+        .pill-sep { width: 1px; height: 13px; background: var(--glass-border); }
+
         .main {
             display: flex;
             justify-content: space-between;
@@ -107,6 +117,8 @@
             position: relative;
             z-index: 10;
         }
+
+        /* Desktop side nav */
         .side-nav.desktop-only {
             display: flex;
             flex-direction: column;
@@ -114,12 +126,14 @@
             z-index: 300;
             width: 66px;
         }
+
+        /* Mobiel grid - strak en clean */
         .side-nav.mobile-nav {
             display: none;
             grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
+            gap: 9px;
             width: 100%;
-            max-width: 310px;
+            max-width: 265px;
             margin: 0 auto;
             z-index: 300;
         }
@@ -132,21 +146,22 @@
             color: var(--text-main);
             background: var(--glass);
             border: 1px solid var(--glass-border);
-            border-radius: 18px;
+            border-radius: 14px;
             transition: var(--transition);
             text-decoration: none;
         }
         .side-link:hover {
-            background: rgba(137, 180, 250, 0.1);
+            background: rgba(137, 180, 250, 0.12);
             border-color: var(--accent);
-            transform: translateY(-4px) scale(1.05);
+            transform: translateY(-3px) scale(1.04);
             color: var(--accent);
         }
         .side-link svg {
-            width: 25px;
-            height: 25px;
-            stroke-width: 1.8px;
+            width: 21px;
+            height: 21px;
+            stroke-width: 2px;
         }
+
         .center-brand {
             position: absolute;
             left: 50%;
@@ -156,7 +171,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 22px;
+            gap: 20px;
             z-index: 50;
         }
         .logo {
@@ -170,13 +185,19 @@
             filter: drop-shadow(0 22px 48px rgba(137, 180, 250, 0.38));
         }
         .tagline {
-            font-size: 1.04rem;
+            font-size: 1.03rem;
             font-weight: 400;
             letter-spacing: 0.16em;
             color: var(--text-dim);
-            margin-top: -8px;
+            margin-top: -6px;
         }
-        .info-pills { display: flex; gap: 14px; margin-top: 8px; flex-wrap: wrap; justify-content: center; }
+        .info-pills { 
+            display: flex; 
+            gap: 14px; 
+            margin-top: 8px; 
+            flex-wrap: wrap; 
+            justify-content: center; 
+        }
         .info-pill {
             background: var(--glass);
             border: 1px solid var(--glass-border);
@@ -222,51 +243,57 @@
         .discord-pill:hover svg {
             fill: var(--accent);
         }
+
         .desktop-only { display: flex; }
+
         @media (max-width: 768px) {
-            .wrapper { padding: 20px 16px; }
+            .wrapper { padding: 20px 18px; }
+           
             .main {
                 flex-direction: column;
                 justify-content: center;
-                gap: 34px;
+                gap: 32px;
             }
+           
             .center-brand {
                 position: static;
                 transform: none;
                 order: 1;
-                gap: 20px;
+                gap: 18px;
             }
-            .logo { font-size: clamp(3.9rem, 18vw, 9rem); }
-            .tagline { font-size: 0.96rem; }
+           
+            .logo { font-size: clamp(3.8rem, 17vw, 8.8rem); }
+            .tagline { font-size: 0.97rem; }
+           
             .info-pills { display: none; }
+           
             .discord-pill {
                 position: fixed;
-                bottom: 26px;
-                right: 22px;
-                width: 56px;
-                height: 56px;
+                bottom: 24px;
+                right: 20px;
+                width: 54px;
+                height: 54px;
                 padding: 0;
                 justify-content: center;
-                border-radius: 17px;
+                border-radius: 15px;
                 background: #121417;
             }
             .discord-pill span { display: none; }
+
             .side-nav.mobile-nav {
                 display: grid !important;
                 grid-template-columns: repeat(3, 1fr);
-                gap: 12px;
+                gap: 9px;
                 width: 100%;
-                max-width: 305px;
+                max-width: 265px;
                 margin: 0 auto;
                 order: 2;
             }
-            .desktop-only { display: none !important; }
         }
     </style>
 </head>
 <body>
     <div class="ambient-bg"></div>
-    <!-- Planet layer verwijderd -->
     <div class="glow" id="mouse-glow"></div>
     <div class="wrapper">
         <header class="header" id="header">
@@ -283,6 +310,7 @@
                 <a href="#" class="side-link" aria-label="Settings" onclick="toggleBG()"><i data-lucide="settings"></i></a>
                 <a href="#" class="side-link" aria-label="Profile"><i data-lucide="user"></i></a>
             </nav>
+
             <!-- Center -->
             <div class="center-brand">
                 <h1 class="logo" aria-label="HRN Gaming Hub">HRN</h1>
@@ -297,7 +325,8 @@
                     <span>JOIN DISCORD</span>
                 </a>
             </div>
-            <!-- Mobile Navigation Grid -->
+
+            <!-- Mobiel grid -->
             <nav class="side-nav mobile-nav" id="mobileNav" aria-label="Main navigation">
                 <a href="#" class="side-link" aria-label="Play"><i data-lucide="play"></i></a>
                 <a href="#" class="side-link" aria-label="Community"><i data-lucide="users"></i></a>
@@ -333,7 +362,11 @@
         // Mouse glow
         const glow = document.getElementById('mouse-glow');
         let targetX = 0, targetY = 0, currentX = 0, currentY = 0;
-        document.addEventListener('mousemove', (e) => { targetX = e.clientX; targetY = e.clientY; }, { passive: true });
+        document.addEventListener('mousemove', (e) => { 
+            targetX = e.clientX; 
+            targetY = e.clientY; 
+        }, { passive: true });
+
         function animateGlow() {
             currentX += (targetX - currentX) * 0.085;
             currentY += (targetY - currentY) * 0.085;
