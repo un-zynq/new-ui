@@ -4,69 +4,236 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Settings - HRN</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { margin:0; padding:40px; font-family:'Inter',sans-serif; background:#05070a; color:#f0f4ff; min-height:100vh; }
-        .container { max-width:720px; margin:0 auto; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:20px; padding:40px; }
-        h1 { font-size:2.4rem; margin-bottom:8px; }
-        .section { margin:32px 0; }
-        label { display:block; margin:12px 0 6px; font-weight:500; color:#a8c4ff; }
-        input[type="text"], input[type="url"] { width:100%; padding:14px 16px; background:#11151f; border:1px solid #334155; border-radius:12px; color:white; font-size:1rem; box-sizing: border-box; }
-        button { padding:12px 28px; background:#89b4fa; color:#05070a; border:none; border-radius:9999px; font-weight:600; cursor:pointer; margin-top:20px; transition: all 0.2s ease; }
-        button:hover { background:#a5c6ff; transform:scale(1.03); }
-        .note { font-size:0.85rem; color:#64748b; margin-top:4px; }
-        input[type="checkbox"] { margin-right: 8px; }
+        :root {
+            --bg-black: #050608;
+            --bg-dark-gray: #12141a;
+            --border-gray: #2d333b;
+            --text-silver: #9ca3af;
+            --text-white: #ffffff;
+            --accent-blue: #2563eb;
+            --accent-blue-hover: #3b82f6;
+            --success-green: #16a34a;
+        }
+
+        /* SaaS Scrollbar */
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: var(--bg-black); }
+        ::-webkit-scrollbar-thumb { background: var(--border-gray); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-silver); }
+
+        body { 
+            margin: 0; 
+            padding: 0; 
+            font-family: 'Inter', sans-serif; 
+            background: var(--bg-black); 
+            color: var(--text-white); 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .settings-card { 
+            width: 100%;
+            max-width: 580px; 
+            background: var(--bg-dark-gray);
+            border: 1px solid var(--border-gray);
+            border-radius: 16px; 
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .header {
+            padding: 32px 40px;
+            border-bottom: 1px solid var(--border-gray);
+        }
+
+        h1 { 
+            font-size: 1.4rem; 
+            font-weight: 700;
+            margin: 0; 
+            letter-spacing: -0.01em;
+        }
+
+        .subtitle {
+            color: var(--text-silver);
+            font-size: 0.85rem;
+            margin-top: 6px;
+        }
+
+        .content { padding: 32px 40px; }
+
+        .form-group { margin-bottom: 24px; }
+
+        label { 
+            display: block; 
+            font-size: 0.7rem;
+            font-weight: 700; 
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-silver);
+            margin-bottom: 10px;
+        }
+
+        input[type="text"], input[type="url"] { 
+            width: 100%; 
+            padding: 12px 14px; 
+            background: var(--bg-black); 
+            border: 1px solid var(--border-gray); 
+            border-radius: 8px; 
+            color: var(--text-white); 
+            font-size: 0.9rem; 
+            box-sizing: border-box;
+            transition: all 0.2s ease;
+            outline: none;
+        }
+
+        input[type="text"]:focus, input[type="url"]:focus {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+        }
+
+        /* Slider Switch */
+        .switch-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            margin-top: 8px;
+        }
+
+        .switch-label-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .switch-title { font-size: 0.9rem; font-weight: 600; color: var(--text-white); }
+        .switch-desc { font-size: 0.8rem; color: var(--text-silver); margin-top: 2px; }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 42px;
+            height: 22px;
+        }
+
+        .switch input { opacity: 0; width: 0; height: 0; }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #1f2937;
+            transition: .2s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 3px;
+            bottom: 3px;
+            background-color: var(--text-silver);
+            transition: .2s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--accent-blue);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(20px);
+            background-color: white;
+        }
+
+        .footer {
+            padding: 24px 40px;
+            background: rgba(0,0,0,0.15);
+            display: flex;
+            justify-content: flex-end;
+            border-top: 1px solid var(--border-gray);
+        }
+
+        button { 
+            padding: 10px 28px; 
+            background: var(--accent-blue); 
+            color: white; 
+            border: none; 
+            border-radius: 8px; 
+            font-weight: 600; 
+            font-size: 0.85rem;
+            cursor: pointer; 
+            transition: all 0.2s ease;
+        }
+
+        button:hover { 
+            background: var(--accent-blue-hover);
+            transform: translateY(-1px);
+        }
+
+        button:active { transform: translateY(0); }
+
+        .note { font-size: 0.75rem; color: #4b5563; margin-top: 8px; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Settings</h1>
-        <p style="color:#94a3b8;">Personalize your HRN Gaming Hub</p>
-
-        <div class="section">
-            <label>Tab Title</label>
-            <input type="text" id="tabTitle" placeholder="HRN | Gaming Hub" value="HRN | Gaming Hub">
+    <div class="settings-card">
+        <div class="header">
+            <h1>Settings</h1>
+            <p class="subtitle">Platform configuration and visual style</p>
         </div>
 
-        <div class="section">
-            <label>Background Image URL</label>
-            <input type="url" id="bgUrl" placeholder="https://example.com/your-image.jpg">
-            <div class="note">Leave empty for default dark gaming background</div>
+        <div class="content">
+            <div class="form-group">
+                <label>Browser Tab Title</label>
+                <input type="text" id="tabTitle" placeholder="HRN | Gaming Hub">
+            </div>
+
+            <div class="form-group">
+                <label>Background Source</label>
+                <input type="url" id="bgUrl" placeholder="https://source.unsplash.com/...">
+                <div class="note">Leave empty for deep black theme</div>
+            </div>
+
+            <div class="form-group">
+                <label>Favicon Resource</label>
+                <input type="url" id="faviconUrl" placeholder="https://link.to/icon.png">
+            </div>
+
+            <div class="switch-row">
+                <div class="switch-label-group">
+                    <span class="switch-title">Visual Particles</span>
+                    <span class="switch-desc">Toggle background particle effects</span>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="particlesToggle" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
         </div>
 
-        <div class="section">
-            <label>Favicon URL (png, jpg, svg, ico)</label>
-            <input type="url" id="faviconUrl" placeholder="https://example.com/favicon.png">
+        <div class="footer">
+            <button onclick="saveSettings()">Apply Changes</button>
         </div>
-
-        <div class="section">
-            <label>
-                <input type="checkbox" id="particlesToggle" checked> Enable Particles
-            </label>
-        </div>
-
-        <button onclick="saveSettings()">Save Settings</button>
     </div>
 
     <script>
-        lucide.createIcons();
-
         function saveSettings() {
             const bgUrl = document.getElementById('bgUrl').value.trim();
             const tabTitle = document.getElementById('tabTitle').value.trim() || "HRN | Gaming Hub";
             const favicon = document.getElementById('faviconUrl').value.trim();
             const particlesOn = document.getElementById('particlesToggle').checked;
 
-            // Save to localStorage
-            if (bgUrl) localStorage.setItem('hrn_bg_url', bgUrl);
-            else localStorage.removeItem('hrn_bg_url');
-
+            localStorage.setItem('hrn_bg_url', bgUrl);
             localStorage.setItem('hrn_tab_title', tabTitle);
-            if (favicon) localStorage.setItem('hrn_favicon_url', favicon);
+            localStorage.setItem('hrn_favicon_url', favicon);
             localStorage.setItem('hrn_particles', particlesOn);
 
-            // Send update to main window
             if (window.parent && window.parent !== window) {
                 window.parent.postMessage({
                     type: 'updateSettings',
@@ -76,10 +243,17 @@
                 }, '*');
             }
 
-            alert('Settings saved! Refresh the page if you do not see the changes immediately.');
+            const btn = document.querySelector('button');
+            const originalText = btn.innerText;
+            btn.innerText = 'Saved';
+            btn.style.background = 'var(--success-green)';
+            
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.style.background = 'var(--accent-blue)';
+            }, 2000);
         }
 
-        // Load current values
         window.onload = () => {
             document.getElementById('tabTitle').value = localStorage.getItem('hrn_tab_title') || "HRN | Gaming Hub";
             document.getElementById('bgUrl').value = localStorage.getItem('hrn_bg_url') || "";
