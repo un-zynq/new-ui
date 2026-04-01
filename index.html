@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>HRN | Gaming Hub</title>    
+    <title>HRN | Gaming Hub</title>
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "e7ca3a68f0c04656baf422e837d316d4"}'></script>
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     
@@ -23,230 +25,50 @@
         *::-webkit-scrollbar{display:none}
         
         html,body{
-            height:100dvh;
-            width:100%;
-            font-family:'Inter',system-ui,sans-serif;
-            background:var(--bg);
-            color:var(--text-main);
-            overflow:hidden;
-            user-select:none;
+            height:100dvh; width:100%; font-family:'Inter',system-ui,sans-serif;
+            background:var(--bg); color:var(--text-main); overflow:hidden; user-select:none;
         }
         
-        .ambient-bg{
-            position:fixed;
-            inset:0;
-            z-index:1;
-            background:radial-gradient(circle at 40% 30%,rgba(137,180,250,.05) 0%,transparent 60%),#05070a;
-        }
-        .ambient-bg::before{
-            content:'';
-            position:absolute;
-            inset:0;
-            background:url('https://wallpapers.com/images/hd/dark-gaming-3475-x-1679-wallpaper-wjdfq8rsvh4lz1dt.jpg') center/cover no-repeat;
-            opacity:.2;
-            pointer-events:none;
-        }
+        .ambient-bg{position:fixed;inset:0;z-index:1;background:radial-gradient(circle at 40% 30%,rgba(137,180,250,.05) 0%,transparent 60%),#05070a;}
+        .ambient-bg::before{content:'';position:absolute;inset:0;background:url('https://wallpapers.com/images/hd/dark-gaming-3475-x-1679-wallpaper-wjdfq8rsvh4lz1dt.jpg') center/cover no-repeat;opacity:.2;pointer-events:none;}
         
-        .glow{
-            position:fixed;
-            width:460px;
-            height:460px;
-            background:radial-gradient(circle,var(--accent-glow) 0%,transparent 70%);
-            border-radius:50%;
-            pointer-events:none;
-            z-index:2;
-            opacity:.38;
-            filter:blur(55px);
-            mix-blend-mode:screen;
-            display:none;
-        }
+        .glow{position:fixed;width:460px;height:460px;background:radial-gradient(circle,var(--accent-glow) 0%,transparent 70%);border-radius:50%;pointer-events:none;z-index:2;opacity:.38;filter:blur(55px);mix-blend-mode:screen;display:none;}
         @media(hover:hover){.glow{display:block}}
         
         #particles{position:fixed;inset:0;z-index:3;pointer-events:none}
         
-        .wrapper{
-            display:flex;
-            flex-direction:column;
-            height:100dvh;
-            padding:28px 36px;
-            max-width:1680px;
-            margin:0 auto;
-            position:relative;
-            z-index:10;
-        }
-        
-        .header{
-            display:flex;
-            justify-content:center;
-            z-index:50;
-            opacity:0;
-            transition:opacity .6s ease;
-        }
+        .wrapper{display:flex;flex-direction:column;height:100dvh;padding:28px 36px;max-width:1680px;margin:0 auto;position:relative;z-index:10;}
+        .header{display:flex;justify-content:center;z-index:50;opacity:0;transition:opacity .6s ease;}
         .header.show{opacity:1}
         
-        #status-pill{
-            display:flex;
-            align-items:center;
-            gap:14px;
-            background:var(--glass);
-            padding:9px 24px;
-            border-radius:9999px;
-            border:1px solid var(--glass-border);
-            backdrop-filter:blur(20px);
-            font-size:.75rem;
-            font-weight:500;
-            letter-spacing:.12em;
-            color:var(--text-dim);
-            text-transform:uppercase;
-            box-shadow:0 4px 15px rgba(0,0,0,.15);
-        }
+        #status-pill{display:flex;align-items:center;gap:14px;background:var(--glass);padding:9px 24px;border-radius:9999px;border:1px solid var(--glass-border);backdrop-filter:blur(20px);font-size:.75rem;font-weight:500;letter-spacing:.12em;color:var(--text-dim);text-transform:uppercase;box-shadow:0 4px 15px rgba(0,0,0,.15);}
         
-        .main{
-            display:flex;
-            justify-content:space-between;
-            align-items:center;
-            flex-grow:1;
-            position:relative;
-            z-index:20;
-        }
+        .main{display:flex;justify-content:space-between;align-items:center;flex-grow:1;position:relative;z-index:20;}
         
-        .side-nav.desktop-only{
-            display:flex;
-            flex-direction:column;
-            gap:16px;
-            z-index:30;
-            width:62px;
-        }
-        .side-nav.mobile-nav{
-            display:none;
-            grid-template-columns:repeat(3,1fr);
-            gap:10px;
-            width:100%;
-            max-width:280px;
-            margin:0 auto;
-            z-index:30;
-        }
+        .side-nav.desktop-only{display:flex;flex-direction:column;gap:16px;z-index:30;width:62px;}
+        .side-nav.mobile-nav{display:none;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;max-width:280px;margin:0 auto;z-index:30;}
         
-        .side-link{
-            width:100%;
-            aspect-ratio:1/1;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            color:var(--text-main);
-            background:var(--glass);
-            border:1px solid var(--glass-border);
-            border-radius:15px;
-            transition:var(--transition);
-            text-decoration:none;
-            box-shadow:0 4px 12px rgba(0,0,0,.1);
-        }
-        .side-link:hover{
-            background:rgba(137,180,250,.13);
-            border-color:var(--accent);
-            transform:translateY(-4px) scale(1.05);
-            color:var(--accent);
-        }
-        .side-link svg{width:22px;height:22px;stroke-width:2.1px}
+        .side-link{width:100%;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;color:var(--text-main);background:var(--glass);border:1px solid var(--glass-border);border-radius:15px;transition:var(--transition);text-decoration:none;box-shadow:0 4px 12px rgba(0,0,0,.1);}
+        .side-link:hover{background:rgba(137,180,250,.13);border-color:var(--accent);transform:translateY(-4px) scale(1.05);color:var(--accent);}
+        .side-link svg{width:22px;height:22px;stroke-width:2.1px;}
+        .side-link.active{background:rgba(137,180,250,.18);border-color:var(--accent);color:var(--accent);box-shadow:0 0 20px rgba(137,180,250,.3);}
         
-        .side-link.active{
-            background:rgba(137,180,250,.18);
-            border-color:var(--accent);
-            color:var(--accent);
-            box-shadow:0 0 20px rgba(137,180,250,.3);
-        }
-        
-        .center-brand{
-            position:absolute;
-            left:50%;
-            top:50%;
-            transform:translate(-50%,-50%);
-            text-align:center;
-            display:flex;
-            flex-direction:column;
-            align-items:center;
-            gap:18px;
-            z-index:40;
-        }
-        .logo{
-            font-size:clamp(4.2rem,14vw,10.5rem);
-            font-weight:900;
-            letter-spacing:-.07em;
-            line-height:.82;
-            background:linear-gradient(180deg,#f0f4ff 28%,#a8c4ff 72%);
-            -webkit-background-clip:text;
-            -webkit-text-fill-color:transparent;
-            filter:drop-shadow(0 20px 45px rgba(137,180,250,.35));
-            opacity:.5;
-            transition:opacity .6s ease;
-        }
+        .center-brand{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center;display:flex;flex-direction:column;align-items:center;gap:18px;z-index:40;}
+        .logo{font-size:clamp(4.2rem,14vw,10.5rem);font-weight:900;letter-spacing:-.07em;line-height:.82;background:linear-gradient(180deg,#f0f4ff 28%,#a8c4ff 72%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 20px 45px rgba(137,180,250,.35));opacity:.5;transition:opacity .6s ease;}
         .logo:hover{opacity:.56}
         
-        .tagline{
-            font-size:1.02rem;
-            font-weight:400;
-            letter-spacing:.15em;
-            color:var(--text-dim);
-            margin-top:-4px;
-            min-height:1.3em;
-            opacity:0;
-            transform:translateY(10px);
-            transition:all .6s cubic-bezier(.23,1,.32,1);
-        }
-        .tagline.show{
-            opacity:1;
-            transform:translateY(0);
-        }
+        .tagline{font-size:1.02rem;font-weight:400;letter-spacing:.15em;color:var(--text-dim);margin-top:-4px;min-height:1.3em;opacity:0;transform:translateY(10px);transition:all .6s cubic-bezier(.23,1,.32,1);}
+        .tagline.show{opacity:1;transform:translateY(0);}
         
-        /* Iframe */
-        #iframe-container{
-            position:fixed;
-            inset:0;
-            z-index:100;
-            background:var(--bg);
-            opacity:0;
-            visibility:hidden;
-            transition:opacity .4s cubic-bezier(.23,1,.32,1);
-        }
-        #iframe-container.active{
-            opacity:1;
-            visibility:visible;
-        }
+        #iframe-container{position:fixed;inset:0;z-index:100;background:var(--bg);opacity:0;visibility:hidden;transition:opacity .4s cubic-bezier(.23,1,.32,1);}
+        #iframe-container.active{opacity:1;visibility:visible;}
         
-        #content-iframe{
-            width:100%;
-            height:100%;
-            border:none;
-            background:var(--bg);
-        }
+        #content-iframe{width:100%;height:100%;border:none;background:var(--bg);}
         
-        .iframe-loading{
-            position:absolute;
-            top:50%;
-            left:50%;
-            transform:translate(-50%,-50%);
-            display:flex;
-            flex-direction:column;
-            align-items:center;
-            gap:16px;
-            color:var(--text-dim);
-            z-index:110;
-        }
-        .spinner{
-            width:42px;
-            height:42px;
-            border:3px solid rgba(137,180,250,.15);
-            border-top-color:var(--accent);
-            border-radius:50%;
-            animation:spin .9s linear infinite;
-        }
+        .iframe-loading{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:16px;color:var(--text-dim);z-index:110;}
+        .spinner{width:42px;height:42px;border:3px solid rgba(137,180,250,.15);border-top-color:var(--accent);border-radius:50%;animation:spin .9s linear infinite;}
         @keyframes spin{to{transform:rotate(360deg)}}
-        
-        .loading-text{
-            font-size:.85rem;
-            letter-spacing:.08em;
-            font-weight:500;
-        }
+        .loading-text{font-size:.85rem;letter-spacing:.08em;font-weight:500;}
         
         @media(max-width:768px){
             .wrapper{padding:20px 16px}
@@ -267,7 +89,7 @@
         <header class="header" id="header">
             <div id="status-pill">
                 <span id="date"></span>
-                <div class="pill-sep" style="width:1px;height:12px;background:var(--glass-border)"></div>
+                <div style="width:1px;height:12px;background:var(--glass-border)"></div>
                 <span id="clock"></span>
             </div>
         </header>
@@ -275,26 +97,26 @@
         <main class="main">
             <!-- Desktop Nav -->
             <nav class="side-nav desktop-only" aria-label="Main navigation">
-                <a href="#" class="side-link" data-page="./settings" aria-label="Settings"><i data-lucide="settings"></i></a>
-                <a href="#" class="side-link" data-page="./games" aria-label="Games"><i data-lucide="gamepad-2"></i></a>
-                <a href="#" class="side-link" data-page="./bookmarklets" aria-label="Bookmarklets"><i data-lucide="bookmark"></i></a>
-                <a href="#" class="side-link" data-page="./about" aria-label="About"><i data-lucide="info"></i></a>
-                <a href="#" class="side-link" data-page="./add" aria-label="Add Game"><i data-lucide="plus"></i></a>
+                <a href="#" class="side-link" data-page="./settings"><i data-lucide="settings"></i></a>
+                <a href="#" class="side-link" data-page="./games"><i data-lucide="gamepad-2"></i></a>
+                <a href="#" class="side-link" data-page="./bookmarklets"><i data-lucide="bookmark"></i></a>
+                <a href="#" class="side-link" data-page="./about"><i data-lucide="info"></i></a>
+                <a href="#" class="side-link" data-page="./add"><i data-lucide="plus"></i></a>
             </nav>
             
             <!-- Center Brand -->
             <div class="center-brand">
-                <h1 class="logo" aria-label="HRN Gaming Hub">HRN</h1>
+                <h1 class="logo">HRN</h1>
                 <p class="tagline" id="tagline"></p>
             </div>
             
             <!-- Mobile Nav -->
             <nav class="side-nav mobile-nav" aria-label="Main navigation">
-                <a href="#" class="side-link" data-page="./settings" aria-label="Settings"><i data-lucide="settings"></i></a>
-                <a href="#" class="side-link" data-page="./games" aria-label="Games"><i data-lucide="gamepad-2"></i></a>
-                <a href="#" class="side-link" data-page="./bookmarklets" aria-label="Bookmarklets"><i data-lucide="bookmark"></i></a>
-                <a href="#" class="side-link" data-page="./about" aria-label="About"><i data-lucide="info"></i></a>
-                <a href="#" class="side-link" data-page="./add" aria-label="Add Game"><i data-lucide="plus"></i></a>
+                <a href="#" class="side-link" data-page="./settings"><i data-lucide="settings"></i></a>
+                <a href="#" class="side-link" data-page="./games"><i data-lucide="gamepad-2"></i></a>
+                <a href="#" class="side-link" data-page="./bookmarklets"><i data-lucide="bookmark"></i></a>
+                <a href="#" class="side-link" data-page="./about"><i data-lucide="info"></i></a>
+                <a href="#" class="side-link" data-page="./add"><i data-lucide="plus"></i></a>
             </nav>
         </main>
     </div>
@@ -311,19 +133,13 @@
     <script>
         lucide.createIcons();
 
-        const taglines = [
-            "ELITE GAMING COMMUNITY", "528 GAMES. ONE PLATFORM.", "PLAY ANYTHING. MASTER EVERYTHING.",
-            "WHERE LEGENDS ARE BORN", "NO SKILL, NO ENTRY", "LEVEL UP OR LOG OUT", "FOR THE REAL ONES",
-            "HIGH RISK. HIGH REWARD.", "CLUTCH OR KICK", "BUILT DIFFERENT", "WE DON'T CHASE. WE LEAD.",
-            "GGs ONLY", "THE FINAL BOSS LOUNGE", "NOT FOR CASUALS", "ONE TAP AWAY FROM GREATNESS"
-            // ... (je kunt de rest gewoon weer toevoegen)
-        ];
+        const taglines = ["ELITE GAMING COMMUNITY","528 GAMES. ONE PLATFORM.","PLAY ANYTHING. MASTER EVERYTHING.","WHERE LEGENDS ARE BORN","NO SKILL, NO ENTRY","LEVEL UP OR LOG OUT","FOR THE REAL ONES","HIGH RISK. HIGH REWARD.","CLUTCH OR KICK","BUILT DIFFERENT","WE DON'T CHASE. WE LEAD.","GGs ONLY","THE FINAL BOSS LOUNGE","NOT FOR CASUALS","ONE TAP AWAY FROM GREATNESS","ONLY THE STRONG REMAIN","SKILL OVER EVERYTHING","EARN YOUR SPOT","NO MERCY. NO EXCUSES."];
 
         function getRandomTagline() {
             return taglines[Math.floor(Math.random() * taglines.length)];
         }
 
-        // Particles
+        // Particles (onveranderd)
         const canvas = document.getElementById('particles');
         const ctx = canvas.getContext('2d');
         let particles = [], w, h;
@@ -331,8 +147,7 @@
         class Particle {
             constructor() { this.reset(); }
             reset() {
-                this.x = Math.random() * w;
-                this.y = Math.random() * h;
+                this.x = Math.random() * w; this.y = Math.random() * h;
                 this.size = Math.random() * 1.7 + 0.5;
                 this.speedX = Math.random() * 0.22 - 0.11;
                 this.speedY = Math.random() * 0.22 - 0.16;
@@ -342,20 +157,14 @@
                 this.baseOpacity = Math.random() * 0.28 + 0.12;
             }
             update() {
-                this.x += this.speedX;
-                this.y += this.speedY;
-                this.age += 16;
-                if (this.x < 0) this.x = w;
-                if (this.x > w) this.x = 0;
-                if (this.y < 0) this.y = h;
-                if (this.y > h) this.y = 0;
+                this.x += this.speedX; this.y += this.speedY; this.age += 16;
+                if (this.x < 0) this.x = w; if (this.x > w) this.x = 0;
+                if (this.y < 0) this.y = h; if (this.y > h) this.y = 0;
                 if (this.age > this.life) this.reset();
             }
             getOpacity() {
                 const p = this.age / this.life;
-                return p < 0.15 ? this.baseOpacity * (p / 0.15) : 
-                       p > 0.80 ? this.baseOpacity * ((1 - p) / 0.20) : 
-                       this.baseOpacity;
+                return p < 0.15 ? this.baseOpacity * (p / 0.15) : p > 0.80 ? this.baseOpacity * ((1 - p) / 0.20) : this.baseOpacity;
             }
             draw() {
                 const o = this.getOpacity();
@@ -365,18 +174,14 @@
                 ctx.fillStyle = `hsl(${this.hue},75%,94%)`;
                 ctx.shadowBlur = 9;
                 ctx.shadowColor = `hsl(${this.hue},90%,78%)`;
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fill();
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
                 ctx.restore();
             }
         }
 
         function resize() {
-            w = window.innerWidth;
-            h = window.innerHeight;
-            canvas.width = w;
-            canvas.height = h;
+            w = window.innerWidth; h = window.innerHeight;
+            canvas.width = w; canvas.height = h;
         }
 
         function initParticles() {
@@ -387,57 +192,66 @@
 
         function animateParticles() {
             ctx.clearRect(0, 0, w, h);
-            for (let p of particles) {
-                p.update();
-                p.draw();
-            }
+            for (let p of particles) { p.update(); p.draw(); }
             requestAnimationFrame(animateParticles);
         }
 
-        // Iframe logic
+        // ==================== IFRAME LOGIC ====================
         const iframeContainer = document.getElementById('iframe-container');
-        const contentIframe = document.getElementById('content-iframe');
         const loading = document.getElementById('iframe-loading');
-        
+        let contentIframe = document.getElementById('content-iframe');
         let currentPage = null;
         let isHidden = false;
 
-        function openPage(page) {
-            // Reset hover states
-            document.querySelectorAll('.side-link').forEach(link => {
-                link.classList.remove('active');
-                // Force reflow om hover states te resetten
-                void link.offsetWidth;
-            });
+        function createNewIframe() {
+            const oldIframe = contentIframe;
+            if (oldIframe) {
+                oldIframe.src = 'about:blank'; // force unload
+                oldIframe.onload = null;
+            }
+            
+            const newIframe = document.createElement('iframe');
+            newIframe.id = 'content-iframe';
+            newIframe.style.width = '100%';
+            newIframe.style.height = '100%';
+            newIframe.style.border = 'none';
+            newIframe.style.background = 'var(--bg)';
+            newIframe.setAttribute('allowfullscreen', '');
+            
+            iframeContainer.appendChild(newIframe);
+            if (oldIframe) oldIframe.remove();
+            
+            contentIframe = newIframe;
+            return newIframe;
+        }
 
-            if (currentPage === page) {
-                if (isHidden) {
-                    showIframe();
-                } else {
-                    hideIframe();
-                }
+        function openPage(page) {
+            if (currentPage === page && !isHidden) {
+                hideIframe();
                 return;
             }
 
             currentPage = page;
             isHidden = false;
 
-            // Activeer juiste link
-            document.querySelectorAll('.side-link').forEach(link => {
-                if (link.dataset.page === page) {
-                    link.classList.add('active');
-                }
+            // Reset active states
+            document.querySelectorAll('.side-link').forEach(l => l.classList.remove('active'));
+            document.querySelectorAll('.side-link').forEach(l => {
+                if (l.dataset.page === page) l.classList.add('active');
             });
 
             iframeContainer.classList.add('active');
             loading.style.display = 'flex';
-            contentIframe.style.opacity = '0';
-            contentIframe.src = page;
 
-            contentIframe.onload = () => {
+            const iframe = createNewIframe();   // ← Belangrijk: nieuwe iframe elke keer
+
+            iframe.style.opacity = '0';
+            iframe.src = page;
+
+            iframe.onload = () => {
                 loading.style.display = 'none';
-                contentIframe.style.transition = 'opacity .45s ease';
-                contentIframe.style.opacity = '1';
+                iframe.style.transition = 'opacity .45s ease';
+                iframe.style.opacity = '1';
             };
         }
 
@@ -446,7 +260,7 @@
             iframeContainer.style.opacity = '0';
             setTimeout(() => {
                 iframeContainer.style.visibility = 'hidden';
-            }, 420);
+            }, 400);
         }
 
         function showIframe() {
@@ -459,22 +273,18 @@
             currentPage = null;
             isHidden = false;
             
-            // Verwijder alle active states
-            document.querySelectorAll('.side-link').forEach(link => {
-                link.classList.remove('active');
-            });
-
+            document.querySelectorAll('.side-link').forEach(l => l.classList.remove('active'));
+            
             iframeContainer.classList.remove('active');
             iframeContainer.style.opacity = '0';
-            
-            // Reset iframe volledig
+
             setTimeout(() => {
-                contentIframe.src = '';
-                contentIframe.style.opacity = '0';
+                createNewIframe(); // volledig resetten
+                iframeContainer.style.visibility = 'hidden';
             }, 450);
         }
 
-        // PostMessage support
+        // PostMessage
         window.addEventListener('message', (event) => {
             const data = event.data;
             if (data === 'HIDE_IFRAME' || data?.action === 'hide') hideIframe();
@@ -491,48 +301,33 @@
             });
         });
 
-        // Click outside iframe om te verbergen
         iframeContainer.addEventListener('click', e => {
             if (e.target === iframeContainer) hideIframe();
         });
 
-        // Escape key
         document.addEventListener('keydown', e => {
-            if (e.key === "Escape" && iframeContainer.classList.contains('active')) {
-                hideIframe();
-            }
+            if (e.key === "Escape" && iframeContainer.classList.contains('active')) hideIframe();
         });
 
-        // Random tagline
+        // Tagline + DateTime + Glow (onveranderd)
         function loadRandomTagline() {
             const taglineEl = document.getElementById('tagline');
             taglineEl.textContent = getRandomTagline();
-            setTimeout(() => {
-                taglineEl.classList.add('show');
-            }, 300);
+            setTimeout(() => taglineEl.classList.add('show'), 300);
         }
 
-        // Date & Time
         function updateDateTime() {
             const now = new Date();
             const hours = now.getHours() % 12 || 12;
             const min = now.getMinutes().toString().padStart(2, '0');
             const ampm = now.getHours() >= 12 ? 'PM' : 'AM';
-            
             document.getElementById('clock').textContent = `${hours}:${min} ${ampm}`;
-            document.getElementById('date').textContent = now.toLocaleDateString('en-US', {
-                weekday:'short', month:'short', day:'numeric'
-            }).toUpperCase();
+            document.getElementById('date').textContent = now.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'}).toUpperCase();
         }
 
-        // Mouse glow
         const glow = document.getElementById('mouse-glow');
         let tx = 0, ty = 0, cx = 0, cy = 0;
-
-        document.addEventListener('mousemove', e => {
-            tx = e.clientX;
-            ty = e.clientY;
-        }, {passive: true});
+        document.addEventListener('mousemove', e => { tx = e.clientX; ty = e.clientY; }, {passive:true});
 
         function animateGlow() {
             cx += (tx - cx) * 0.09;
@@ -548,7 +343,6 @@
             animateParticles();
             updateDateTime();
             setInterval(updateDateTime, 1000);
-            
             document.getElementById('header').classList.toggle('show', window.innerHeight > 620);
             loadRandomTagline();
             animateGlow();
