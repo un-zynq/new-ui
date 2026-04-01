@@ -1,11 +1,10 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title id="dynamic-title">HRN | Gaming Hub</title>
     <link rel="icon" id="dynamic-favicon" href="favicon.ico" type="image/x-icon">
-    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "e7ca3a68f0c04656baf422e837d316d4"}'></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -83,7 +82,7 @@
         </header>
 
         <main class="main">
-            <nav class="side-nav desktop-only" aria-label="Main navigation">
+            <nav class="side-nav desktop-only">
                 <a href="#" class="side-link" data-page="settings"><i data-lucide="settings"></i></a>
                 <a href="#" class="side-link" data-page="games"><i data-lucide="gamepad-2"></i></a>
                 <a href="#" class="side-link" data-page="bookmarklets"><i data-lucide="bookmark"></i></a>
@@ -96,7 +95,7 @@
                 <p class="tagline" id="tagline"></p>
             </div>
 
-            <nav class="side-nav mobile-nav" aria-label="Main navigation">
+            <nav class="side-nav mobile-nav">
                 <a href="#" class="side-link" data-page="settings"><i data-lucide="settings"></i></a>
                 <a href="#" class="side-link" data-page="games"><i data-lucide="gamepad-2"></i></a>
                 <a href="#" class="side-link" data-page="bookmarklets"><i data-lucide="bookmark"></i></a>
@@ -106,7 +105,6 @@
         </main>
     </div>
 
-    <!-- Iframe Container -->
     <div id="iframe-container">
         <div class="iframe-loading" id="iframe-loading">
             <div class="spinner"></div>
@@ -124,41 +122,49 @@
             "FOR THE REAL ONES","HIGH RISK. HIGH REWARD.","CLUTCH OR KICK","BUILT DIFFERENT"
         ];
 
-        // ================ GLOBAL SETTINGS ================
-        function loadGlobalSettings() {
-            // Background
+        let currentState = {
+            bgUrl: null,
+            tabTitle: null,
+            favicon: null,
+            particles: null
+        };
+
+        function syncSettings() {
             const bgUrl = localStorage.getItem('hrn_bg_url');
-            const ambient = document.getElementById('ambient-bg');
-            if (bgUrl) {
-                ambient.style.backgroundImage = `url('${bgUrl}')`;
-                ambient.style.opacity = '0.25';
+            const tabTitle = localStorage.getItem('hrn_tab_title');
+            const favicon = localStorage.getItem('hrn_favicon_url');
+            const particles = localStorage.getItem('hrn_particles') !== 'false';
+
+            if (bgUrl !== currentState.bgUrl) {
+                const ambient = document.getElementById('ambient-bg');
+                ambient.style.backgroundImage = bgUrl ? `url('${bgUrl}')` : '';
+                ambient.style.opacity = bgUrl ? '0.25' : '';
+                currentState.bgUrl = bgUrl;
             }
 
-            // Tab Title
-            const savedTitle = localStorage.getItem('hrn_tab_title');
-            if (savedTitle) document.getElementById('dynamic-title').textContent = savedTitle;
-
-            // Favicon
-            const savedFavicon = localStorage.getItem('hrn_favicon_url');
-            if (savedFavicon) changeFavicon(savedFavicon);
-
-            // Particles
-            const particlesEnabled = localStorage.getItem('hrn_particles') !== 'false';
-            if (!particlesEnabled) document.getElementById('particles').style.display = 'none';
-        }
-
-        function changeFavicon(url) {
-            let link = document.getElementById('dynamic-favicon');
-            if (!link) {
-                link = document.createElement('link');
-                link.id = 'dynamic-favicon';
-                link.rel = 'icon';
-                document.head.appendChild(link);
+            if (tabTitle !== currentState.tabTitle) {
+                document.getElementById('dynamic-title').textContent = tabTitle || 'HRN | Gaming Hub';
+                currentState.tabTitle = tabTitle;
             }
-            link.href = url;
+
+            if (favicon !== currentState.favicon) {
+                let link = document.getElementById('dynamic-favicon');
+                if (!link) {
+                    link = document.createElement('link');
+                    link.id = 'dynamic-favicon';
+                    link.rel = 'icon';
+                    document.head.appendChild(link);
+                }
+                link.href = favicon || 'favicon.ico';
+                currentState.favicon = favicon;
+            }
+
+            if (particles !== currentState.particles) {
+                document.getElementById('particles').style.display = particles ? 'block' : 'none';
+                currentState.particles = particles;
+            }
         }
 
-        // ================ PARTICLES ================
         const canvas = document.getElementById('particles');
         const ctx = canvas.getContext('2d');
         let particlesArray = [], w, h;
@@ -218,7 +224,6 @@
             requestAnimationFrame(animateParticles);
         }
 
-        // ================ IFRAME & NAVIGATION ================
         const iframeContainer = document.getElementById('iframe-container');
         const loading = document.getElementById('iframe-loading');
         const contentIframe = document.getElementById('content-iframe');
@@ -226,24 +231,21 @@
         let isHidden = false;
 
         function openPage(page) {
+            syncSettings();
             if (currentPage === page) {
                 if (isHidden) showIframe(); else hideIframe();
                 return;
             }
             currentPage = page;
             isHidden = false;
-
             document.querySelectorAll('.side-link').forEach(link => {
                 link.classList.toggle('active', link.dataset.page === page);
             });
-
             history.pushState({page: page}, '', '#' + page);
-
             iframeContainer.classList.add('active');
             loading.style.display = 'flex';
             contentIframe.style.opacity = '0';
             contentIframe.src = page + '.html';
-
             contentIframe.onload = () => {
                 loading.style.display = 'none';
                 contentIframe.style.transition = 'opacity .45s ease';
@@ -258,6 +260,7 @@
         }
 
         function showIframe() {
+            syncSettings();
             isHidden = false;
             iframeContainer.style.visibility = 'visible';
             iframeContainer.style.opacity = '1';
@@ -267,9 +270,9 @@
             const hash = window.location.hash.slice(1);
             const valid = ['settings','games','bookmarklets','about','add'];
             if (hash && valid.includes(hash)) openPage(hash);
+            else syncSettings();
         }
 
-        // ================ EVENT LISTENERS ================
         document.querySelectorAll('.side-link').forEach(link => {
             link.addEventListener('click', e => {
                 e.preventDefault();
@@ -286,30 +289,11 @@
         });
 
         window.addEventListener('popstate', handleHash);
+        window.addEventListener('focus', syncSettings);
 
-        // PostMessage van settings.html
         window.addEventListener('message', (event) => {
-            if (event.data?.type === 'updateSettings') {
-                if (event.data.bgUrl) {
-                    const ambient = document.getElementById('ambient-bg');
-                    ambient.style.backgroundImage = `url('${event.data.bgUrl}')`;
-                    ambient.style.opacity = '0.25';
-                }
-                if (event.data.tabTitle) {
-                    document.getElementById('dynamic-title').textContent = event.data.tabTitle;
-                }
-                if (event.data.favicon) {
-                    changeFavicon(event.data.favicon);
-                }
-            }
+            if (event.data?.type === 'updateSettings') syncSettings();
         });
-
-        // ================ INIT ================
-        function loadRandomTagline() {
-            const el = document.getElementById('tagline');
-            el.textContent = taglines[Math.floor(Math.random() * taglines.length)];
-            setTimeout(() => el.classList.add('show'), 300);
-        }
 
         function updateDateTime() {
             const now = new Date();
@@ -338,13 +322,15 @@
             resize();
             initParticles();
             animateParticles();
-            loadGlobalSettings();
+            syncSettings();
             updateDateTime();
             setInterval(updateDateTime, 1000);
             document.getElementById('header').classList.toggle('show', window.innerHeight > 620);
-            loadRandomTagline();
+            const el = document.getElementById('tagline');
+            el.textContent = taglines[Math.floor(Math.random() * taglines.length)];
+            setTimeout(() => el.classList.add('show'), 300);
             animateGlow();
-            handleHash();                    // Check hash bij openen
+            handleHash();
         });
 
         window.addEventListener('resize', resize);
