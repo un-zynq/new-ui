@@ -4,413 +4,425 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>HRN | Gaming Hub</title>
+    <!-- Cloudflare Web Analytics --><script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "e7ca3a68f0c04656baf422e837d316d4"}'></script><!-- End Cloudflare Web Analytics -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
-
-    <!-- Vanta.js NET -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.net.min.js"></script>
-
     <style>
-        :root {
-            --bg: #05070a;
-            --accent: #89b4fa;
-            --text-main: #f0f4ff;
-            --text-dim: rgba(255, 255, 255, 0.65);
-            --glass: rgba(255, 255, 255, 0.06);
-            --glass-border: rgba(255, 255, 255, 0.12);
+        :root{
+            --bg:#05070a;
+            --accent:#89b4fa;
+            --accent-glow:rgba(137,180,250,.18);
+            --text-main:#f0f4ff;
+            --text-dim:rgba(255,255,255,.58);
+            --glass:rgba(255,255,255,.035);
+            --glass-border:rgba(255,255,255,.09);
+            --transition:all .35s cubic-bezier(.23,1,.32,1)
+        }
+        *{margin:0;padding:0;box-sizing:border-box;scrollbar-width:none}
+        *::-webkit-scrollbar{display:none}
+        html,body{height:100dvh;width:100%;font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text-main);overflow:hidden;user-select:none}
+
+        .ambient-bg{position:fixed;inset:0;z-index:1;background:radial-gradient(circle at 40% 30%,rgba(137,180,250,.05) 0%,transparent 60%),#05070a}
+        .ambient-bg::before{content:'';position:absolute;inset:0;background:url('https://wallpapers.com/images/hd/dark-gaming-3475-x-1679-wallpaper-wjdfq8rsvh4lz1dt.jpg') center/cover no-repeat;opacity:.2;pointer-events:none}
+
+        .glow{position:fixed;width:460px;height:460px;background:radial-gradient(circle,var(--accent-glow) 0%,transparent 70%);border-radius:50%;pointer-events:none;z-index:2;opacity:.38;filter:blur(55px);mix-blend-mode:screen;display:none}
+        @media(hover:hover){.glow{display:block}}
+
+        #particles{position:fixed;inset:0;z-index:3;pointer-events:none}
+
+        .wrapper{display:flex;flex-direction:column;height:100dvh;padding:28px 36px;max-width:1680px;margin:0 auto;position:relative;z-index:10}
+        .header{display:flex;justify-content:center;z-index:50;opacity:0;transition:opacity .6s ease}
+        .header.show{opacity:1}
+
+        #status-pill{display:flex;align-items:center;gap:14px;background:var(--glass);padding:9px 24px;border-radius:9999px;border:1px solid var(--glass-border);backdrop-filter:blur(20px);font-size:.75rem;font-weight:500;letter-spacing:.12em;color:var(--text-dim);text-transform:uppercase;box-shadow:0 4px 15px rgba(0,0,0,.15)}
+
+        .main{display:flex;justify-content:space-between;align-items:center;flex-grow:1;position:relative;z-index:20}
+
+        .side-nav.desktop-only{display:flex;flex-direction:column;gap:16px;z-index:30;width:62px}
+        .side-nav.mobile-nav{display:none;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;max-width:280px;margin:0 auto;z-index:30}
+
+        .side-link{width:100%;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;color:var(--text-main);background:var(--glass);border:1px solid var(--glass-border);border-radius:15px;transition:var(--transition);text-decoration:none;box-shadow:0 4px 12px rgba(0,0,0,.1)}
+        .side-link:hover{background:rgba(137,180,250,.13);border-color:var(--accent);transform:translateY(-4px) scale(1.05);color:var(--accent)}
+        .side-link svg{width:22px;height:22px;stroke-width:2.1px}
+        .side-link.active{background:rgba(137,180,250,.18);border-color:var(--accent);color:var(--accent);box-shadow:0 0 20px rgba(137,180,250,.3)}
+
+        .center-brand{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center;display:flex;flex-direction:column;align-items:center;gap:18px;z-index:40}
+        .logo{font-size:clamp(4.2rem,14vw,10.5rem);font-weight:900;letter-spacing:-.07em;line-height:.82;background:linear-gradient(180deg,#f0f4ff 28%,#a8c4ff 72%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 20px 45px rgba(137,180,250,.35));opacity:.5;transition:opacity .6s ease}
+        .logo:hover{opacity:.56}
+
+        .tagline{
+            font-size:1.02rem;
+            font-weight:400;
+            letter-spacing:.15em;
+            color:var(--text-dim);
+            margin-top:-4px;
+            min-height:1.3em;
+            opacity:0;
+            transform:translateY(10px);
+            transition:all .6s cubic-bezier(.23,1,.32,1);
+        }
+        .tagline.show{
+            opacity:1;
+            transform:translateY(0);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        /* Iframe */
+        #iframe-container{
+            position:fixed;inset:0;z-index:100;background:var(--bg);opacity:0;visibility:hidden;
+            transition:opacity .4s cubic-bezier(.23,1,.32,1);display:none
         }
+        #iframe-container.active{opacity:1;visibility:visible;display:block}
 
-        html, body {
-            height: 100dvh;
-            width: 100%;
-            font-family: 'Inter', system-ui, sans-serif;
-            background: var(--bg);
-            color: var(--text-main);
-            overflow: hidden;
-            user-select: none;
-            touch-action: manipulation;
+        #content-iframe{width:100%;height:100%;border:none;background:var(--bg)}
+
+        .iframe-loading{
+            position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+            display:flex;flex-direction:column;align-items:center;gap:16px;color:var(--text-dim);z-index:110
         }
+        .spinner{width:42px;height:42px;border:3px solid rgba(137,180,250,.15);border-top-color:var(--accent);border-radius:50%;animation:spin .9s linear infinite}
+        @keyframes spin{to{transform:rotate(360deg)}}
+        .loading-text{font-size:.85rem;letter-spacing:.08em;font-weight:500}
 
-        /* Vanta Background */
-        #vanta-bg {
-            position: fixed;
-            inset: 0;
-            z-index: 1;
-        }
-
-        .ambient-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 2;
-            background: radial-gradient(circle at 50% 30%, rgba(137, 180, 250, 0.035) 0%, transparent 60%);
-            pointer-events: none;
-        }
-
-        /* Content Container */
-        .wrapper {
-            position: relative;
-            z-index: 10;
-            height: 100dvh;
-            width: 100%;
-            max-width: 1680px;
-            margin: 0 auto;
-            padding: 24px 20px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        /* Header */
-        .header {
-            text-align: center;
-            opacity: 0;
-            transition: opacity 0.5s ease;
-        }
-        .header.show { opacity: 1; }
-
-        #status-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 12px;
-            background: var(--glass);
-            padding: 8px 20px;
-            border-radius: 9999px;
-            border: 1px solid var(--glass-border);
-            backdrop-filter: blur(20px);
-            font-size: 0.78rem;
-            font-weight: 500;
-            letter-spacing: 0.08em;
-            color: var(--text-dim);
-        }
-
-        /* Main Content */
-        .main-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            gap: 20px;
-        }
-
-        .logo {
-            font-size: clamp(3.8rem, 15vw, 9.5rem);
-            font-weight: 900;
-            letter-spacing: -0.06em;
-            line-height: 0.85;
-            background: linear-gradient(180deg, #f0f4ff 25%, #a8c4ff 75%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 15px 40px rgba(137, 180, 250, 0.4));
-        }
-
-        .tagline {
-            font-size: 1.05rem;
-            font-weight: 400;
-            letter-spacing: 0.18em;
-            color: var(--text-dim);
-            margin-top: -8px;
-        }
-
-        /* Info Pills */
-        .info-pills {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            justify-content: center;
-            margin-top: 10px;
-        }
-
-        .info-pill {
-            background: var(--glass);
-            border: 1px solid var(--glass-border);
-            border-radius: 9999px;
-            padding: 9px 18px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: var(--text-dim);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            backdrop-filter: blur(16px);
-            transition: all 0.3s ease;
-            text-decoration: none;
-        }
-
-        .info-pill:hover {
-            border-color: var(--accent);
-            color: var(--text-main);
-            transform: translateY(-2px);
-        }
-
-        /* Discord Button */
-        .discord-pill {
-            margin-top: 12px;
-            display: inline-flex;
-            align-items: center;
-            gap: 12px;
-            padding: 14px 32px;
-            border-radius: 9999px;
-            border: 1px solid rgba(255,255,255,0.15);
-            background: var(--glass);
-            backdrop-filter: blur(18px);
-            font-weight: 600;
-            letter-spacing: 0.06em;
-            color: white;
-            text-decoration: none;
-            transition: all 0.35s ease;
-        }
-
-        .discord-pill:hover {
-            background: rgba(137, 180, 250, 0.15);
-            border-color: var(--accent);
-        }
-
-        .discord-pill svg {
-            width: 24px;
-            height: 24px;
-        }
-
-        /* Navigation */
-        .nav-container {
-            display: flex;
-            justify-content: center;
-            z-index: 20;
-        }
-
-        .side-nav {
-            display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            gap: 10px;
-            width: 100%;
-            max-width: 420px;
-        }
-
-        .side-link {
-            aspect-ratio: 1 / 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--glass);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            color: var(--text-main);
-            transition: all 0.35s cubic-bezier(0.23, 1, 0.32, 1);
-            text-decoration: none;
-        }
-
-        .side-link:hover {
-            background: rgba(137, 180, 250, 0.12);
-            border-color: var(--accent);
-            transform: translateY(-4px) scale(1.06);
-            color: var(--accent);
-        }
-
-        .side-link svg {
-            width: 24px;
-            height: 24px;
-            stroke-width: 2.2px;
-        }
-
-        /* Mouse Glow */
-        .glow {
-            position: fixed;
-            width: 420px;
-            height: 420px;
-            background: radial-gradient(circle, rgba(137, 180, 250, 0.12) 0%, transparent 70%);
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 3;
-            opacity: 0.25;
-            filter: blur(70px);
-            mix-blend-mode: screen;
-            display: none;
-        }
-
-        @media (hover: hover) {
-            .glow { display: block; }
-        }
-
-        /* Mobile Optimizations */
-        @media (max-width: 640px) {
-            .wrapper {
-                padding: 18px 16px;
-            }
-            .logo {
-                font-size: clamp(3.4rem, 18vw, 7.8rem);
-            }
-            .side-nav {
-                grid-template-columns: repeat(3, 1fr);
-                max-width: 320px;
-                gap: 9px;
-            }
-            .discord-pill {
-                padding: 13px 24px;
-                font-size: 0.9rem;
-            }
+        @media(max-width:768px){
+            .wrapper{padding:20px 16px}
+            .main{flex-direction:column;justify-content:center;gap:28px}
+            .center-brand{position:static;transform:none;order:1;gap:16px}
+            .logo{font-size:clamp(3.7rem,16.5vw,8.6rem);opacity:.68}
+            .side-nav.mobile-nav{display:grid!important;grid-template-columns:repeat(3,1fr);gap:9px;width:100%;max-width:255px;margin:0 auto;order:2}
+            .desktop-only{display:none!important}
         }
     </style>
 </head>
 <body>
-    <!-- Vanta Net Background -->
-    <div id="vanta-bg"></div>
-    <div class="ambient-overlay"></div>
+    <div class="ambient-bg"></div>
     <div class="glow" id="mouse-glow"></div>
+    <canvas id="particles"></canvas>
 
     <div class="wrapper">
-        <!-- Header -->
         <header class="header" id="header">
             <div id="status-pill">
                 <span id="date"></span>
-                <span style="opacity:0.4">•</span>
+                <div class="pill-sep" style="width:1px;height:12px;background:var(--glass-border)"></div>
                 <span id="clock"></span>
             </div>
         </header>
 
-        <!-- Center Content -->
-        <div class="main-content">
-            <h1 class="logo">HRN</h1>
-            <p class="tagline">ELITE GAMING COMMUNITY</p>
-
-            <div class="info-pills" id="info-pills"></div>
-
-            <a href="https://discord.gg/JAmeRKQzX" target="_blank" rel="noopener noreferrer" class="discord-pill">
-                <svg viewBox="0 0 127.14 96.36" aria-hidden="true">
-                    <path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.71,32.65-1.82,56.6.48,80.21h0A105.73,105.73,0,0,0,32.47,96.36,77.7,77.7,0,0,0,39.2,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.73,11.1,105.32,105.32,0,0,0,32.05-16.15h0C129.58,52.84,121,29.22,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5.07-12.73,11.41-12.73S54,46,53.86,53,48.74,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5.07-12.73,11.44-12.73S96.23,46,96.11,53,91,65.69,84.69,65.69Z"/>
-                </svg>
-                <span>JOIN DISCORD</span>
-            </a>
-        </div>
-
-        <!-- Navigation -->
-        <div class="nav-container">
-            <nav class="side-nav" aria-label="Main navigation">
-                <a href="#" class="side-link" aria-label="Play"><i data-lucide="play"></i></a>
-                <a href="#" class="side-link" aria-label="Community"><i data-lucide="users"></i></a>
-                <a href="#" class="side-link" aria-label="Tournaments"><i data-lucide="trophy"></i></a>
-                <a href="#" class="side-link" aria-label="Shop"><i data-lucide="shopping-cart"></i></a>
-                <a href="#" class="side-link" aria-label="Settings" onclick="toggleBG()"><i data-lucide="settings"></i></a>
-                <a href="#" class="side-link" aria-label="Profile"><i data-lucide="user"></i></a>
+        <main class="main">
+            <!-- Desktop Nav -->
+            <nav class="side-nav desktop-only" aria-label="Main navigation">
+                <a href="#" class="side-link" data-page="/settings" aria-label="Settings"><i data-lucide="settings"></i></a>
+                <a href="#" class="side-link" data-page="/games" aria-label="Games"><i data-lucide="gamepad-2"></i></a>
+                <a href="#" class="side-link" data-page="/bookmarklets" aria-label="Bookmarklets"><i data-lucide="bookmark"></i></a>
+                <a href="#" class="side-link" data-page="/about" aria-label="About"><i data-lucide="info"></i></a>
+                <a href="#" class="side-link" data-page="/add" aria-label="Add Game"><i data-lucide="plus"></i></a>
             </nav>
+
+            <!-- Center Brand -->
+            <div class="center-brand">
+                <h1 class="logo" aria-label="HRN Gaming Hub">HRN</h1>
+                <p class="tagline" id="tagline"></p>
+            </div>
+
+            <!-- Mobile Nav -->
+            <nav class="side-nav mobile-nav" aria-label="Main navigation">
+                <a href="#" class="side-link" data-page="/settings" aria-label="Settings"><i data-lucide="settings"></i></a>
+                <a href="#" class="side-link" data-page="/games" aria-label="Games"><i data-lucide="gamepad-2"></i></a>
+                <a href="#" class="side-link" data-page="/bookmarklets" aria-label="Bookmarklets"><i data-lucide="bookmark"></i></a>
+                <a href="#" class="side-link" data-page="/about" aria-label="About"><i data-lucide="info"></i></a>
+                <a href="#" class="side-link" data-page="/add" aria-label="Add Game"><i data-lucide="plus"></i></a>
+            </nav>
+        </main>
+    </div>
+
+    <!-- Iframe -->
+    <div id="iframe-container">
+        <div class="iframe-loading" id="iframe-loading">
+            <div class="spinner"></div>
+            <div class="loading-text">Loading...</div>
         </div>
+        <iframe id="content-iframe" src="" allowfullscreen></iframe>
     </div>
 
     <script>
         lucide.createIcons();
 
-        // Vanta NET
-        let vantaEffect;
-        function initVanta() {
-            vantaEffect = VANTA.NET({
-                el: "#vanta-bg",
-                mouseControls: true,
-                touchControls: true,
-                gyroControls: false,
-                minHeight: 200,
-                minWidth: 200,
-                scale: 1.0,
-                scaleMobile: 1.0,
-                color: 0x89b4fa,
-                backgroundColor: 0x05070a,
-                points: 10,
-                maxDistance: 20,
-                spacing: 15,
-                showDots: true
+const taglines = [
+    "ELITE GAMING COMMUNITY",
+    "528 GAMES. ONE PLATFORM.",
+    "PLAY ANYTHING. MASTER EVERYTHING.",
+    "WHERE LEGENDS ARE BORN",
+    "NO SKILL, NO ENTRY",
+    "LEVEL UP OR LOG OUT",
+    "FOR THE REAL ONES",
+    "HIGH RISK. HIGH REWARD.",
+    "CLUTCH OR KICK",
+    "BUILT DIFFERENT",
+    "WE DON'T CHASE. WE LEAD.",
+    "GGs ONLY",
+    "THE FINAL BOSS LOUNGE",
+    "NOT FOR CASUALS",
+    "ONE TAP AWAY FROM GREATNESS",
+    "ONLY THE STRONG REMAIN",
+    "SKILL OVER EVERYTHING",
+    "EARN YOUR SPOT",
+    "NO MERCY. NO EXCUSES.",
+    "PRECISION > LUCK",
+    "DOMINATE OR DISAPPEAR",
+    "WINNERS QUEUE ONLY",
+    "WE BREAK META",
+    "LEGACY IN PROGRESS",
+    "FEAR THE NAME",
+    "TOP FRAG OR TOP OUT",
+    "SWEAT MODE ACTIVATED",
+    "THIS IS WAR, NOT PLAY",
+    "AIM. FIRE. REPEAT.",
+    "OUTPLAY. OUTSMART. OUTLAST.",
+    "WE DON'T MISS",
+    "LOCKED IN. DIALED UP.",
+    "THE GRIND NEVER STOPS",
+    "BORN TO COMPETE",
+    "NO RNG HERE",
+    "SKILL CHECK INCOMING",
+    "PLAY LIKE YOU MEAN IT",
+    "ONLY HEADSHOTS MATTER",
+    "ELITE STATUS: UNLOCKED",
+    "RAISE YOUR KD OR LEAVE",
+    "WE SET THE STANDARD",
+    "HERE TO WIN. ALWAYS.",
+    "NEXT LEVEL IS DEFAULT",
+    "YOU EITHER CLUTCH OR WATCH",
+    "RESPECT IS EARNED IN-GAME",
+    "PRESS START TO PROVE YOURSELF",
+    "NO HANDOUTS. JUST SKILL.",
+    "TURNING PLAYERS INTO PROBLEMS",
+    "IF YOU KNOW, YOU KNOW",
+    "WE MAKE HIGHLIGHTS DAILY",
+    "ZERO TOLERANCE FOR WEAKNESS",
+    "GAME SENSE OVER NONSENSE",
+    "PERFORMANCE > PROMISES",
+    "WELCOME TO THE BIG LEAGUES",
+    "PLAYERS COME. LEGENDS STAY.",
+    "YOU'RE EITHER READY OR YOU'RE FOOD",
+    "THE DIFFERENCE IS DISCIPLINE",
+    "THIS IS WHERE SKILL PEAKS",
+    "YOUR RANK MEANS NOTHING HERE",
+    "ONLY RESULTS MATTER",
+    "SILENCE. FOCUS. EXECUTE.",
+    "NO SECOND CHANCES",
+    "EVERY GAME IS A STATEMENT",
+    "528 WORLDS TO CONQUER",
+    "ENDLESS GAMES. ZERO LIMITS.",
+    "FROM CASUAL TO CHAOS",
+    "ONE SITE. EVERY GAME.",
+    "ALL GENRES. ALL SKILL LEVELS.",
+    "DISCOVER. PLAY. DOMINATE.",
+    "YOUR NEXT ADDICTION STARTS HERE",
+    "NEW GAME. SAME DOMINATION.",
+    "CLICK. LOAD. TAKE OVER.",
+    "MORE GAMES THAN YOU CAN HANDLE",
+    "VARIETY MEETS SKILL",
+    "PLAY DIFFERENT EVERY DAY",
+    "NEVER RUN OUT OF GAMES",
+    "ONE PLATFORM. INFINITE GRIND",
+    "CHOOSE YOUR BATTLE",
+    "EVERY CLICK IS A NEW CHALLENGE",
+    "FROM ZERO TO HERO",
+    "STACK WINS ACROSS 528 GAMES",
+    "MASTER THEM ALL",
+    "NO BOREDOM ALLOWED",
+    "YOUR SKILL. YOUR PLAYGROUND",
+    "SWITCH GAMES. STAY ELITE",
+    "ALWAYS SOMETHING NEW",
+    "PLAY MORE. WIN MORE",
+    "ENTER. EXPLORE. DOMINATE."
+];
+
+        function getRandomTagline() {
+            return taglines[Math.floor(Math.random() * taglines.length)];
+        }
+
+        // Particles (same)
+        const canvas = document.getElementById('particles');
+        const ctx = canvas.getContext('2d');
+        let particles = [], w, h;
+
+        class Particle {
+            constructor() { this.reset(); }
+            reset() {
+                this.x = Math.random() * w; this.y = Math.random() * h;
+                this.size = Math.random() * 1.7 + 0.5;
+                this.speedX = Math.random() * 0.22 - 0.11;
+                this.speedY = Math.random() * 0.22 - 0.16;
+                this.hue = 212 + Math.random() * 28;
+                this.life = Math.random() * 8000 + 6000;
+                this.age = Math.random() * this.life;
+                this.baseOpacity = Math.random() * 0.28 + 0.12;
+            }
+            update() {
+                this.x += this.speedX; this.y += this.speedY; this.age += 16;
+                if (this.x < 0) this.x = w; if (this.x > w) this.x = 0;
+                if (this.y < 0) this.y = h; if (this.y > h) this.y = 0;
+                if (this.age > this.life) this.reset();
+            }
+            getOpacity() {
+                const p = this.age / this.life;
+                return p < 0.15 ? this.baseOpacity * (p / 0.15) : p > 0.80 ? this.baseOpacity * ((1 - p) / 0.20) : this.baseOpacity;
+            }
+            draw() {
+                const o = this.getOpacity();
+                if (o <= 0) return;
+                ctx.save();
+                ctx.globalAlpha = o;
+                ctx.fillStyle = `hsl(${this.hue},75%,94%)`;
+                ctx.shadowBlur = 9;
+                ctx.shadowColor = `hsl(${this.hue},90%,78%)`;
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        function resize() {
+            w = window.innerWidth; h = window.innerHeight;
+            canvas.width = w; canvas.height = h;
+        }
+
+        function initParticles() {
+            particles = [];
+            const count = Math.floor(Math.min(w * h / 13500, 85));
+            for (let i = 0; i < count; i++) particles.push(new Particle());
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, w, h);
+            for (let p of particles) { p.update(); p.draw(); }
+            requestAnimationFrame(animateParticles);
+        }
+
+        // Iframe logic (hide / close via postMessage)
+        const iframeContainer = document.getElementById('iframe-container');
+        const contentIframe = document.getElementById('content-iframe');
+        const loading = document.getElementById('iframe-loading');
+        let currentPage = null;
+        let isHidden = false;
+
+        function openPage(page) {
+            if (currentPage === page) {
+                if (!isHidden) hideIframe();
+                else showIframe();
+                return;
+            }
+
+            currentPage = page;
+            isHidden = false;
+
+            document.querySelectorAll('.side-link').forEach(l => {
+                l.classList.toggle('active', l.dataset.page === page);
             });
+
+            iframeContainer.classList.add('active');
+            loading.style.display = 'flex';
+            contentIframe.style.opacity = '0';
+            contentIframe.src = page;
+
+            contentIframe.onload = () => {
+                loading.style.display = 'none';
+                contentIframe.style.transition = 'opacity .45s ease';
+                contentIframe.style.opacity = '1';
+            };
         }
 
-        function toggleBG() {
-            document.body.classList.toggle('show-bg');
-            localStorage.setItem('bg-visible', document.body.classList.contains('show-bg'));
+        function hideIframe() {
+            isHidden = true;
+            iframeContainer.style.opacity = '0';
+            setTimeout(() => iframeContainer.style.visibility = 'hidden', 400);
         }
 
+        function showIframe() {
+            isHidden = false;
+            iframeContainer.style.visibility = 'visible';
+            iframeContainer.style.opacity = '1';
+        }
+
+        function closeIframe() {
+            currentPage = null;
+            isHidden = false;
+            document.querySelectorAll('.side-link').forEach(l => l.classList.remove('active'));
+            iframeContainer.classList.remove('active');
+            iframeContainer.style.opacity = '0';
+            setTimeout(() => contentIframe.src = '', 450);
+        }
+
+        // PostMessage support
+        window.addEventListener('message', (event) => {
+            const data = event.data;
+            if (data === 'HIDE_IFRAME' || data?.action === 'hide') hideIframe();
+            else if (data === 'CLOSE_IFRAME' || data?.action === 'close') closeIframe();
+            else if (data === 'SHOW_IFRAME' || data?.action === 'show') showIframe();
+        });
+
+        // Nav clicks
+        document.querySelectorAll('.side-link').forEach(link => {
+            link.addEventListener('click', e => {
+                e.preventDefault();
+                const page = link.dataset.page;
+                if (page) openPage(page);
+            });
+        });
+
+        iframeContainer.addEventListener('click', e => {
+            if (e.target === iframeContainer) hideIframe();
+        });
+
+        document.addEventListener('keydown', e => {
+            if (e.key === "Escape" && iframeContainer.classList.contains('active')) hideIframe();
+        });
+
+        // Random tagline with animation
+        function loadRandomTagline() {
+            const taglineEl = document.getElementById('tagline');
+            const randomText = getRandomTagline();
+            taglineEl.textContent = randomText;
+            
+            // Trigger fade-in animation
+            setTimeout(() => {
+                taglineEl.classList.add('show');
+            }, 300);
+        }
+
+        // Date & Time + Glow
         function updateDateTime() {
             const now = new Date();
             const hours = now.getHours() % 12 || 12;
             const min = now.getMinutes().toString().padStart(2, '0');
             const ampm = now.getHours() >= 12 ? 'PM' : 'AM';
-            const dateStr = now.toLocaleDateString('nl-NL', { weekday: 'short', month: 'short', day: 'numeric' }).toUpperCase();
-            
             document.getElementById('clock').textContent = `${hours}:${min} ${ampm}`;
-            document.getElementById('date').textContent = dateStr;
+            document.getElementById('date').textContent = now.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'}).toUpperCase();
         }
 
-        // Mouse glow
         const glow = document.getElementById('mouse-glow');
-        let targetX = 0, targetY = 0, currentX = 0, currentY = 0;
-
-        document.addEventListener('mousemove', (e) => {
-            targetX = e.clientX;
-            targetY = e.clientY;
-        }, { passive: true });
+        let tx = 0, ty = 0, cx = 0, cy = 0;
+        document.addEventListener('mousemove', e => { tx = e.clientX; ty = e.clientY; }, {passive:true});
 
         function animateGlow() {
-            currentX += (targetX - currentX) * 0.085;
-            currentY += (targetY - currentY) * 0.085;
-            glow.style.transform = `translate3d(${currentX}px, ${currentY}px, 0) translate(-50%, -50%)`;
+            cx += (tx - cx) * 0.09;
+            cy += (ty - cy) * 0.09;
+            glow.style.transform = `translate3d(${cx}px,${cy}px,0) translate(-50%,-50%)`;
             requestAnimationFrame(animateGlow);
         }
 
-        function checkHeaderVisibility() {
-            const header = document.getElementById('header');
-            header.classList.toggle('show', window.innerHeight > 580);
-        }
-
-        async function loadRandomGames() {
-            const container = document.getElementById('info-pills');
-            if (!container) return;
-
-            try {
-                const res = await fetch('https://un-zynq.github.io/games.json');
-                const data = await res.json();
-                let all = [];
-                Object.values(data).forEach(arr => { if (Array.isArray(arr)) all = all.concat(arr); });
-                const shuffled = all.sort(() => 0.5 - Math.random()).slice(0, 2);
-
-                container.innerHTML = `
-                    <a href="/game/${shuffled[0]}" class="info-pill">
-                        <i data-lucide="play-circle"></i>
-                        <span>${shuffled[0].replace(/-/g, ' ')}</span>
-                    </a>
-                    <a href="/unblocked/" class="info-pill">
-                        <i data-lucide="globe"></i>
-                        <span>Backup Sites</span>
-                    </a>
-                `;
-                lucide.createIcons();
-            } catch (e) {
-                container.innerHTML = `
-                    <a href="/game/2048" class="info-pill"><i data-lucide="play-circle"></i><span>2048</span></a>
-                    <a href="/unblocked/" class="info-pill"><i data-lucide="globe"></i><span>Backup Sites</span></a>
-                `;
-                lucide.createIcons();
-            }
-        }
-
-        // Initialize everything
+        // Init everything
         window.addEventListener('load', () => {
-            initVanta();
+            resize();
+            initParticles();
+            animateParticles();
             updateDateTime();
             setInterval(updateDateTime, 1000);
-            checkHeaderVisibility();
-            loadRandomGames();
+            document.getElementById('header').classList.toggle('show', window.innerHeight > 620);
+            loadRandomTagline();
             animateGlow();
         });
 
-        window.addEventListener('resize', checkHeaderVisibility);
-
-        // Cleanup
-        window.addEventListener('beforeunload', () => {
-            if (vantaEffect) vantaEffect.destroy();
-        });
+        window.addEventListener('resize', resize);
     </script>
 </body>
 </html>
