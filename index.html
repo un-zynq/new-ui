@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>HRN | Ultimate Gaming Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        :root {
+            --bg: #030508;
+            --accent: #89b4fa;
+            --accent-glow: rgba(137, 180, 250, 0.15);
+            --text-main: #f0f3f8;
+            --text-dim: rgba(240, 243, 248, 0.4);
+            --glass: rgba(255, 255, 255, 0.02);
+            --glass-border: rgba(255, 255, 255, 0.07);
+            --ease: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * {
+            margin: 0; padding: 0; box-sizing: border-box;
+            /* Systeemcursor verbergen voor de custom 32px cursor */
+            cursor: none !important;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body, html {
+            height: 100%; width: 100%;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            overflow: hidden;
+        }
+
+        /* De Custom Cursor - Nu op 32px */
+        #custom-cursor {
+            position: fixed;
+            width: 32px;
+            height: 32px;
+            background-image: url('https://cdn.jsdelivr.net/gh/un-zynq/new-ui/cursor.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            pointer-events: none;
+            z-index: 9999;
+            will-change: transform;
+            /* Geen translate(-50%) meer zodat de 'punt' van de cursor op de muis zit */
+            transform: translate3d(0, 0, 0); 
+            top: 0;
+            left: 0;
+        }
+
+        .ambient-bg {
+            position: fixed;
+            inset: 0;
+            background: 
+                radial-gradient(circle at 50% -20%, #161b2a 0%, transparent 50%),
+                radial-gradient(circle at 50% 120%, #0a0e14 0%, #030508 100%);
+            z-index: -2;
+        }
+
+        .glow {
+            position: absolute;
+            width: 35vw; height: 35vw;
+            background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            will-change: transform;
+            z-index: -1;
+        }
+
+        .wrapper {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            padding: clamp(20px, 5vh, 60px);
+            max-width: 1800px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .header { display: flex; justify-content: center; z-index: 10; }
+        
+        #clock {
+            background: var(--glass);
+            padding: 12px 28px;
+            border-radius: 100px;
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(12px);
+            font-size: 0.7rem;
+            letter-spacing: 0.2em;
+            color: var(--text-dim);
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .main {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex: 1;
+            width: 100%;
+            position: relative;
+        }
+
+        .side-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            z-index: 10;
+        }
+
+        .side-link {
+            width: 60px; height: 60px;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-dim);
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 18px;
+            transition: all 0.5s var(--ease);
+            text-decoration: none;
+            backdrop-filter: blur(8px);
+        }
+
+        .side-link:hover {
+            color: var(--accent);
+            background: rgba(137, 180, 250, 0.08);
+            border-color: var(--accent);
+            transform: scale(1.1);
+        }
+
+        .center-brand {
+            position: absolute;
+            left: 50%; top: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            pointer-events: none;
+        }
+
+        .logo {
+            font-size: clamp(5rem, 15vw, 12rem);
+            font-weight: 900;
+            letter-spacing: -0.06em;
+            background: linear-gradient(180deg, #ffffff 20%, rgba(137, 180, 250, 0.4) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            opacity: 0.85;
+        }
+
+        .discord-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 36px;
+            border-radius: 100px;
+            border: 1px solid rgba(255,255,255,0.1);
+            font-size: 0.75rem;
+            font-weight: 900;
+            background: var(--glass);
+            transition: all 0.4s var(--ease);
+            backdrop-filter: blur(15px);
+            text-decoration: none;
+            color: white;
+            pointer-events: auto;
+            margin-top: 20px;
+        }
+
+        .discord-pill:hover {
+            background: rgba(255, 255, 255, 0.07);
+            transform: translateY(-5px);
+        }
+
+        .footer { display: flex; justify-content: center; z-index: 10; }
+
+        .status-indicator { 
+            display: flex; align-items: center; gap: 10px; 
+            background: var(--glass);
+            padding: 6px 16px;
+            border-radius: 100px;
+            border: 1px solid var(--glass-border);
+            font-size: 0.65rem;
+            color: var(--text-dim);
+        }
+
+        .dot { 
+            width: 6px; height: 6px; 
+            background: #50fa7b; 
+            border-radius: 50%; 
+            box-shadow: 0 0 15px #50fa7b;
+        }
+
+        @media (max-width: 850px) {
+            #custom-cursor { display: none; }
+            * { cursor: auto !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="custom-cursor"></div>
+
+    <div class="ambient-bg"></div>
+    <div class="glow" id="mouse-glow"></div>
+
+    <div class="wrapper">
+        <header class="header">
+            <div id="clock">SYNCING...</div>
+        </header>
+
+        <main class="main">
+            <nav class="side-nav">
+                <a href="#" class="side-link"><i data-lucide="play"></i></a>
+                <a href="#" class="side-link"><i data-lucide="users"></i></a>
+                <a href="#" class="side-link"><i data-lucide="trophy"></i></a>
+            </nav>
+
+            <div class="center-brand">
+                <h1 class="logo">HRN</h1>
+                <a href="https://discord.gg/JAmeRKQzX" target="_blank" class="discord-pill">
+                    <i data-lucide="message-square"></i>
+                    <span>CONNECT DISCORD</span>
+                </a>
+            </div>
+
+            <nav class="side-nav desktop-only">
+                <a href="#" class="side-link"><i data-lucide="shopping-cart"></i></a>
+                <a href="#" class="side-link"><i data-lucide="settings"></i></a>
+                <a href="#" class="side-link"><i data-lucide="user"></i></a>
+            </nav>
+        </main>
+
+        <footer class="footer">
+            <div class="status-indicator">
+                <div class="dot"></div>
+                <span>SYSTEMS NOMINAL</span>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        const cursor = document.getElementById('custom-cursor');
+        const glow = document.getElementById('mouse-glow');
+        
+        let mX = 0, mY = 0;
+        let gloX = 0, gloY = 0;
+
+        window.addEventListener('mousemove', (e) => {
+            mX = e.clientX;
+            mY = e.clientY;
+        }, { passive: true });
+
+        function update() {
+            // Cursor: Exacte positie (geen vertraging voor UX)
+            cursor.style.transform = `translate3d(${mX}px, ${mY}px, 0)`;
+
+            // Glow: Smooth vertraging
+            gloX += (mX - gloX) * 0.08;
+            gloY += (mY - gloY) * 0.08;
+            glow.style.transform = `translate3d(${gloX}px, ${gloY}px, 0) translate3d(-50%, -50%, 0)`;
+
+            requestAnimationFrame(update);
+        }
+        update();
+
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('clock').textContent = now.toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' }) + " | " + now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            setTimeout(updateClock, 1000);
+        }
+        updateClock();
+    </script>
+</body>
+</html>
