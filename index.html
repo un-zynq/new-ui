@@ -25,17 +25,15 @@
         #loader { position: fixed; inset: 0; z-index: 10000; background: var(--bg); display: flex; align-items: center; justify-content: center; transition: opacity 0.5s ease; }
         .load-line { width: 190px; height: 1px; background: rgba(255,255,255,0.03); position: relative; overflow: hidden; }
         #progress { position: absolute; height: 100%; width: 0%; background: var(--accent); transition: width 0.5s ease; box-shadow: 0 0 20px var(--accent); }
-        .wrapper { position: relative; display: flex; flex-direction: column; height: 100dvh; width: 100%; z-index: 10; opacity: 0; transform: scale(1.02); transition: 1.5s cubic-bezier(0.16, 1, 0.3, 1); }
+        .wrapper { position: relative; display: flex; flex-direction: column; height: 100dvh; width: 100%; z-index: 10; opacity: 0; transform: scale(1.05); transition: 1.5s cubic-bezier(0.16, 1, 0.3, 1); }
         .wrapper.active { opacity: 1; transform: scale(1); }
-        .wrapper.no-anim { transition: none !important; opacity: 1 !important; transform: scale(1) !important; }
         .header { position: absolute; top: 38px; width: 100%; display: flex; justify-content: center; z-index: 100; }
         .status-pill { background: rgba(255,255,255,0.02); border: 1px solid var(--ui-border); padding: 11px 28px; border-radius: 100px; backdrop-filter: blur(20px); font-size: 9px; font-weight: 900; letter-spacing: 2.5px; display: flex; gap: 28px; transition: 0.6s ease; color: var(--ui-silver); }
         .brand { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); text-align: center; pointer-events: none; width: 100%; }
         .logo { font-size: clamp(5.5rem, 22vw, 11.5rem); font-weight: 900; letter-spacing: -0.06em; line-height: 0.75; background: linear-gradient(180deg, #fff 50%, var(--accent) 150%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; opacity: 0.5; transition: 0.8s; }
-        .tagline { font-size: 10px; font-weight: 600; letter-spacing: 9px; color: #fff; margin-top: 32px; opacity: 0; transform: translateY(12px); transition: 1.5s cubic-bezier(0.16, 1, 0.3, 1) 0.8s; text-shadow: 0 0 15px rgba(255,255,255,0.08); }
+        .tagline { font-size: 10px; font-weight: 600; letter-spacing: 9px; color: #fff; margin-top: 32px; opacity: 0; transform: translateY(20px); transition: 1.5s cubic-bezier(0.16, 1, 0.3, 1) 0.5s; text-shadow: 0 0 15px rgba(255,255,255,0.08); }
         .tagline.show { opacity: 0.7; transform: translateY(0); }
-        .tagline.no-anim { transition: none !important; opacity: 0.7 !important; transform: translateY(0) !important; }
-        .side-nav { position: absolute; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 25px; padding: 0 55px; z-index: 20; transition: 1.2s; }
+        .side-nav { position: absolute; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 25px; padding: 0 55px; z-index: 20; transition: 1.2s cubic-bezier(0.16, 1, 0.3, 1); }
         .nav-left { left: -150px; opacity: 0; }
         .nav-right { right: -150px; opacity: 0; }
         .wrapper.active .nav-left { left: 0; opacity: 1; }
@@ -45,9 +43,8 @@
         .btn svg { width: 23px; height: 23px; stroke-width: 1.8px; }
         .btn:hover, .btn.active { opacity: 1; color: #fff; border: 1px solid rgba(255, 255, 255, 0.35); background: rgba(255, 255, 255, 0.08); transform: scale(1.08) translateY(-3px); box-shadow: 0 12px 25px -10px rgba(255, 255, 255, 0.1); }
         @media (max-width: 900px) { .side-nav { display: none !important; } .mobile-nav { display: flex; } }
-        #container { position: fixed; inset: 0; z-index: 1000; background: var(--bg); display: none; opacity: 0; transition: opacity 0.4s ease; }
-        #container.active { display: block; opacity: 1; }
-        #container.no-anim { transition: none !important; display: block !important; opacity: 1 !important; }
+        #container { position: fixed; inset: 0; z-index: 1000; background: var(--bg); display: none; opacity: 0; transform: scale(1.05); transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+        #container.active { display: block; opacity: 1; transform: scale(1); }
         iframe { width: 100%; height: 100%; border: none; }
     </style>
 </head>
@@ -76,6 +73,7 @@
         </div>
     </div>
     <div id="container"><iframe id="frame"></iframe></div>
+
     <script id="vs" type="x-shader/x-vertex">
         attribute vec2 a_pos; attribute float a_size; attribute float a_op;
         uniform vec2 u_res; varying float v_op;
@@ -102,6 +100,7 @@
         const gl = canvas.getContext('webgl', { antialias: true, alpha: true });
         let cache = {}, particles = [], pAmount = 150, pEnabled = true;
         let program, posAttr, sizeAttr, opAttr, resUni, colUni;
+
         function createShader(gl, type, source) { const s = gl.createShader(type); gl.shaderSource(s, source); gl.compileShader(s); return s; }
         function initGL() {
             const vS = createShader(gl, gl.VERTEX_SHADER, $('vs').text);
@@ -111,6 +110,7 @@
             resUni = gl.getUniformLocation(program, "u_res"); colUni = gl.getUniformLocation(program, "u_color");
             gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
         }
+
         function sync() {
             const c = localStorage.getItem('hrn_clr') || "#89b4fa";
             const o = parseFloat(localStorage.getItem('hrn_op')) || 0.8;
@@ -127,6 +127,7 @@
             if(localStorage.getItem('hrn_bg')) { $('bg').style.backgroundImage = `url(${localStorage.getItem('hrn_bg')})`; $('bg').classList.add('loaded'); }
             if(localStorage.getItem('hrn_fav')) $('app-favicon').href = localStorage.getItem('hrn_fav');
         }
+
         function render() {
             if(!pEnabled) { gl.clear(gl.COLOR_BUFFER_BIT); requestAnimationFrame(render); return; }
             const posData = new Float32Array(pAmount * 2), sizeData = new Float32Array(pAmount), opData = new Float32Array(pAmount);
@@ -145,49 +146,75 @@
             gl.enableVertexAttribArray(opAttr); gl.vertexAttribPointer(opAttr, 1, gl.FLOAT, false, 0, 0);
             gl.drawArrays(gl.POINTS, 0, pAmount); requestAnimationFrame(render);
         }
+
         window.onresize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; gl.viewport(0,0,canvas.width,canvas.height); };
-        
+
         async function init() {
             window.onresize(); initGL(); sync();
-            const pages = ['settings', 'games', 'about', 'add']; let loaded = 0;
-            await Promise.all(pages.map(async p => { try { const r = await fetch(p+'.html'); cache[p] = await r.text(); } catch(e) { cache[p] = ''; } loaded++; $('progress').style.width = (loaded/pages.length*100)+'%'; }));
+            const pages = ['settings', 'games', 'about', 'add']; 
+            let loaded = 0;
+            await Promise.all(pages.map(async p => { 
+                try { 
+                    const r = await fetch(p+'.html'); 
+                    cache[p] = await r.text(); 
+                } catch(e) { 
+                    cache[p] = ''; 
+                } 
+                loaded++; 
+                $('progress').style.width = (loaded/pages.length*100)+'%'; 
+            }));
+            
             render();
             
-            const h = window.location.hash.slice(1);
-            if(h && cache[h]) {
-                $('ui').classList.add('no-anim');
-                $('tagline').classList.add('no-anim');
-                $('container').classList.add('no-anim');
-                $('frame').srcdoc = cache[h];
-                $('loader').style.display = 'none';
-            } else {
-                setTimeout(() => { 
-                    $('loader').style.opacity = '0'; 
-                    setTimeout(() => { 
-                        $('loader').style.display = 'none'; 
-                        $('ui').classList.add('active'); 
-                        $('tagline').classList.add('show'); 
-                    }, 500); 
-                }, 400);
-            }
+            setTimeout(() => {
+                $('loader').style.opacity = '0';
+                setTimeout(() => {
+                    $('loader').style.display = 'none';
+                    $('ui').classList.add('active');
+                    $('tagline').classList.add('show');
+                    checkHash();
+                }, 500);
+            }, 600);
         }
 
         function setHash(n) { window.location.hash = n; }
+
         function checkHash() {
-            const h = window.location.hash.slice(1); const container = $('container'), frame = $('frame');
-            if(h && cache[h]) { 
-                frame.srcdoc = cache[h]; 
-                container.style.display = 'block'; 
-                setTimeout(() => container.classList.add('active'), 25); 
-            } else { 
-                container.classList.remove('active'); 
-                container.classList.remove('no-anim');
-                setTimeout(() => { if(!window.location.hash) container.style.display = 'none'; }, 500); 
+            const h = window.location.hash.slice(1);
+            const container = $('container');
+            const frame = $('frame');
+
+            if(h && cache[h]) {
+                frame.srcdoc = cache[h];
+                container.style.display = 'block';
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        container.classList.add('active');
+                    });
+                });
+            } else {
+                container.classList.remove('active');
+                setTimeout(() => {
+                    if(!window.location.hash) {
+                        container.style.display = 'none';
+                        frame.srcdoc = '';
+                    }
+                }, 500);
             }
         }
+
         window.addEventListener('hashchange', checkHash);
-        window.addEventListener('message', e => { if(e.data === 'sync') sync(); if(e.data === 'close') setHash(''); });
-        setInterval(() => { const n = new Date(); $('clock').textContent = n.toTimeString().split(' ')[0]; $('date').textContent = n.toLocaleDateString('en-US', {weekday:'short', day:'numeric'}).toUpperCase(); }, 1000);
+        window.addEventListener('message', e => { 
+            if(e.data === 'sync') sync(); 
+            if(e.data === 'close') setHash(''); 
+        });
+
+        setInterval(() => { 
+            const n = new Date(); 
+            $('clock').textContent = n.toTimeString().split(' ')[0]; 
+            $('date').textContent = n.toLocaleDateString('en-US', {weekday:'short', day:'numeric'}).toUpperCase(); 
+        }, 1000);
+
         window.onload = init;
     </script>
 </body>
