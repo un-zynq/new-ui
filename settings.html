@@ -99,7 +99,7 @@
         .file-input-wrapper { position: relative; }
         .file-btn { 
             width: 100%; padding: 12px; background: rgba(255,255,255,0.04); border: 1px solid var(--ui-border);
-            border-radius: 12px; color: #fff; font-size: 9px; cursor: pointer; text-align: center;
+            border-radius: 12px; color: #fff; font-size: 10px; cursor: pointer; text-align: center;
         }
         #bg-file { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; }
 
@@ -116,8 +116,8 @@
 
         .preset-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
         .preset-btn {
-            padding: 8px; background: rgba(255,255,255,0.03); border: 1px solid var(--ui-border);
-            border-radius: 8px; color: #fff; font-size: 8px; cursor: pointer; transition: 0.2s;
+            padding: 10px; background: rgba(255,255,255,0.03); border: 1px solid var(--ui-border);
+            border-radius: 10px; color: #fff; font-size: 9px; cursor: pointer; transition: 0.2s;
         }
         .preset-btn:hover { background: rgba(255,255,255,0.08); border-color: var(--accent); }
 
@@ -129,7 +129,7 @@
     <div class="wrapper">
         <div class="pane">
             <div class="header">
-                <h2>SYSTEM ENGINE V3</h2>
+                <h2>CORE ENGINE V3</h2>
                 <div class="close-btn" onclick="window.parent.postMessage('close', '*')">
                     <i data-lucide="x"></i>
                 </div>
@@ -184,7 +184,7 @@
                         <input type="text" id="fav" placeholder="https://...">
                     </div>
                     <div class="group full">
-                        <label>Stealth Presets</label>
+                        <label>Identity Presets</label>
                         <div class="preset-grid" id="preset-container"></div>
                     </div>
                 </div>
@@ -200,7 +200,8 @@
             { name: "Google", title: "Google", fav: "https://www.google.com/favicon.ico" },
             { name: "Drive", title: "My Drive - Google Drive", fav: "https://ssl.gstatic.com/docs/doclist/images/drive_2022q3_32dp.png" },
             { name: "Classroom", title: "Classes", fav: "https://www.gstatic.com/classroom/favicon.png" },
-            { name: "Canvas", title: "Dashboard", fav: "https://du11hjcvhe07u.cloudfront.net/favicon.ico" }
+            { name: "Canvas", title: "Dashboard", fav: "https://du11hjcvhe07u.cloudfront.net/favicon.ico" },
+            { name: "Gmail", title: "Gmail", fav: "https://ssl.gstatic.com/ui/v1/icons/mail/images/favicon5.ico" }
         ];
 
         const fields = ['title', 'clr', 'op', 'int', 'fav'];
