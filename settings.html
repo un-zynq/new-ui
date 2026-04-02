@@ -11,57 +11,64 @@
         .ambient-bg{position:fixed;inset:0;z-index:1;background-size:cover;background-position:center;filter:brightness(0.5);transition:opacity 0.5s ease}
         .overlay-dim{position:fixed;inset:0;z-index:2;background:radial-gradient(circle at center,transparent,rgba(0,0,0,0.5))}
         
-        .core-pane{position:relative;z-index:10;width:92%;max-width:400px;max-height:85dvh;background:rgba(8,10,15,0.85);backdrop-filter:blur(30px) saturate(150%);-webkit-backdrop-filter:blur(30px) saturate(150%);border:1px solid var(--border);border-radius:20px;padding:24px;display:flex;flex-direction:column;gap:16px;box-shadow:0 40px 80px rgba(0,0,0,0.9);overflow-y:auto;scrollbar-width:none}
+        .core-pane{position:relative;z-index:10;width:92%;max-width:400px;max-height:85dvh;background:rgba(8,10,15,0.85);backdrop-filter:blur(30px) saturate(150%);-webkit-backdrop-filter:blur(30px) saturate(150%);border:1px solid var(--border);border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:14px;box-shadow:0 40px 80px rgba(0,0,0,0.9);overflow-y:auto;scrollbar-width:none}
         .core-pane::-webkit-scrollbar{display:none}
         
-        .nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+        .nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:2px}
         .nav h2{font-size:10px;font-weight:900;color:var(--accent);letter-spacing:3px}
-        .close-btn{cursor:pointer;font-size:16px;opacity:0.4;transition:0.2s}
-        .close-btn:hover{opacity:1}
+        .close-btn{cursor:pointer;font-size:18px;opacity:0.4;padding:5px}
         
         .row{width:100%}
-        label{font-size:8px;font-weight:800;opacity:0.4;display:block;margin-bottom:8px;letter-spacing:1px}
+        label{font-size:8px;font-weight:800;opacity:0.4;display:block;margin-bottom:6px;letter-spacing:1px}
         
-        input[type="text"],.btn-action{width:100%;background:var(--glass);border:1px solid var(--border);padding:12px;border-radius:8px;color:#fff;font-size:10px;font-weight:700;outline:none;transition:0.2s}
-        input[type="text"]:focus{border-color:var(--accent)}
+        input[type="text"],.btn-action{width:100%;background:var(--glass);border:1px solid var(--border);padding:12px;border-radius:8px;color:#fff;font-size:10px;font-weight:700;outline:none}
         
-        /* FIX: Toegevoegd min-width: 0 om grid blowout te voorkomen */
-        .flex-group{display:grid;grid-template-columns:1fr 1fr;gap:10px;min-width: 0;}
-        .group{min-width: 0;} 
+        /* Verbeterde Grid voor mobiel */
+        .flex-group{display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%;}
+        
+        @media (max-width: 360px) {
+            .flex-group { grid-template-columns: 1fr; } /* Zet alles onder elkaar op hele kleine schermen */
+        }
 
-        .btn-action{cursor:pointer;border:1px solid var(--border)}
+        .group{width: 100%; min-width: 0;} /* min-width: 0 is cruciaal voor sliders in grid */
+
+        .btn-action{cursor:pointer; transition: 0.2s;}
         .btn-reset{background:rgba(243,139,168,0.05);border-color:rgba(243,139,168,0.2);color:#f38ba8}
-        .btn-reset:hover{background:rgba(243,139,168,0.15)}
         
-        input[type="color"]{-webkit-appearance:none;border:1px solid var(--border);width:100%;height:38px;border-radius:8px;background:var(--glass);cursor:pointer}
+        input[type="color"]{-webkit-appearance:none;border:1px solid var(--border);width:100%;height:38px;border-radius:8px;background:var(--glass);cursor:pointer;padding:0}
+        input[type="color"]::-webkit-color-swatch-wrapper{padding:4px}
         input[type="color"]::-webkit-color-swatch{border:none;border-radius:4px}
         
-        /* FIX: Verbeterde slider box voor mobiel */
-        .slider-box{background:var(--glass);padding:12px;border-radius:8px;border:1px solid var(--border);display:flex;align-items:center;height:38px;overflow:hidden}
+        /* SLIDER FIX */
+        .slider-box{background:var(--glass);padding:0 12px;border-radius:8px;border:1px solid var(--border);display:flex;align-items:center;height:38px;width:100%;}
         
         input[type="range"]{
             -webkit-appearance:none;
-            width: 100%; /* Zorgt dat hij de box vult */
+            width: 100% !important;
             background: transparent;
-            cursor: pointer;
+            margin: 0;
         }
-        
-        /* De track van de slider */
+
+        input[type="range"]:focus { outline: none; }
+
+        /* Track styling */
         input[type="range"]::-webkit-slider-runnable-track {
             width: 100%;
             height: 2px;
             background: rgba(255,255,255,0.1);
+            border-radius: 2px;
         }
 
-        /* De knop van de slider */
-        input[type="range"]::-webkit-slider-thumb{
-            -webkit-appearance:none;
-            width:14px;
-            height:14px;
-            background:var(--accent);
-            border-radius:50%;
-            margin-top: -6px; /* Centreert de thumb op de track */
-            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        /* Thumb styling - groter voor Samsung/Touch */
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: var(--accent);
+            cursor: pointer;
+            margin-top: -7px; /* (track height / 2) - (thumb height / 2) */
+            box-shadow: 0 0 5px rgba(0,0,0,0.5);
         }
 
         .toggle-box{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--glass);border-radius:8px;border:1px solid var(--border);cursor:pointer}
@@ -69,8 +76,7 @@
         input:checked+.dot{background:var(--accent);box-shadow:0 0 10px var(--accent)}
         
         .chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
-        .chip{padding:8px 12px;background:var(--glass);border:1px solid var(--border);border-radius:6px;font-size:8px;font-weight:800;cursor:pointer;white-space:nowrap;transition:0.2s}
-        .chip:hover{border-color:var(--accent);color:var(--accent)}
+        .chip{padding:8px 12px;background:var(--glass);border:1px solid var(--border);border-radius:6px;font-size:8px;font-weight:800;cursor:pointer;white-space:nowrap}
         .hidden-file{display:none}
     </style>
 </head>
@@ -135,11 +141,11 @@
         <div class="row flex-group">
             <div class="group">
                 <label>TITLE</label>
-                <input type="text" id="title" placeholder="TAB NAME">
+                <input type="text" id="title" placeholder="TAB">
             </div>
             <div class="group">
                 <label>FAVICON</label>
-                <input type="text" id="fav" placeholder="ICON URL">
+                <input type="text" id="fav" placeholder="URL">
             </div>
         </div>
     </div>
@@ -152,32 +158,24 @@
             {n:"DEFAULT", t:"HRN | CORE", f:"/logo.svg"},
             {n:"GOOGLE", t:"Google", f:"https://google.com/favicon.ico"},
             {n:"DRIVE", t:"My Drive", f:"https://ssl.gstatic.com/docs/doclist/images/drive_2022q3_32dp.png"},
-            {n:"GMAIL", t:"Inbox", f:"https://ssl.gstatic.com/ui/v1/icons/mail/images/favicon5.ico"},
-            {n:"CLASSROOM", t:"Home - Classroom", f:"https://www.gstatic.com/classroom/favicon.png"}
+            {n:"GMAIL", t:"Inbox", f:"https://ssl.gstatic.com/ui/v1/icons/mail/images/favicon5.ico"}
         ];
 
         function updateBg(val) {
             const bgLayer = document.getElementById('bg-layer');
             if (!val || val.trim() === "") val = defaultBg;
-
-            const img = new Image();
-            img.onload = () => {
-                bgLayer.style.backgroundImage = `url('${val}')`;
-                localStorage.setItem('hrn_bg', val);
-                sync();
-            };
-            img.onerror = () => {
-                bgLayer.style.backgroundImage = `url('${defaultBg}')`;
-                localStorage.setItem('hrn_bg', defaultBg);
-                sync();
-            };
-            img.src = val;
+            bgLayer.style.backgroundImage = `url('${val}')`;
+            localStorage.setItem('hrn_bg', val);
+            sync();
         }
 
         function resetBg() {
             updateBg(defaultBg);
             document.getElementById('bg').value = "";
         }
+
+        const fields = ['title', 'clr', 'op', 'int', 'fav'];
+        const defaults = {title:'HRN | CORE', clr:'#89b4fa', op:0.8, int:1.1, fav:''};
 
         const resetAll = () => {
             fields.forEach(f => {
@@ -199,12 +197,6 @@
             fr.onload = () => updateBg(fr.result);
             fr.readAsDataURL(file);
         };
-
-        const bgInput = document.getElementById('bg');
-        bgInput.onchange = () => updateBg(bgInput.value.trim());
-
-        const fields = ['title', 'clr', 'op', 'int', 'fav'];
-        const defaults = {title:'HRN | CORE', clr:'#89b4fa', op:0.8, int:1.1, fav:''};
 
         fields.forEach(f => {
             const el = document.getElementById(f);
@@ -239,7 +231,6 @@
         });
 
         updateBg(localStorage.getItem('hrn_bg') || defaultBg);
-        if(localStorage.getItem('hrn_bg')?.startsWith('http')) bgInput.value = localStorage.getItem('hrn_bg');
     </script>
 </body>
 </html>
