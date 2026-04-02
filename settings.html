@@ -49,6 +49,14 @@
             <h2>SETTINGS</h2>
             <div class="close-btn" onclick="window.parent.postMessage('close','*')">×</div>
         </div>
+
+        <div class="row">
+            <div class="toggle-box" id="nav-toggle">
+                <label style="margin:0;opacity:1;cursor:pointer">SIDE NAVIGATION</label>
+                <div class="dot"></div>
+            </div>
+        </div>
+
         <div class="row flex-group">
             <div><label>ACCENT</label><input type="color" id="clr"></div>
             <div>
@@ -198,6 +206,19 @@
             };
         });
 
+        // Navigation Mode Toggle
+        const navBtn = document.getElementById('nav-toggle');
+        let useSideNav = localStorage.getItem('hrn_nav_mode') !== 'bottom';
+        if (useSideNav) navBtn.classList.add('active');
+
+        navBtn.onclick = () => {
+            useSideNav = !useSideNav;
+            navBtn.classList.toggle('active', useSideNav);
+            localStorage.setItem('hrn_nav_mode', useSideNav ? 'side' : 'bottom');
+            sync();
+        };
+
+        // Particles Toggle
         const partBtn = document.getElementById('part-toggle');
         let partActive = localStorage.getItem('hrn_part') !== 'false';
         if (partActive) partBtn.classList.add('active');
