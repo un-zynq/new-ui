@@ -3,72 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Settings - HRN</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root { --bg-black: #050608; --bg-dark-gray: #12141a; --border-gray: #2d333b; --text-silver: #9ca3af; --text-white: #ffffff; --accent-blue: #2563eb; --accent-blue-hover: #3b82f6; --success-green: #16a34a; }
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-track { background: var(--bg-black); }
-        ::-webkit-scrollbar-thumb { background: var(--border-gray); border-radius: 10px; }
-        body { margin: 0; padding: 0; font-family: 'Inter', sans-serif; background: var(--bg-black); color: var(--text-white); display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden; }
-        .settings-card { width: 100%; max-width: 580px; background: var(--bg-dark-gray); border: 1px solid var(--border-gray); border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
-        .header { padding: 32px 40px; border-bottom: 1px solid var(--border-gray); }
-        h1 { font-size: 1.4rem; font-weight: 700; margin: 0; }
-        .subtitle { color: var(--text-silver); font-size: 0.85rem; margin-top: 6px; }
-        .content { padding: 32px 40px; }
-        .form-group { margin-bottom: 24px; }
-        label { display: block; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: var(--text-silver); margin-bottom: 10px; }
-        input[type="text"], input[type="url"] { width: 100%; padding: 12px 14px; background: var(--bg-black); border: 1px solid var(--border-gray); border-radius: 8px; color: var(--text-white); outline: none; transition: 0.2s; }
-        input:focus { border-color: var(--accent-blue); box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15); }
-        .switch-row { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; }
-        .switch-title { font-size: 0.9rem; font-weight: 600; }
-        .switch { position: relative; width: 42px; height: 22px; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; inset: 0; background-color: #1f2937; transition: .2s; border-radius: 34px; }
-        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: var(--text-silver); transition: .2s; border-radius: 50%; }
-        input:checked + .slider { background-color: var(--accent-blue); }
-        input:checked + .slider:before { transform: translateX(20px); background-color: white; }
-        .footer { padding: 24px 40px; background: rgba(0,0,0,0.15); display: flex; justify-content: flex-end; border-top: 1px solid var(--border-gray); }
-        button { padding: 10px 28px; background: var(--accent-blue); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; }
-        button:hover { background: var(--accent-blue-hover); }
+        :root { --bg: #050608; --card: #12141a; --border: #2d333b; --text: #9ca3af; --accent: #2563eb; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .card { width: 100%; max-width: 500px; background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 32px; }
+        .group { margin-bottom: 20px; }
+        label { display: block; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text); margin-bottom: 8px; }
+        input, select { width: 100%; padding: 12px; background: #000; border: 1px solid var(--border); border-radius: 8px; color: white; outline: none; }
+        input[type="color"] { height: 45px; padding: 5px; cursor: pointer; }
+        .footer { margin-top: 32px; display: flex; justify-content: flex-end; }
+        button { padding: 12px 24px; background: var(--accent); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
     </style>
 </head>
 <body>
-    <div class="settings-card">
-        <div class="header"><h1>Settings</h1><p class="subtitle">Platform configuration</p></div>
-        <div class="content">
-            <div class="form-group"><label>Browser Tab Title</label><input type="text" id="tabTitle"></div>
-            <div class="form-group"><label>Background URL</label><input type="url" id="bgUrl"></div>
-            <div class="form-group"><label>Favicon URL</label><input type="url" id="faviconUrl"></div>
-            <div class="switch-row"><span>Visual Particles</span><label class="switch"><input type="checkbox" id="particlesToggle"><span class="slider"></span></label></div>
+    <div class="card">
+        <div class="group"><label>Tab Title</label><input type="text" id="tabTitle"></div>
+        <div class="group"><label>Background URL</label><input type="url" id="bgUrl"></div>
+        <div class="group"><label>Theme Color</label><input type="color" id="themeColor"></div>
+        <div class="group">
+            <label>Particles Amount</label>
+            <select id="particleAmount">
+                <option value="off">Disabled</option>
+                <option value="low">Low (40)</option>
+                <option value="mid">Medium (100)</option>
+                <option value="high">High (250)</option>
+            </select>
         </div>
-        <div class="footer"><button onclick="saveAndClose()">Apply & Close</button></div>
+        <div class="footer"><button onclick="save()">Save Changes</button></div>
     </div>
+
     <script>
-        function saveAndClose() {
-            const settings = {
-                bgUrl: document.getElementById('bgUrl').value.trim() || null,
-                tabTitle: document.getElementById('tabTitle').value.trim() || "HRN | Gaming Hub",
-                favicon: document.getElementById('faviconUrl').value.trim() || null,
-                particles: document.getElementById('particlesToggle').checked
-            };
+        function save() {
+            localStorage.setItem('hrn_tab_title', document.getElementById('tabTitle').value);
+            localStorage.setItem('hrn_bg_url', document.getElementById('bgUrl').value);
+            localStorage.setItem('hrn_theme_color', document.getElementById('themeColor').value);
+            localStorage.setItem('hrn_particle_amount', document.getElementById('particleAmount').value);
 
-            localStorage.setItem('hrn_bg_url', settings.bgUrl || "");
-            localStorage.setItem('hrn_tab_title', settings.tabTitle);
-            localStorage.setItem('hrn_favicon_url', settings.favicon || "");
-            localStorage.setItem('hrn_particles', settings.particles);
-
-            if (window.parent) {
-                window.parent.postMessage({ type: 'updateSettings' }, '*');
-                setTimeout(() => window.parent.postMessage({ type: 'closeIframe' }, '*'), 100);
-            }
+            window.parent.postMessage({ type: 'updateSettings' }, '*');
+            setTimeout(() => window.parent.postMessage({ type: 'closeIframe' }, '*'), 100);
         }
 
         window.onload = () => {
             document.getElementById('tabTitle').value = localStorage.getItem('hrn_tab_title') || "";
             document.getElementById('bgUrl').value = localStorage.getItem('hrn_bg_url') || "";
-            document.getElementById('faviconUrl').value = localStorage.getItem('hrn_favicon_url') || "";
-            document.getElementById('particlesToggle').checked = localStorage.getItem('hrn_particles') !== 'false';
+            document.getElementById('themeColor').value = localStorage.getItem('hrn_theme_color') || "#89b4fa";
+            document.getElementById('particleAmount').value = localStorage.getItem('hrn_particle_amount') || "mid";
         };
     </script>
 </body>
