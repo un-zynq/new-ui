@@ -3,146 +3,169 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        :root{--accent:#89b4fa;--bg:#030508;--glass:rgba(0,0,0,0.45);--border:rgba(255,255,255,0.15)}*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif}body{background:var(--bg);color:#fff;height:100dvh;display:flex;align-items:center;justify-content:center;text-transform:uppercase;letter-spacing:1px;overflow:hidden}.ambient-bg{position:fixed;inset:0;z-index:1;pointer-events:none;background-size:cover;background-position:center;opacity:1;filter:brightness(0.7);display:block}.overlay-dim{position:fixed;inset:0;z-index:1;background:rgba(0,0,0,0.3);pointer-events:none}.core-pane{position:relative;z-index:10;width:90%;max-width:400px;background:rgba(13,15,23,0.75);backdrop-filter:blur(30px) saturate(150%);-webkit-backdrop-filter:blur(30px) saturate(150%);border:1px solid var(--border);border-radius:30px;padding:30px;box-shadow:0 25px 50px -12px rgba(0,0,0,0.6)}.nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:25px}.nav h2{font-size:10px;font-weight:900;color:var(--accent);letter-spacing:3px}.close-btn{cursor:pointer;opacity:0.5;transition:0.2s}.close-btn:hover{opacity:1;transform:scale(1.1);color:var(--accent)}.row{margin-bottom:18px}label{font-size:7px;font-weight:800;opacity:0.6;display:block;margin-bottom:8px;letter-spacing:1.5px}input[type="text"],.btn-action{width:100%;background:var(--glass);border:1px solid var(--border);padding:12px;border-radius:12px;color:#fff;font-size:10px;outline:none}.flex-group{display:grid;grid-template-columns:1fr 1fr;gap:12px}input[type="color"]{-webkit-appearance:none;border:1px solid var(--border);width:100%;height:42px;border-radius:12px;background:var(--glass);cursor:pointer}input[type="color"]::-webkit-color-swatch{border:none;border-radius:8px}.slider-box{background:var(--glass);padding:12px;border-radius:12px;border:1px solid var(--border);display:flex;align-items:center;gap:10px}input[type="range"]{-webkit-appearance:none;flex:1;height:2px;background:rgba(255,255,255,0.1)}input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;background:var(--accent);border-radius:50%;cursor:pointer;box-shadow:0 0 8px var(--accent)}.toggle-box{display:flex;align-items:center;justify-content:space-between;padding:14px;background:var(--glass);border-radius:12px;border:1px solid var(--border)}.dot{width:10px;height:10px;border-radius:50%;background:#333;transition:0.3s}input:checked+.dot{background:var(--accent);box-shadow:0 0 10px var(--accent)}.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;scrollbar-width:none}.chips::-webkit-scrollbar{display:none}.chip{padding:8px 12px;background:var(--glass);border:1px solid var(--border);border-radius:10px;font-size:8px;font-weight:700;cursor:pointer;white-space:nowrap;transition:0.2s}.chip:hover{border-color:var(--accent);color:var(--accent);background:rgba(137,180,250,0.05)}.hidden-file{position:absolute;width:1px;height:1px;opacity:0}
+        :root{--accent:#89b4fa;--bg:#030508;--glass:rgba(255,255,255,0.03);--border:rgba(255,255,255,0.12)}*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',-apple-system,sans-serif}body{background:var(--bg);color:#fff;height:100dvh;display:flex;align-items:center;justify-content:center;text-transform:uppercase;letter-spacing:1px;overflow:hidden;touch-action:none}.ambient-bg{position:fixed;inset:0;z-index:1;background-size:cover;background-position:center;filter:brightness(0.5);transition:opacity 0.5s ease}.overlay-dim{position:fixed;inset:0;z-index:2;background:radial-gradient(circle at center,transparent,rgba(0,0,0,0.5))}.core-pane{position:relative;z-index:10;width:92%;max-width:400px;max-height:85dvh;background:rgba(8,10,15,0.85);backdrop-filter:blur(30px) saturate(150%);-webkit-backdrop-filter:blur(30px) saturate(150%);border:1px solid var(--border);border-radius:20px;padding:24px;display:flex;flex-direction:column;gap:16px;box-shadow:0 40px 80px rgba(0,0,0,0.9);overflow-y:auto;scrollbar-width:none}.core-pane::-webkit-scrollbar{display:none}.nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}.nav h2{font-size:10px;font-weight:900;color:var(--accent);letter-spacing:3px}.close-btn{cursor:pointer;font-size:16px;opacity:0.4;transition:0.2s}.close-btn:hover{opacity:1}.row{width:100%}label{font-size:8px;font-weight:800;opacity:0.4;display:block;margin-bottom:8px;letter-spacing:1px}input[type="text"],.btn-action{width:100%;background:var(--glass);border:1px solid var(--border);padding:12px;border-radius:8px;color:#fff;font-size:10px;font-weight:700;outline:none;transition:0.2s}input[type="text"]:focus{border-color:var(--accent)}.flex-group{display:grid;grid-template-columns:1fr 1fr;gap:10px}.btn-action{cursor:pointer;border:1px solid var(--border)}.btn-reset{background:rgba(243,139,168,0.05);border-color:rgba(243,139,168,0.2);color:#f38ba8}.btn-reset:hover{background:rgba(243,139,168,0.15)}input[type="color"]{-webkit-appearance:none;border:1px solid var(--border);width:100%;height:38px;border-radius:8px;background:var(--glass);cursor:pointer}input[type="color"]::-webkit-color-swatch{border:none;border-radius:4px}.slider-box{background:var(--glass);padding:12px;border-radius:8px;border:1px solid var(--border);display:flex;align-items:center}input[type="range"]{-webkit-appearance:none;flex:1;height:2px;background:rgba(255,255,255,0.1)}input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;background:var(--accent);border-radius:50%;cursor:pointer}.toggle-box{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--glass);border-radius:8px;border:1px solid var(--border);cursor:pointer}.dot{width:8px;height:8px;border-radius:50%;background:#222;transition:0.3s}input:checked+.dot{background:var(--accent);box-shadow:0 0 10px var(--accent)}.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}.chip{padding:8px 12px;background:var(--glass);border:1px solid var(--border);border-radius:6px;font-size:8px;font-weight:800;cursor:pointer;white-space:nowrap;transition:0.2s}.chip:hover{border-color:var(--accent);color:var(--accent)}.hidden-file{display:none}
     </style>
 </head>
 <body>
     <div class="ambient-bg" id="bg-layer"></div>
     <div class="overlay-dim"></div>
+
     <div class="core-pane">
         <div class="nav">
             <h2>SETTINGS</h2>
-            <div class="close-btn" onclick="window.parent.postMessage('close', '*')">
-                <i data-lucide="x" size="18"></i>
-            </div>
+            <div class="close-btn" onclick="window.parent.postMessage('close', '*')">×</div>
         </div>
+
         <div class="row">
             <div class="flex-group">
                 <div class="group">
-                    <label>Accent</label>
+                    <label>ACCENT</label>
                     <input type="color" id="clr">
                 </div>
                 <div class="group">
-                    <label>Wallpaper</label>
-                    <button class="btn-action" onclick="document.getElementById('bg-file').click()">Upload</button>
+                    <label>WALLPAPER</label>
+                    <button class="btn-action" onclick="document.getElementById('bg-file').click()">UPLOAD</button>
                     <input type="file" id="bg-file" class="hidden-file" accept="image/*">
                 </div>
             </div>
         </div>
+
         <div class="row">
-            <label>Remote Background URL</label>
-            <input type="text" id="bg" placeholder="Paste link here...">
+            <label>REMOTE URL</label>
+            <input type="text" id="bg" placeholder="PASTE IMAGE LINK...">
         </div>
+
+        <div class="row flex-group">
+            <button class="btn-action btn-reset" onclick="resetBg()">RESET BG</button>
+            <button class="btn-action btn-reset" onclick="resetAll()">PURGE ALL</button>
+        </div>
+
         <div class="row">
-            <div class="toggle-box" onclick="document.getElementById('part').click()" style="cursor:pointer">
-                <label style="margin:0; opacity:1">Particles</label>
+            <div class="toggle-box" onclick="document.getElementById('part').click()">
+                <label style="margin:0; opacity:1">PARTICLES</label>
                 <input type="checkbox" id="part" hidden>
                 <div class="dot"></div>
             </div>
         </div>
+
         <div class="row flex-group">
             <div class="group">
-                <label>Density</label>
+                <label>DENSITY</label>
                 <div class="slider-box"><input type="range" id="int" min="0.1" max="4.0" step="0.1"></div>
             </div>
             <div class="group">
-                <label>Opacity</label>
+                <label>OPACITY</label>
                 <div class="slider-box"><input type="range" id="op" min="0.1" max="1" step="0.05"></div>
             </div>
         </div>
+
         <div class="row">
-            <label>Identity Presets</label>
+            <label>PRESETS</label>
             <div class="chips" id="p-list"></div>
         </div>
+
         <div class="row flex-group">
             <div class="group">
-                <label>Tab Title</label>
-                <input type="text" id="title" placeholder="Title">
+                <label>TITLE</label>
+                <input type="text" id="title" placeholder="TAB NAME">
             </div>
             <div class="group">
-                <label>Favicon</label>
-                <input type="text" id="fav" placeholder="URL">
+                <label>FAVICON</label>
+                <input type="text" id="fav" placeholder="ICON URL">
             </div>
         </div>
     </div>
+
     <script>
-        lucide.createIcons();
         const sync = () => window.parent.postMessage('sync', '*');
-        const defaultBg = "https://img.freepik.com/free-vector/black-background-with-wavy-lines_52683-76524.jpg?semt=ais_incoming&w=740&q=80";
+        const defaultBg = "https://images.unsplash.com/photo-1614850523296-d8c1af93d400?q=80&w=2070";
+        
         const presets = [
-            {n:"Default",t:"HRN",f:"/logo.svg"},
-            {n:"Google",t:"Google",f:"https://google.cm/favicon.ico"},
-            {n:"Drive",t:"My Drive",f:"https://ssl.gstatic.com/docs/doclist/images/drive_2022q3_32dp.png"},
-            {n:"Mail",t:"Gmail",f:"https://ssl.gstatic.com/ui/v1/icons/mail/images/favicon5.ico"},
-            {n:"Classroom",t:"Home - Classroom",f:"https://www.gstatic.com/classroom/favicon.png"}
+            {n:"DEFAULT", t:"HRN | CORE", f:"/logo.svg"},
+            {n:"GOOGLE", t:"Google", f:"https://google.com/favicon.ico"},
+            {n:"DRIVE", t:"My Drive", f:"https://ssl.gstatic.com/docs/doclist/images/drive_2022q3_32dp.png"},
+            {n:"GMAIL", t:"Inbox", f:"https://ssl.gstatic.com/ui/v1/icons/mail/images/favicon5.ico"},
+            {n:"CLASSROOM", t:"Home - Classroom", f:"https://www.gstatic.com/classroom/favicon.png"}
         ];
-        presets.forEach(p => {
-            const c = document.createElement('div'); 
-            c.className = 'chip'; 
-            c.innerText = p.n;
-            c.onclick = () => { 
-                document.getElementById('title').value = p.t; 
-                document.getElementById('fav').value = p.f; 
-                localStorage.setItem('hrn_title', p.t); 
-                localStorage.setItem('hrn_fav', p.f); 
-                sync(); 
-            };
-            document.getElementById('p-list').appendChild(c);
-        });
+
         function updateBg(val) {
             const bgLayer = document.getElementById('bg-layer');
-            if (!val || val.trim() === "") {
-                localStorage.setItem('hrn_bg', defaultBg);
-                bgLayer.style.backgroundImage = `url(${defaultBg})`;
-                sync();
-                return;
-            }
+            const bgInput = document.getElementById('bg');
+            if (!val || val.trim() === "") val = defaultBg;
+
             const img = new Image();
             img.onload = () => {
+                bgLayer.style.backgroundImage = `url('${val}')`;
                 localStorage.setItem('hrn_bg', val);
-                bgLayer.style.backgroundImage = `url(${val})`;
                 sync();
             };
             img.onerror = () => {
-                bgLayer.style.backgroundImage = 'none';
-                localStorage.setItem('hrn_bg', 'none');
+                bgLayer.style.backgroundImage = `url('${defaultBg}')`;
+                localStorage.setItem('hrn_bg', defaultBg);
                 sync();
             };
             img.src = val;
         }
-        document.getElementById('bg-file').onchange = (e) => { 
-            if(!e.target.files[0]) return;
-            const fr = new FileReader(); 
-            fr.onload = () => updateBg(fr.result); 
-            fr.readAsDataURL(e.target.files[0]); 
+
+        function resetBg() {
+            updateBg(defaultBg);
+            document.getElementById('bg').value = "";
+        }
+
+        function resetAll() {
+            localStorage.clear();
+            location.reload();
+        }
+
+        document.getElementById('bg-file').onchange = (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const fr = new FileReader();
+            fr.onload = () => updateBg(fr.result);
+            fr.readAsDataURL(file);
         };
+
         const bgInput = document.getElementById('bg');
         bgInput.onchange = () => updateBg(bgInput.value.trim());
-        ['title', 'clr', 'op', 'int', 'fav'].forEach(f => {
-            const el = document.getElementById(f); 
-            const defs = {title:'HRN | CORE', clr:'#89b4fa', op:0.8, int:1.1, fav:''};
-            const saved = localStorage.getItem('hrn_'+f);
-            el.value = saved !== null ? saved : defs[f]; 
-            el.oninput = () => { 
-                localStorage.setItem('hrn_'+f, el.value); 
-                sync(); 
+
+        const fields = ['title', 'clr', 'op', 'int', 'fav'];
+        const defaults = {title:'HRN | CORE', clr:'#89b4fa', op:0.8, int:1.1, fav:''};
+
+        fields.forEach(f => {
+            const el = document.getElementById(f);
+            const saved = localStorage.getItem('hrn_' + f);
+            el.value = saved !== null ? saved : defaults[f];
+            el.oninput = () => {
+                localStorage.setItem('hrn_' + f, el.value);
+                sync();
             };
         });
-        const partCheck = document.getElementById('part'); 
+
+        const partCheck = document.getElementById('part');
         partCheck.checked = localStorage.getItem('hrn_part') !== 'false';
-        partCheck.onchange = () => { 
-            localStorage.setItem('hrn_part', partCheck.checked); 
-            sync(); 
+        partCheck.onchange = () => {
+            localStorage.setItem('hrn_part', partCheck.checked);
+            sync();
         };
-        const initialBg = localStorage.getItem('hrn_bg');
-        if (initialBg === 'none') {
-            document.getElementById('bg-layer').style.backgroundImage = 'none';
-        } else {
-            updateBg(initialBg || defaultBg);
-        }
-        if(initialBg && initialBg.startsWith('http')) bgInput.value = initialBg;
+
+        const list = document.getElementById('p-list');
+        presets.forEach(p => {
+            const c = document.createElement('div');
+            c.className = 'chip';
+            c.innerText = p.n;
+            c.onclick = () => {
+                document.getElementById('title').value = p.t;
+                document.getElementById('fav').value = p.f;
+                localStorage.setItem('hrn_title', p.t);
+                localStorage.setItem('hrn_fav', p.f);
+                sync();
+            };
+            list.appendChild(c);
+        });
+
+        updateBg(localStorage.getItem('hrn_bg') || defaultBg);
+        if(localStorage.getItem('hrn_bg')?.startsWith('http')) bgInput.value = localStorage.getItem('hrn_bg');
     </script>
 </body>
 </html>
