@@ -250,9 +250,7 @@
                 const request = indexedDB.open(DB_NAME, DB_VERSION);
                 request.onupgradeneeded = e => {
                     db = e.target.result;
-                    if (!db.objectStoreNames.contains('background')) {
-                        db.createObjectStore('background', { keyPath: 'id' });
-                    }
+                    if (!db.objectStoreNames.contains('background')) db.createObjectStore('background', { keyPath: 'id' });
                 };
                 request.onsuccess = e => { db = e.target.result; resolve(); };
                 request.onerror = () => resolve();
@@ -283,7 +281,6 @@
         async function updateBg(val) {
             const bgLayer = document.getElementById('bg-layer');
             let displayUrl = defaultBg;
-
             if (val instanceof Blob) {
                 await saveBackground(val);
                 displayUrl = URL.createObjectURL(val);
@@ -294,7 +291,6 @@
                 await saveBackground(defaultBg);
                 displayUrl = defaultBg;
             }
-
             bgLayer.style.backgroundImage = `url('${displayUrl}')`;
             sync();
         }
