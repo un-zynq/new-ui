@@ -19,36 +19,42 @@
             --border: rgba(255, 255, 255, 0.12);
             --logo-opacity: 0.8;
             --hover-opacity: 1.0;
-            /* De border op hover is 10% minder dan de icoon opacity */
             --hover-border-opacity: 0.9; 
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         html, body { height: 100%; width: 100%; background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; overflow: hidden; text-transform: uppercase; }
 
-        /* LOADER */
         #loader { position: fixed; inset: 0; z-index: 10000; background: var(--bg); display: flex; align-items: center; justify-content: center; transition: opacity 0.6s ease; }
         .load-line { width: 140px; height: 1px; background: rgba(255,255,255,0.08); position: relative; }
         #progress { position: absolute; height: 100%; width: 0%; background: var(--accent); transition: width 0.3s; box-shadow: 0 0 15px var(--accent); }
 
-        /* BG EFFECTS */
         .ambient-bg { position: fixed; inset: 0; z-index: 1; pointer-events: none; background-size: cover; background-position: center; opacity: 0; filter: brightness(0.4); transition: opacity 1.5s; }
         canvas { position: fixed; inset: 0; z-index: 2; pointer-events: none; display: block; }
         #mouse-glow { position: fixed; width: 500px; height: 500px; border-radius: 50%; pointer-events: none; z-index: 3; background: radial-gradient(circle, rgba(var(--accent-rgb), 0.1) 0%, transparent 70%); transform: translate(-50%, -50%); filter: blur(50px); }
 
-        /* UI */
         .wrapper { position: relative; display: flex; flex-direction: column; height: 100dvh; width: 100%; z-index: 10; opacity: 0; transition: opacity 0.8s ease; }
         .wrapper.active { opacity: 1; }
 
         .header { position: absolute; top: 40px; width: 100%; display: flex; justify-content: center; }
-        .status-pill { background: rgba(255,255,255,0.03); border: 1px solid var(--border); padding: 10px 25px; border-radius: 100px; backdrop-filter: blur(12px); font-size: 9px; font-weight: 900; letter-spacing: 2px; color: var(--text); display: flex; gap: 20px; }
+        
+        /* TIME & DATE DISPLAY - Nu beïnvloed door accent settings */
+        .status-pill { 
+            background: rgba(255,255,255,0.02); 
+            border: 1px solid var(--border); 
+            padding: 10px 25px; border-radius: 100px; 
+            backdrop-filter: blur(12px); 
+            font-size: 9px; font-weight: 900; letter-spacing: 2px; 
+            color: var(--text); 
+            display: flex; gap: 20px;
+            transition: border-color 0.4s ease, color 0.4s ease;
+        }
 
         .brand { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); text-align: center; pointer-events: none; display: flex; flex-direction: column; align-items: center; width: 100%; }
         .logo { font-size: clamp(5rem, 22vw, 13rem); font-weight: 900; letter-spacing: -0.07em; line-height: 0.8; background: linear-gradient(180deg, #fff 50%, var(--accent) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; opacity: var(--logo-opacity); transition: 0.4s ease; }
         .tagline { font-size: 10px; letter-spacing: 11px; color: var(--text); margin-top: 30px; opacity: 0; transform: translateY(15px); transition: 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.5s; font-weight: 500; }
         .tagline.show { opacity: calc(var(--logo-opacity) - 0.2); transform: translateY(0); }
 
-        /* NAV */
         .side-nav { position: absolute; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 25px; padding: 0 55px; z-index: 20; transition: 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s; }
         .nav-left { left: -100px; opacity: 0; }
         .nav-right { right: -100px; opacity: 0; }
@@ -66,7 +72,6 @@
             pointer-events: all; backdrop-filter: blur(8px); 
         }
 
-        /* HOVER LOGICA: Border is 10% minder opaque dan het icoon */
         .btn:hover, .btn.active { 
             opacity: var(--hover-opacity); 
             color: var(--accent); 
@@ -95,7 +100,10 @@
 
     <div class="wrapper" id="ui">
         <div class="header">
-            <div class="status-pill"><span id="date">SYNCING</span><span id="clock">00:00</span></div>
+            <div class="status-pill" id="status-pill">
+                <span id="date">SYNCING</span>
+                <span id="clock">00:00</span>
+            </div>
         </div>
 
         <div class="side-nav nav-left">
@@ -171,18 +179,23 @@
         function sync() {
             const c = localStorage.getItem('hrn_clr') || "#89b4fa";
             const o = parseFloat(localStorage.getItem('hrn_op')) || 0.8;
+            const rgb = hexToRgb(c);
             pEnabled = localStorage.getItem('hrn_part') !== 'false';
             pAmount = parseInt(localStorage.getItem('hrn_int')) || 50;
             
             document.documentElement.style.setProperty('--accent', c);
-            document.documentElement.style.setProperty('--accent-rgb', hexToRgb(c));
+            document.documentElement.style.setProperty('--accent-rgb', rgb);
             document.documentElement.style.setProperty('--logo-opacity', o);
             
             const hoverOp = Math.min(o + 0.2, 1.0);
             document.documentElement.style.setProperty('--hover-opacity', hoverOp);
-            // Border is 10% minder dan het icoon op hover
             document.documentElement.style.setProperty('--hover-border-opacity', Math.max(hoverOp - 0.1, 0.1));
             
+            // Sync status-pill met accent
+            const pill = $('status-pill');
+            pill.style.borderColor = `rgba(${rgb}, 0.2)`;
+            pill.style.color = `rgba(255, 255, 255, ${o})`;
+
             $('dynamic-title').textContent = localStorage.getItem('hrn_title') || "HRN | CORE";
             
             if(localStorage.getItem('hrn_bg')) { 
