@@ -1,83 +1,92 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SETTINGS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        :root { --accent: #89b4fa; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; text-transform: uppercase; }
-        body { background: #030508; color: white; display: flex; align-items: center; justify-content: center; height: 100vh; }
-        
-        .card { 
-            width: 340px; background: #0d1117; border: 1px solid #30363d; padding: 30px; border-radius: 24px; 
-            box-shadow: 0 25px 60px rgba(0,0,0,0.6); animation: slideUp 0.4s ease;
-        }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-        .item { margin-bottom: 20px; }
-        label { display: block; font-size: 9px; color: #8b949e; margin-bottom: 8px; letter-spacing: 2px; font-weight: 900; }
-        
-        input[type="text"], input[type="number"] { 
-            width: 100%; padding: 12px; background: #010409; border: 1px solid #30363d; color: white; 
-            border-radius: 10px; outline: none; font-size: 12px; transition: 0.2s;
-        }
-        input:focus { border-color: var(--accent); box-shadow: 0 0 10px -5px var(--accent); }
-        
-        input[type="color"] { width: 100%; height: 45px; border: none; background: none; cursor: pointer; border-radius: 10px; }
-
-        .btns { display: flex; gap: 12px; margin-top: 30px; }
-        button { 
-            flex: 1; padding: 14px; border: none; border-radius: 12px; cursor: pointer; 
-            font-weight: 900; font-size: 10px; letter-spacing: 1px; transition: 0.3s;
-        }
-        .save { background: var(--accent); color: #030508; }
-        .back { background: #21262d; color: white; }
-        button:hover { filter: brightness(1.1); transform: translateY(-2px); }
-        
-        .reset { background: none; color: #f85149; text-decoration: underline; font-size: 9px; width: 100%; margin-top: 20px; border: none; cursor: pointer; opacity: 0.5; transition: 0.2s; }
-        .reset:hover { opacity: 1; }
+        :root { --bg: #030508; --accent: #89b4fa; --text: #f0f4ff; --panel: rgba(255, 255, 255, 0.03); --border: rgba(255, 255, 255, 0.1); }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; padding: 40px 20px; text-transform: uppercase; overflow-x: hidden; }
+        .container { max-width: 600px; margin: 0 auto; animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        h1 { font-size: 12px; letter-spacing: 5px; font-weight: 900; color: var(--accent); }
+        .close-btn { background: var(--panel); border: 1px solid var(--border); color: var(--text); padding: 10px 20px; border-radius: 12px; cursor: pointer; font-size: 9px; font-weight: 900; letter-spacing: 2px; transition: 0.3s; }
+        .close-btn:hover { background: rgba(255,255,255,0.1); border-color: var(--accent); }
+        .group { background: var(--panel); border: 1px solid var(--border); border-radius: 20px; padding: 25px; margin-bottom: 20px; backdrop-filter: blur(10px); }
+        .label { font-size: 9px; font-weight: 600; letter-spacing: 2px; color: rgba(255,255,255,0.4); margin-bottom: 15px; display: block; }
+        input[type="text"] { width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border); padding: 15px; border-radius: 12px; color: white; font-family: inherit; font-size: 11px; letter-spacing: 1px; outline: none; transition: 0.3s; }
+        input[type="text"]:focus { border-color: var(--accent); }
+        .flex-row { display: flex; gap: 15px; align-items: center; }
+        input[type="color"] { -webkit-appearance: none; border: none; width: 50px; height: 50px; border-radius: 12px; background: none; cursor: pointer; }
+        input[type="color"]::-webkit-color-swatch { border: 2px solid var(--border); border-radius: 12px; }
+        input[type="range"] { flex: 1; accent-color: var(--accent); cursor: pointer; }
+        .btn-save { width: 100%; background: var(--accent); color: #000; border: none; padding: 18px; border-radius: 15px; font-weight: 900; font-size: 11px; letter-spacing: 3px; cursor: pointer; margin-top: 20px; transition: 0.3s; }
+        .btn-save:hover { transform: translateY(-2px); opacity: 0.9; }
+        .hint { font-size: 8px; color: rgba(255,255,255,0.2); margin-top: 10px; line-height: 1.5; }
     </style>
 </head>
 <body>
-    <div class="card">
-        <div class="item"><label>Hub Title</label><input id="t" type="text" placeholder="HRN | CORE"></div>
-        <div class="item"><label>Background URL</label><input id="bg" type="text" placeholder="https://..."></div>
-        <div class="item"><label>Logo Opacity (0.2-1.0)</label><input id="op" type="number" step="0.1" min="0.2" max="1"></div>
-        <div class="item"><label>Accent Color</label><input id="clr" type="color"></div>
-        
-        <div class="btns">
-            <button class="back" onclick="window.parent.postMessage('close','*')">Cancel</button>
-            <button class="save" onclick="save()">Apply</button>
-        </div>
-        <button class="reset" onclick="reset()">Factory Reset</button>
+
+<div class="container">
+    <header>
+        <h1><i data-lucide="sliders-horizontal" style="width:14px; vertical-align:middle; margin-right:10px"></i> Core Settings</h1>
+        <button class="close-btn" onclick="window.parent.postMessage('close', '*')">EXIT</button>
+    </header>
+
+    <div class="group">
+        <span class="label">System Identity</span>
+        <input type="text" id="sys-title" placeholder="HRN | CORE" style="margin-bottom: 10px;">
+        <input type="text" id="sys-fav" placeholder="Favicon URL (png/ico)">
+        <p class="hint">Title and Tab Icon. Use a direct image link for the favicon.</p>
     </div>
 
-    <script>
-        const s = localStorage;
-        const $ = id => document.getElementById(id);
+    <div class="group">
+        <span class="label">Visuals</span>
+        <div class="flex-row">
+            <input type="color" id="sys-color" value="#89b4fa">
+            <input type="range" id="sys-opacity" min="0.1" max="1" step="0.1" value="0.8">
+        </div>
+    </div>
 
-        window.onload = () => {
-            $('t').value = s.getItem('hrn_title') || "";
-            $('bg').value = s.getItem('hrn_bg') || "";
-            $('op').value = s.getItem('hrn_op') || "0.5";
-            $('clr').value = s.getItem('hrn_clr') || "#89b4fa";
-            document.documentElement.style.setProperty('--accent', $('clr').value);
-        };
+    <div class="group">
+        <span class="label">Wallpaper URL</span>
+        <input type="text" id="sys-bg" placeholder="https://image-url.com/wallpaper.jpg">
+    </div>
 
-        function save() {
-            s.setItem('hrn_title', $('t').value);
-            s.setItem('hrn_bg', $('bg').value);
-            s.setItem('hrn_op', $('op').value);
-            s.setItem('hrn_clr', $('clr').value);
-            window.parent.postMessage('sync', '*');
-            window.parent.postMessage('close', '*');
-        }
+    <button class="btn-save" onclick="saveSettings()">Apply Changes</button>
+</div>
 
-        function reset() {
-            if(confirm("Wipe all system data?")) {
-                s.clear();
-                window.parent.postMessage('sync', '*');
-                window.parent.postMessage('close', '*');
-            }
-        }
-    </script>
+<script>
+    lucide.createIcons();
+
+    window.onload = () => {
+        document.getElementById('sys-title').value = localStorage.getItem('hrn_title') || "HRN | CORE";
+        document.getElementById('sys-fav').value = localStorage.getItem('hrn_fav') || "";
+        document.getElementById('sys-color').value = localStorage.getItem('hrn_clr') || "#89b4fa";
+        document.getElementById('sys-opacity').value = localStorage.getItem('hrn_op') || "0.8";
+        document.getElementById('sys-bg').value = localStorage.getItem('hrn_bg') || "";
+        document.documentElement.style.setProperty('--accent', localStorage.getItem('hrn_clr') || "#89b4fa");
+    };
+
+    function saveSettings() {
+        localStorage.setItem('hrn_title', document.getElementById('sys-title').value);
+        localStorage.setItem('hrn_fav', document.getElementById('sys-fav').value);
+        localStorage.setItem('hrn_clr', document.getElementById('sys-color').value);
+        localStorage.setItem('hrn_op', document.getElementById('sys-opacity').value);
+        localStorage.setItem('hrn_bg', document.getElementById('sys-bg').value);
+
+        window.parent.postMessage('sync', '*');
+        
+        const btn = document.querySelector('.btn-save');
+        btn.textContent = "SYSTEM UPDATED";
+        setTimeout(() => btn.textContent = "Apply Changes", 2000);
+    }
+</script>
 </body>
 </html>
