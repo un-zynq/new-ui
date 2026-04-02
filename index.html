@@ -3,254 +3,169 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title id="dynamic-title">HRN | Gaming Hub</title>
-    <link rel="icon" id="dynamic-favicon" href="/logo.svg" type="image/x-icon">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+    <title id="dynamic-title">HRN</title>
+    <link rel="icon" id="dynamic-favicon" href="/logo.svg">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
             --bg: #030508;
             --accent: #89b4fa;
-            --accent-glow: rgba(137, 180, 250, 0.15);
-            --text-main: #f0f4ff;
-            --text-dim: rgba(255, 255, 255, 0.4);
-            --glass-border: rgba(255, 255, 255, 0.08);
-            --transition: all .25s cubic-bezier(.23, 1, .32, 1);
+            --text: #f0f4ff;
+            --dim: rgba(255, 255, 255, 0.4);
+            --border: rgba(255, 255, 255, 0.08);
             --logo-opacity: 0.5;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
-        html, body { height: 100dvh; width: 100%; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text-main); overflow: hidden; user-select: none; }
-        
-        /* Preloader */
-        #loader-wrapper {
+        /* Global Reset - No more margin/padding bugs */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+        html, body { height: 100dvh; width: 100%; background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; overflow: hidden; }
+
+        /* Ultra Minimal Loader */
+        #loader {
             position: fixed; inset: 0; z-index: 9999; background: var(--bg);
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            transition: opacity 0.6s ease, visibility 0.6s;
+            display: flex; align-items: center; justify-content: center;
+            transition: opacity 0.4s ease, visibility 0.4s;
         }
-        .loader-content { width: 220px; text-align: center; }
-        .loader-bar-bg { width: 100%; height: 2px; background: rgba(255,255,255,0.03); border-radius: 10px; overflow: hidden; margin-top: 25px; }
-        #loader-progress { width: 0%; height: 100%; background: var(--accent); transition: width 0.4s ease; box-shadow: 0 0 20px var(--accent); }
-        .loader-title { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 5px; color: var(--text-main); font-weight: 900; margin-bottom: 4px; }
-        .loader-sub { font-size: 0.55rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-dim); font-weight: 500; }
+        .load-line { width: 120px; height: 1px; background: rgba(255,255,255,0.1); position: relative; overflow: hidden; }
+        #progress { position: absolute; height: 100%; width: 0%; background: var(--accent); transition: width 0.3s ease; box-shadow: 0 0 10px var(--accent); }
 
-        /* Main UI hidden initially */
-        .wrapper { display: flex; flex-direction: column; height: 100dvh; padding: 25px; max-width: 1600px; margin: 0 auto; position: relative; z-index: 10; opacity: 0; transform: scale(1.02); transition: opacity 1s ease, transform 1s ease; }
-        .wrapper.ready { opacity: 1; transform: scale(1); }
+        /* Layout */
+        .wrapper { 
+            display: flex; flex-direction: column; height: 100%; padding: 30px; 
+            opacity: 0; transform: translateY(10px); transition: all 0.8s ease; 
+        }
+        .wrapper.ready { opacity: 1; transform: translateY(0); }
 
-        .ambient-bg { position: fixed; inset: 0; z-index: 1; background-size: cover; background-position: center; opacity: 0; transition: opacity .8s ease; pointer-events: none; filter: brightness(0.5); }
-        #particles { position: fixed; inset: 0; z-index: 3; pointer-events: none; }
-        .glow { position: fixed; width: 600px; height: 600px; background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%); border-radius: 50%; pointer-events: none; z-index: 4; opacity: 0.4; filter: blur(80px); mix-blend-mode: screen; transform: translate(-50%, -50%); }
-
-        .header { display: flex; justify-content: center; z-index: 50; margin-bottom: 20px; }
-        #status-pill { display: flex; align-items: center; gap: 14px; background: rgba(255,255,255,0.02); padding: 10px 22px; border-radius: 99px; border: 1px solid var(--glass-border); backdrop-filter: blur(20px); font-size: .7rem; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
+        .ambient-bg { position: fixed; inset: 0; z-index: 1; background: center/cover no-repeat; opacity: 0; transition: opacity 1s; pointer-events: none; filter: brightness(0.4); }
+        canvas { position: fixed; inset: 0; z-index: 2; pointer-events: none; }
         
-        .main { display: flex; justify-content: space-between; align-items: center; flex-grow: 1; position: relative; z-index: 20; }
-        .side-nav { display: flex; flex-direction: column; gap: 15px; z-index: 30; }
-        .side-link { width: 58px; aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; color: var(--text-dim); background: rgba(255, 255, 255, 0.02); border: 1px solid var(--glass-border); border-radius: 18px; transition: var(--transition); cursor: pointer; position: relative; backdrop-filter: blur(10px); }
-        .side-link:hover, .side-link.active { color: var(--accent); border-color: rgba(255,255,255,0.12); background: rgba(255,255,255,0.05); transform: translateY(-2px); }
-        .side-link.active::after { content: ''; position: absolute; left: -12px; width: 3px; height: 18px; background: var(--accent); border-radius: 10px; box-shadow: 0 0 10px var(--accent); }
-        
-        .center-brand { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px; }
-        .logo { font-size: clamp(4.5rem, 18vw, 11rem); font-weight: 900; letter-spacing: -.05em; line-height: .8; background: linear-gradient(180deg, #fff 40%, var(--accent) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 15px 30px rgba(0,0,0,0.5)); opacity: var(--logo-opacity); transition: opacity 0.4s ease; }
+        .header { display: flex; justify-content: center; margin-bottom: auto; z-index: 10; }
+        .pill { background: rgba(255,255,255,0.03); border: 1px solid var(--border); padding: 8px 20px; border-radius: 100px; backdrop-filter: blur(10px); font-size: 11px; font-weight: 600; letter-spacing: 1px; color: var(--dim); display: flex; gap: 15px; }
+
+        .main { display: flex; align-items: center; justify-content: space-between; margin: auto 0; z-index: 10; }
+        .side-nav { display: flex; flex-direction: column; gap: 12px; }
+        .btn { 
+            width: 54px; height: 54px; border-radius: 16px; background: rgba(255,255,255,0.02); 
+            border: 1px solid var(--border); color: var(--dim); display: flex; align-items: center; 
+            justify-content: center; cursor: pointer; transition: all 0.2s; backdrop-filter: blur(10px);
+        }
+        .btn:hover, .btn.active { color: var(--accent); border-color: rgba(255,255,255,0.15); background: rgba(255,255,255,0.05); transform: scale(1.05); }
+
+        .brand { text-align: center; }
+        .logo { 
+            font-size: clamp(5rem, 20vw, 12rem); font-weight: 900; letter-spacing: -0.06em; line-height: 0.8;
+            background: linear-gradient(180deg, #fff 30%, var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            opacity: var(--logo-opacity); transition: opacity 0.3s ease; cursor: default;
+        }
         .logo:hover { opacity: calc(var(--logo-opacity) + 0.15); }
-        
-        .tagline { font-size: 0.9rem; letter-spacing: 6px; color: var(--text-dim); text-transform: uppercase; opacity: 0; transform: translateY(15px); transition: opacity 1.2s ease, transform 1.2s ease; }
-        .tagline.show { opacity: 1; transform: translateY(0); }
+        .tagline { font-size: 12px; letter-spacing: 8px; color: var(--dim); text-transform: uppercase; margin-top: 20px; opacity: 0; transition: 1s ease 0.4s; }
+        .tagline.show { opacity: 1; }
 
-        #iframe-container { position: fixed; inset: 0; z-index: 100; background: var(--bg); opacity: 0; visibility: hidden; transition: opacity .3s ease; pointer-events: none; }
-        #iframe-container.active { opacity: 1; visibility: visible; pointer-events: auto; }
-        #content-iframe { width: 100%; height: 100%; border: none; }
+        /* Iframe */
+        #container { position: fixed; inset: 0; z-index: 100; background: var(--bg); visibility: hidden; opacity: 0; transition: 0.3s; }
+        #container.active { visibility: visible; opacity: 1; }
+        iframe { width: 100%; height: 100%; border: none; }
 
-        @media (max-width: 768px) {
-            .main { flex-direction: column; justify-content: center; gap: 40px; }
-            .side-nav { flex-direction: row; order: 2; flex-wrap: wrap; justify-content: center; }
-            .desktop-nav-right { display: none; }
-        }
+        @media (max-width: 768px) { .main { flex-direction: column; gap: 50px; } .side-nav { flex-direction: row; } .desktop-only { display: none; } }
     </style>
 </head>
 <body>
-    <div id="loader-wrapper">
-        <div class="loader-content">
-            <div class="loader-title">HRN</div>
-            <div class="loader-sub" id="loader-status">Preparing System</div>
-            <div class="loader-bar-bg"><div id="loader-progress"></div></div>
+    <div id="loader"><div class="load-line"><div id="progress"></div></div></div>
+    <div class="ambient-bg" id="bg"></div>
+    <canvas id="p"></canvas>
+
+    <div class="wrapper" id="ui">
+        <div class="header">
+            <div class="pill"><span id="date"></span><span id="clock"></span></div>
         </div>
-    </div>
-
-    <div class="ambient-bg" id="ambient-bg"></div>
-    <div class="glow" id="mouse-glow"></div>
-    <canvas id="particles"></canvas>
-
-    <div class="wrapper" id="main-wrapper">
-        <header class="header">
-            <div id="status-pill"><span id="date"></span><div style="width:1px;height:12px;background:var(--glass-border)"></div><span id="clock"></span></div>
-        </header>
-        <main class="main">
-            <nav class="side-nav">
-                <div class="side-link" data-page="settings"><i data-lucide="settings"></i></div>
-                <div class="side-link" data-page="games"><i data-lucide="gamepad-2"></i></div>
-                <div class="side-link" data-page="bookmarklets"><i data-lucide="bookmark"></i></div>
-            </nav>
-            <div class="center-brand">
-                <h1 class="logo" id="main-logo">HRN</h1>
-                <p class="tagline" id="tagline-text"></p>
+        <div class="main">
+            <div class="side-nav">
+                <div class="btn" data-p="settings"><i data-lucide="settings"></i></div>
+                <div class="btn" data-p="games"><i data-lucide="gamepad-2"></i></div>
+                <div class="btn" data-p="bookmarklets"><i data-lucide="bookmark"></i></div>
             </div>
-            <nav class="side-nav desktop-nav-right">
-                <div class="side-link" data-page="about"><i data-lucide="info"></i></div>
-                <div class="side-link" data-page="add"><i data-lucide="plus"></i></div>
-            </nav>
-        </main>
-    </div>
+            <div class="brand">
+                <h1 class="logo">HRN</h1>
+                <p class="tagline" id="tag">ELITE HUB</p>
+            </div>
+            <div class="side-nav desktop-only">
+                <div class="btn" data-p="about"><i data-lucide="info"></i></div>
+                <div class="btn" data-p="add"><i data-lucide="plus"></i></div>
+            </div>
+        </div>
+        <div style="height: 60px;"></div> </div>
 
-    <div id="iframe-container"><iframe id="content-iframe" src="about:blank"></iframe></div>
+    <div id="container"><iframe id="frame"></iframe></div>
 
     <script>
         lucide.createIcons();
-        const taglines = ["ELITE GAMING","BUILT DIFFERENT","LEVEL UP","STAY AHEAD","CLUTCH ONLY"];
-        let pageCache = {}, currentAccentColor = '#89b4fa', particlesArray = [], w, h;
-        const progress = document.getElementById('loader-progress');
+        const cache = {};
+        const $ = id => document.getElementById(id);
         
-        const updateProgress = (p) => progress.style.width = p + '%';
-
-        function updateTime() {
-            const now = new Date();
-            document.getElementById('clock').textContent = now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-            document.getElementById('date').textContent = now.toLocaleDateString([], {weekday:'short', day:'numeric', month:'short'});
-        }
-
-        async function initApp() {
-            updateTime(); setInterval(updateTime, 1000);
+        async function init() {
+            const set = (p) => $("progress").style.width = p + "%";
             
-            // 1. Load Settings
-            updateProgress(20);
-            syncSettings();
+            // Step 1: Config
+            set(30);
+            updateUI();
             
-            // 2. Fetch Background if exists
-            const bgUrl = localStorage.getItem('hrn_bg_url');
-            if (bgUrl && bgUrl.trim() !== "") {
-                updateProgress(40);
-                await new Promise(resolve => {
-                    const img = new Image();
-                    img.src = bgUrl;
-                    img.onload = resolve;
-                    img.onerror = resolve; // Continue anyway on error
-                });
+            // Step 2: Background
+            const bgImg = localStorage.getItem('hrn_bg');
+            if (bgImg) {
+                await new Promise(r => { const i = new Image(); i.src = bgImg; i.onload = r; i.onerror = r; });
             }
+            set(60);
 
-            // 3. Cache Pages
-            updateProgress(60);
+            // Step 3: Pages
             const pages = ['settings', 'games', 'about', 'add', 'bookmarklets'];
-            let loaded = 0;
-            for (const p of pages) {
-                try {
-                    const res = await fetch(p + '.html');
-                    if(res.ok) pageCache[p] = await res.text();
-                } catch(e) {}
-                loaded++;
-                updateProgress(60 + (loaded / pages.length * 30));
-            }
-
-            // 4. Finalize
-            updateProgress(100);
+            await Promise.all(pages.map(async p => {
+                try { const r = await fetch(p + '.html'); if(r.ok) cache[p] = await r.text(); } catch(e){}
+            }));
+            
+            set(100);
             setTimeout(() => {
-                document.getElementById('loader-wrapper').style.opacity = '0';
-                document.getElementById('loader-wrapper').style.visibility = 'hidden';
-                document.getElementById('main-wrapper').classList.add('ready');
-                const tag = document.getElementById('tagline-text');
-                tag.textContent = taglines[Math.floor(Math.random() * taglines.length)];
-                setTimeout(() => tag.classList.add('show'), 400);
-                checkHash();
-            }, 800);
+                $("loader").style.opacity = 0;
+                $("ui").classList.add('ready');
+                $("tag").classList.add('show');
+                if(window.location.hash) openPage(window.location.hash.slice(1));
+            }, 500);
         }
 
-        function syncSettings() {
-            const themeColor = localStorage.getItem('hrn_theme_color') || "#89b4fa";
-            const logoOpacity = localStorage.getItem('hrn_logo_opacity') || "0.5";
-            document.title = localStorage.getItem('hrn_tab_title') || "HRN | Gaming Hub";
-            document.documentElement.style.setProperty('--logo-opacity', logoOpacity);
-            document.documentElement.style.setProperty('--accent', themeColor);
-            document.documentElement.style.setProperty('--accent-glow', themeColor + '26');
+        function updateUI() {
+            const clr = localStorage.getItem('hrn_clr') || "#89b4fa";
+            const op = localStorage.getItem('hrn_op') || "0.5";
+            document.documentElement.style.setProperty('--accent', clr);
+            document.documentElement.style.setProperty('--logo-opacity', op);
+            document.title = localStorage.getItem('hrn_title') || "HRN";
             
-            const link = document.getElementById('dynamic-favicon');
-            const fav = localStorage.getItem('hrn_favicon_url');
-            link.href = (fav && fav.trim() !== "") ? fav : "/logo.svg";
-
-            const bgUrl = localStorage.getItem('hrn_bg_url');
-            const ambient = document.getElementById('ambient-bg');
-            if (bgUrl) { ambient.style.backgroundImage = `url('${bgUrl}')`; ambient.style.opacity = "0.6"; }
-            
-            w = window.innerWidth; h = window.innerHeight;
-            const canvas = document.getElementById('particles');
-            canvas.width = w; canvas.height = h;
-            initParticles(localStorage.getItem('hrn_particle_amount') || "mid");
+            const bg = localStorage.getItem('hrn_bg');
+            if(bg) { $("bg").style.backgroundImage = `url(${bg})`; $("bg").style.opacity = 0.5; }
         }
 
-        function openPage(page) {
-            if (!page || !pageCache[page]) return;
-            document.getElementById('content-iframe').srcdoc = pageCache[page];
-            document.getElementById('iframe-container').classList.add('active');
-            document.querySelectorAll('.side-link').forEach(l => l.classList.toggle('active', l.dataset.page === page));
+        function openPage(p) {
+            if(!cache[p]) return;
+            $("frame").srcdoc = cache[p];
+            $("container").classList.add('active');
+            document.querySelectorAll('.btn').forEach(b => b.classList.toggle('active', b.dataset.p === p));
         }
 
-        function closeIframe() {
-            document.getElementById('iframe-container').classList.remove('active');
-            setTimeout(() => { document.getElementById('content-iframe').srcdoc = ""; }, 200);
-            if (window.location.hash) history.pushState(null, null, ' ');
-            document.querySelectorAll('.side-link').forEach(l => l.classList.remove('active'));
-        }
-
-        function checkHash() {
-            const hash = window.location.hash.substring(1);
-            if (hash) openPage(hash);
-        }
-
-        class Particle {
-            constructor() { this.init(); }
-            init() { 
-                this.x = Math.random() * w; this.y = Math.random() * h; 
-                this.size = Math.random() * 1.5 + 0.5; 
-                this.speedX = Math.random() * 0.4 - 0.2; this.speedY = Math.random() * 0.4 - 0.2; 
-                this.opacity = Math.random() * 0.5 + 0.2;
-            }
-            update() { 
-                this.x += this.speedX; this.y += this.speedY; 
-                if (this.x < 0 || this.x > w) this.x = Math.random() * w;
-                if (this.y < 0 || this.y > h) this.y = Math.random() * h;
-            }
-            draw(ctx) { 
-                ctx.fillStyle = currentAccentColor; ctx.globalAlpha = this.opacity; 
-                ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); 
-            }
-        }
-
-        function initParticles(mode) {
-            if (mode === 'off') { particlesArray = []; return; }
-            const counts = { low: 30, mid: 80, high: 200 };
-            particlesArray = Array.from({ length: counts[mode] || 80 }, () => new Particle());
-        }
-
-        function animate() { 
-            const ctx = document.getElementById('particles').getContext('2d');
-            ctx.clearRect(0, 0, w, h); 
-            particlesArray.forEach(p => { p.update(); p.draw(ctx); }); 
-            requestAnimationFrame(animate); 
-        }
-
-        window.addEventListener('hashchange', checkHash);
         window.addEventListener('message', e => {
-            if (e.data.type === 'updateSettings') syncSettings();
-            if (e.data.type === 'closeIframe') closeIframe();
-        });
-        document.querySelectorAll('.side-link').forEach(l => l.addEventListener('click', () => {
-            history.pushState(null, null, '#' + l.dataset.page);
-            openPage(l.dataset.page);
-        }));
-        window.addEventListener('mousemove', e => { 
-            document.getElementById('mouse-glow').style.left = e.clientX + 'px'; 
-            document.getElementById('mouse-glow').style.top = e.clientY + 'px'; 
+            if(e.data === 'close') {
+                $("container").classList.remove('active');
+                setTimeout(() => $("frame").srcdoc = "", 300);
+                document.querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
+            }
+            if(e.data === 'sync') updateUI();
         });
 
-        window.addEventListener('load', () => { initApp(); animate(); });
+        document.querySelectorAll('.btn').forEach(b => b.onclick = () => openPage(b.dataset.p));
+        setInterval(() => {
+            const n = new Date();
+            $("clock").textContent = n.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+            $("date").textContent = n.toLocaleDateString([], {weekday:'short',day:'numeric'});
+        }, 1000);
+
+        window.onload = init;
     </script>
 </body>
 </html>
