@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title id="dynamic-title">HRN | Gaming Hub</title>
-    <link rel="icon" id="dynamic-favicon" href="favicon.ico" type="image/x-icon">
+    <link rel="icon" id="dynamic-favicon" href="/logo.svg" type="image/x-icon">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -14,25 +14,26 @@
             --accent-glow: rgba(137, 180, 250, 0.15);
             --text-main: #f0f4ff;
             --text-dim: rgba(255, 255, 255, 0.5);
-            --glass: rgba(0, 0, 0, 0.15);
-            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
             --transition: all .2s cubic-bezier(.23, 1, .32, 1);
         }
         * { margin: 0; padding: 0; box-sizing: border-box; scrollbar-width: none; }
         *::-webkit-scrollbar { display: none; }
         html, body { height: 100dvh; width: 100%; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text-main); overflow: hidden; user-select: none; }
         
-        .ambient-bg { position: fixed; inset: 0; z-index: 1; background-size: cover; background-position: center; opacity: 0; transition: opacity .4s ease; pointer-events: none; filter: brightness(0.7); }
+        /* Geen blur op de bg voor scherpte */
+        .ambient-bg { position: fixed; inset: 0; z-index: 1; background-size: cover; background-position: center; opacity: 0; transition: opacity .4s ease; pointer-events: none; filter: brightness(0.6); }
         #particles { position: fixed; inset: 0; z-index: 3; pointer-events: none; }
         .glow { position: fixed; width: 500px; height: 500px; background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%); border-radius: 50%; pointer-events: none; z-index: 4; opacity: 0.4; filter: blur(60px); mix-blend-mode: screen; transform: translate(-50%, -50%); }
 
         .wrapper { display: flex; flex-direction: column; height: 100dvh; padding: 25px; max-width: 1600px; margin: 0 auto; position: relative; z-index: 10; }
-        
         .header { display: flex; justify-content: center; z-index: 50; margin-bottom: 20px; }
-        #status-pill { display: flex; align-items: center; gap: 14px; background: rgba(0,0,0,0.3); padding: 10px 22px; border-radius: 99px; border: 1px solid var(--glass-border); backdrop-filter: blur(15px); font-size: .7rem; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
+        #status-pill { display: flex; align-items: center; gap: 14px; background: rgba(255,255,255,0.03); padding: 10px 22px; border-radius: 99px; border: 1px solid var(--glass-border); backdrop-filter: blur(15px); font-size: .7rem; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
         
         .main { display: flex; justify-content: space-between; align-items: center; flex-grow: 1; position: relative; z-index: 20; }
         
+        /* Zachtere contrast achter icons */
         .side-nav { display: flex; flex-direction: column; gap: 15px; z-index: 30; }
         .side-link { 
             width: 58px; 
@@ -41,19 +42,18 @@
             align-items: center; 
             justify-content: center; 
             color: var(--text-dim); 
-            background: rgba(255, 255, 255, 0.03); 
+            background: rgba(255, 255, 255, 0.02); 
             border: 1px solid var(--glass-border); 
             border-radius: 18px; 
             transition: var(--transition); 
             cursor: pointer; 
             position: relative;
-            backdrop-filter: blur(8px);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
         }
         .side-link:hover, .side-link.active { 
             color: var(--accent); 
-            border-color: rgba(255,255,255,0.2); 
-            background: rgba(255, 255, 255, 0.07); 
+            border-color: rgba(255,255,255,0.15); 
+            background: rgba(255,255,255,0.05); 
             transform: translateY(-2px); 
         }
         .side-link.active::after { content: ''; position: absolute; left: -10px; width: 3px; height: 18px; background: var(--accent); border-radius: 10px; box-shadow: 0 0 10px var(--accent); }
@@ -113,11 +113,14 @@
         const glow = document.getElementById('mouse-glow');
         let currentPage = null;
 
-        function updateClock() {
+        // Instant tijd update
+        function updateTime() {
             const now = new Date();
             document.getElementById('clock').textContent = now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
             document.getElementById('date').textContent = now.toLocaleDateString([], {weekday:'short', day:'numeric', month:'short'});
         }
+        updateTime();
+        setInterval(updateTime, 1000);
 
         async function prefetchPages() {
             const pages = ['settings', 'games', 'about', 'add', 'bookmarklets'];
@@ -137,7 +140,14 @@
             
             document.title = tabTitle;
             let link = document.getElementById('dynamic-favicon');
-            if (faviconUrl) { link.href = faviconUrl; link.onerror = () => { link.href = "favicon.ico"; }; }
+            
+            // Fallback logica voor favicon
+            if (faviconUrl && faviconUrl.trim() !== "") {
+                link.href = faviconUrl;
+                link.onerror = () => { link.href = "/logo.svg"; };
+            } else {
+                link.href = "/logo.svg";
+            }
 
             currentAccentColor = themeColor;
             document.documentElement.style.setProperty('--accent', themeColor);
@@ -145,8 +155,12 @@
             
             const bgUrl = localStorage.getItem('hrn_bg_url');
             const ambient = document.getElementById('ambient-bg');
-            if (bgUrl) { ambient.style.backgroundImage = `url('${bgUrl}')`; ambient.style.opacity = "0.6"; } 
-            else { ambient.style.opacity = "0"; }
+            if (bgUrl) {
+                ambient.style.backgroundImage = `url('${bgUrl}')`;
+                ambient.style.opacity = "0.6";
+            } else {
+                ambient.style.opacity = "0";
+            }
             
             initParticles(localStorage.getItem('hrn_particle_amount') || "mid");
         }
@@ -220,10 +234,6 @@
             w = window.innerWidth; h = window.innerHeight; canvas.width = w; canvas.height = h; 
         });
 
-        // Instant load logic
-        updateClock();
-        setInterval(updateClock, 1000);
-        
         window.addEventListener('load', () => { 
             w = window.innerWidth; h = window.innerHeight; canvas.width = w; canvas.height = h;
             syncSettings(); prefetchPages(); animate(); 
