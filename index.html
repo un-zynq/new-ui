@@ -103,44 +103,32 @@
             checkHash();
         }
 
-function syncSettings() {
-    const themeColor = localStorage.getItem('hrn_theme_color') || "#89b4fa";
-    const tabTitle = localStorage.getItem('hrn_tab_title') || "HRN | Gaming Hub";
-    const faviconUrl = localStorage.getItem('hrn_favicon_url'); // Kan leeg zijn
-    
-    // 1. Titel Update
-    document.title = tabTitle;
+        function syncSettings() {
+            const themeColor = localStorage.getItem('hrn_theme_color') || "#89b4fa";
+            const tabTitle = localStorage.getItem('hrn_tab_title') || "HRN | Gaming Hub";
+            const faviconUrl = localStorage.getItem('hrn_favicon_url');
+            
+            document.title = tabTitle;
 
-    // 2. Favicon Update (met Fallback)
-    let link = document.getElementById('dynamic-favicon');
-    if (!link) {
-        link = document.createElement('link');
-        link.id = 'dynamic-favicon';
-        link.rel = 'icon';
-        document.head.appendChild(link);
-    }
+            let link = document.getElementById('dynamic-favicon');
+            if (faviconUrl && faviconUrl.trim() !== "") {
+                link.href = faviconUrl;
+                link.onerror = () => { link.href = "favicon.ico"; };
+            } else {
+                link.href = "favicon.ico";
+            }
 
-    if (faviconUrl && faviconUrl.trim() !== "") {
-        // Gebruik de nieuwe URL met cache-buster voor instant resultaat
-        link.href = faviconUrl + "?t=" + new Date().getTime();
-    } else {
-        // Als de waarde leeg is, terug naar standaard of leeg
-        link.href = "favicon.ico"; 
-        // Wil je hem écht helemaal weg? Gebruik dan: link.href = "about:blank";
-    }
-
-    // 3. Accent & Ambient Sync
-    currentAccentColor = themeColor;
-    document.documentElement.style.setProperty('--accent', themeColor);
-    document.documentElement.style.setProperty('--accent-glow', themeColor + '26');
-    
-    const bgUrl = localStorage.getItem('hrn_bg_url');
-    const ambient = document.getElementById('ambient-bg');
-    ambient.style.backgroundImage = bgUrl ? `url('${bgUrl}')` : "none";
-    ambient.style.opacity = bgUrl ? "0.4" : "0";
-    
-    initParticles(localStorage.getItem('hrn_particle_amount') || "mid");
-}
+            currentAccentColor = themeColor;
+            document.documentElement.style.setProperty('--accent', themeColor);
+            document.documentElement.style.setProperty('--accent-glow', themeColor + '26');
+            
+            const bgUrl = localStorage.getItem('hrn_bg_url');
+            const ambient = document.getElementById('ambient-bg');
+            ambient.style.backgroundImage = bgUrl ? `url('${bgUrl}')` : "none";
+            ambient.style.opacity = bgUrl ? "0.4" : "0";
+            
+            initParticles(localStorage.getItem('hrn_particle_amount') || "mid");
+        }
 
         function openPage(page) {
             if (!page || !pageCache[page]) return;
@@ -149,7 +137,11 @@ function syncSettings() {
             
             iframe.srcdoc = pageCache[page];
             container.classList.add('active');
-            document.querySelectorAll('.side-link').forEach(l => l.classList.toggle('active', l.dataset.page === page));
+            
+            // UI Update voor de zijbalk
+            document.querySelectorAll('.side-link').forEach(l => {
+                l.classList.toggle('active', l.dataset.page === page);
+            });
         }
 
         function closeIframe() {
@@ -179,8 +171,6 @@ function syncSettings() {
             update() { 
                 this.x += this.speedX; 
                 this.y += this.speedY; 
-                
-                // Sexy Wrap Around
                 if (this.x < 0) this.x = w;
                 if (this.x > w) this.x = 0;
                 if (this.y < 0) this.y = h;
@@ -204,7 +194,6 @@ function syncSettings() {
 
         function animate() { 
             ctx.clearRect(0, 0, w, h); 
-            // Kleur één keer per frame doorgeven voor performance
             particlesArray.forEach(p => { 
                 p.update(); 
                 p.draw(currentAccentColor); 
