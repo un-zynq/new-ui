@@ -193,7 +193,7 @@
             $('dynamic-title').textContent = localStorage.getItem('hrn_title') || "HRN | CORE";
             if (localStorage.getItem('hrn_fav')) $('app-favicon').href = localStorage.getItem('hrn_fav');
 
-            // Alleen aantal particles updaten als het significant verandert
+            // Update particle count without resetting positions
             if (pAmount !== newpAmount) {
                 const oldParticles = particles;
                 particles = [];
@@ -201,10 +201,8 @@
 
                 for (let i = 0; i < pAmount; i++) {
                     if (i < oldParticles.length) {
-                        // Hergebruik bestaande particles (positie blijft behouden)
                         particles.push(oldParticles[i]);
                     } else {
-                        // Nieuwe particles alleen toevoegen
                         particles.push({
                             x: Math.random() * window.innerWidth,
                             y: Math.random() * window.innerHeight,
@@ -215,15 +213,12 @@
                         });
                     }
                 }
-                // Verwijder overtollige particles als density lager is
                 if (particles.length > pAmount) particles.length = pAmount;
             }
 
-            // Update opacity van bestaande particles
-            if (particles.length > 0) {
-                for (let i = 0; i < particles.length; i++) {
-                    particles[i].o = o * (Math.random() * 0.5 + 0.5);
-                }
+            // Live opacity update
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].o = o * (Math.random() * 0.5 + 0.5);
             }
 
             const bgValue = await loadBackground();
@@ -314,9 +309,7 @@
             }, 600);
         }
 
-        function setHash(n) {
-            window.location.hash = n;
-        }
+        function setHash(n) { window.location.hash = n; }
 
         function checkHash() {
             const h = window.location.hash.slice(1);
@@ -338,7 +331,7 @@
             }
         }
 
-        window.onresize = () => { sync(); };
+        window.onresize = () => sync();
         window.addEventListener('hashchange', checkHash);
         window.addEventListener('message', e => {
             if (e.data === 'sync') sync();
