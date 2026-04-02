@@ -26,22 +26,35 @@
         #particles { position: fixed; inset: 0; z-index: 3; pointer-events: none; }
         .glow { position: fixed; width: 500px; height: 500px; background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%); border-radius: 50%; pointer-events: none; z-index: 4; opacity: 0.4; filter: blur(60px); mix-blend-mode: screen; transform: translate(-50%, -50%); }
 
-        .wrapper { display: flex; flex-direction: column; height: 100dvh; padding: 30px; max-width: 1600px; margin: 0 auto; position: relative; z-index: 10; }
+        .wrapper { display: flex; flex-direction: column; height: 100dvh; padding: 25px; max-width: 1600px; margin: 0 auto; position: relative; z-index: 10; }
+        
         .header { display: flex; justify-content: center; z-index: 50; opacity: 0; transition: opacity .6s ease; margin-bottom: 20px; }
         .header.show { opacity: 1; }
         #status-pill { display: flex; align-items: center; gap: 14px; background: var(--glass); padding: 10px 22px; border-radius: 99px; border: 1px solid var(--glass-border); backdrop-filter: blur(15px); font-size: .7rem; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
         
         .main { display: flex; justify-content: space-between; align-items: center; flex-grow: 1; position: relative; z-index: 20; }
-        .side-nav { display: flex; flex-direction: column; gap: 20px; }
+        
+        .side-nav { display: flex; flex-direction: column; gap: 15px; z-index: 30; }
         .side-link { width: 58px; aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; color: var(--text-dim); background: var(--glass); border: 1px solid var(--glass-border); border-radius: 18px; transition: var(--transition); text-decoration: none; cursor: pointer; position: relative; }
-        .side-link:hover, .side-link.active { color: var(--accent); border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.05); transform: translateY(-2px); }
-        .side-link.active::after { content: ''; position: absolute; left: -12px; width: 4px; height: 20px; background: var(--accent); border-radius: 10px; box-shadow: 0 0 10px var(--accent); }
+        .side-link:hover, .side-link.active { color: var(--accent); border-color: rgba(255,255,255,0.15); background: rgba(255,255,255,0.05); transform: translateY(-2px); }
+        .side-link.active::after { content: ''; position: absolute; left: -10px; width: 3px; height: 18px; background: var(--accent); border-radius: 10px; box-shadow: 0 0 10px var(--accent); }
         
-        .logo { font-size: clamp(5rem, 15vw, 11rem); font-weight: 900; letter-spacing: -.05em; line-height: .8; background: linear-gradient(180deg, #fff 30%, var(--accent) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 15px 30px rgba(0,0,0,0.5)); opacity: 0.7; pointer-events: none; }
-        
+        .center-brand { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+        .logo { font-size: clamp(4rem, 15vw, 10rem); font-weight: 900; letter-spacing: -.05em; line-height: .8; background: linear-gradient(180deg, #fff 30%, var(--accent) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 15px 30px rgba(0,0,0,0.5)); opacity: 0.8; }
+        .tagline { font-size: 0.9rem; letter-spacing: 4px; color: var(--text-dim); text-transform: uppercase; opacity: 0; transform: translateY(10px); transition: 0.8s ease; }
+        .tagline.show { opacity: 1; transform: translateY(0); }
+
         #iframe-container { position: fixed; inset: 0; z-index: 100; background: var(--bg); opacity: 0; visibility: hidden; transition: opacity .3s ease; pointer-events: none; }
         #iframe-container.active { opacity: 1; visibility: visible; pointer-events: auto; }
         #content-iframe { width: 100%; height: 100%; border: none; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main { flex-direction: column; justify-content: center; gap: 50px; }
+            .side-nav { flex-direction: row; order: 2; flex-wrap: wrap; justify-content: center; }
+            .desktop-nav-right { display: none; }
+            .side-link.active::after { bottom: -10px; left: 50%; width: 18px; height: 3px; transform: translateX(-50%); }
+        }
     </style>
 </head>
 <body>
@@ -53,13 +66,22 @@
         <header class="header" id="header">
             <div id="status-pill"><span id="date"></span><div style="width:1px;height:12px;background:var(--glass-border)"></div><span id="clock"></span></div>
         </header>
+
         <main class="main">
             <nav class="side-nav">
                 <div class="side-link" data-page="settings"><i data-lucide="settings"></i></div>
                 <div class="side-link" data-page="games"><i data-lucide="gamepad-2"></i></div>
+                <div class="side-link" data-page="bookmarklets"><i data-lucide="bookmark"></i></div>
+                <div class="side-link mobile-only" style="display:none" data-page="about"><i data-lucide="info"></i></div>
+                <div class="side-link mobile-only" style="display:none" data-page="add"><i data-lucide="plus"></i></div>
             </nav>
-            <div class="center-brand"><h1 class="logo">HRN</h1></div>
-            <nav class="side-nav">
+
+            <div class="center-brand">
+                <h1 class="logo">HRN</h1>
+                <p class="tagline" id="tagline-text"></p>
+            </div>
+
+            <nav class="side-nav desktop-nav-right">
                 <div class="side-link" data-page="about"><i data-lucide="info"></i></div>
                 <div class="side-link" data-page="add"><i data-lucide="plus"></i></div>
             </nav>
@@ -70,22 +92,22 @@
 
     <script>
         lucide.createIcons();
+        const taglines = ["ELITE GAMING","BUILT DIFFERENT","NO SKILL NO ENTRY","LEVEL UP","CLUTCH OR KICK","STAY AHEAD"];
         let particlesArray = [], w, h, pageCache = {};
         const canvas = document.getElementById('particles'), ctx = canvas.getContext('2d');
         const container = document.getElementById('iframe-container'), iframe = document.getElementById('content-iframe');
         const glow = document.getElementById('mouse-glow');
         let currentPage = null;
 
-        // Instant Page Fetching
         async function prefetchPages() {
-            const pages = ['settings', 'games', 'about', 'add'];
-            pages.forEach(async p => {
+            ['settings', 'games', 'about', 'add', 'bookmarklets'].forEach(async p => {
                 try {
                     const res = await fetch(p + '.html');
-                    pageCache[p] = await res.text();
-                    // Check of we direct naar een hash moeten
-                    if(window.location.hash === '#' + p) openPage(p);
-                } catch(e) { console.error("Prefetch failed for " + p); }
+                    if(res.ok) {
+                        pageCache[p] = await res.text();
+                        if(window.location.hash === '#' + p) openPage(p);
+                    }
+                } catch(e) {}
             });
         }
 
@@ -96,12 +118,13 @@
             const favicon = localStorage.getItem('hrn_favicon_url');
             
             document.documentElement.style.setProperty('--accent', themeColor);
+            document.documentElement.style.setProperty('--accent-glow', themeColor + '1A'); // Subtiele 10% opacity
             document.getElementById('dynamic-title').textContent = tabTitle;
             if(favicon) document.getElementById('dynamic-favicon').href = favicon;
             
             const ambient = document.getElementById('ambient-bg');
             ambient.style.backgroundImage = bgUrl ? `url('${bgUrl}')` : "none";
-            ambient.style.opacity = bgUrl ? "0.5" : "0";
+            ambient.style.opacity = bgUrl ? "0.4" : "0";
             initParticles(localStorage.getItem('hrn_particle_amount') || "mid");
         }
 
@@ -112,17 +135,16 @@
             
             if (pageCache[page]) {
                 iframe.srcdoc = pageCache[page];
-                container.classList.add('active');
             } else {
-                iframe.src = page + '.html'; // Fallback
-                container.classList.add('active');
+                iframe.src = page + '.html';
             }
+            container.classList.add('active');
             document.querySelectorAll('.side-link').forEach(l => l.classList.toggle('active', l.dataset.page === page));
         }
 
         function closeIframe() {
             container.classList.remove('active');
-            iframe.srcdoc = "";
+            iframe.srcdoc = ""; iframe.src = "about:blank";
             currentPage = null;
             window.location.hash = "";
             document.querySelectorAll('.side-link').forEach(l => l.classList.remove('active'));
@@ -130,15 +152,14 @@
 
         class Particle {
             constructor() { this.reset(); }
-            reset() { this.x = Math.random() * w; this.y = Math.random() * h; this.size = Math.random() * 1.5 + 0.5; this.speedX = Math.random() * 0.2 - 0.1; this.speedY = Math.random() * 0.2 - 0.1; this.opacity = Math.random() * 0.5 + 0.1; }
+            reset() { this.x = Math.random() * w; this.y = Math.random() * h; this.size = Math.random() * 1.5 + 0.5; this.speedX = Math.random() * 0.15 - 0.07; this.speedY = Math.random() * 0.15 - 0.07; this.opacity = Math.random() * 0.4 + 0.1; }
             update() { this.x += this.speedX; this.y += this.speedY; if (this.x < 0 || this.x > w || this.y < 0 || this.y > h) this.reset(); }
             draw() { ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent'); ctx.globalAlpha = this.opacity; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); }
         }
 
         function initParticles(mode) {
-            const counts = { off: 0, low: 30, mid: 80, high: 200 };
-            const target = counts[mode] || 80;
-            if (particlesArray.length === target) return;
+            const counts = { off: 0, low: 25, mid: 70, high: 180 };
+            const target = counts[mode] || 70;
             particlesArray = Array.from({ length: target }, () => new Particle());
         }
 
@@ -157,6 +178,9 @@
             w = window.innerWidth; h = window.innerHeight; canvas.width = w; canvas.height = h;
             syncSettings(); prefetchPages(); animate(); 
             document.getElementById('header').classList.add('show');
+            const tag = document.getElementById('tagline-text');
+            tag.textContent = taglines[Math.floor(Math.random() * taglines.length)];
+            setTimeout(() => tag.classList.add('show'), 500);
             setInterval(() => {
                 const now = new Date();
                 document.getElementById('clock').textContent = now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
