@@ -26,43 +26,53 @@
             overflow: hidden;
         }
 
-        .ambient-preview { 
-            position: fixed; inset: 0; z-index: 1; 
-            background-size: cover; background-position: center; 
-            opacity: 0.2; filter: blur(40px); 
+        /* Exact V1/V2 Background Effect */
+        .ambient-bg { 
+            position: fixed; 
+            inset: -50px; 
+            z-index: 1; 
+            pointer-events: none; 
+            background-size: cover; 
+            background-position: center; 
+            opacity: 0.4; 
+            filter: brightness(0.4) blur(0px);
+            display: none; 
         }
 
         .core-pane { 
             position: relative; z-index: 10;
             width: 90%; max-width: 400px; 
-            background: rgba(10, 10, 15, 0.8); 
-            backdrop-filter: blur(30px);
+            background: rgba(13, 15, 23, 0.85); 
+            backdrop-filter: blur(40px) saturate(150%);
+            -webkit-backdrop-filter: blur(40px) saturate(150%);
             border: 1px solid var(--border);
             border-radius: 30px; 
-            padding: 25px;
+            padding: 30px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
         }
 
         .nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
-        .nav h2 { font-size: 10px; font-weight: 900; color: var(--accent); opacity: 0.8; }
+        .nav h2 { font-size: 10px; font-weight: 900; color: var(--accent); letter-spacing: 3px; }
         
         .close-btn { 
             cursor: pointer; opacity: 0.5; transition: 0.2s; 
         }
         .close-btn:hover { opacity: 1; transform: scale(1.1); color: var(--accent); }
 
-        .row { margin-bottom: 15px; }
-        label { font-size: 7px; font-weight: 800; opacity: 0.3; display: block; margin-bottom: 8px; }
+        .row { margin-bottom: 18px; }
+        label { font-size: 7px; font-weight: 800; opacity: 0.3; display: block; margin-bottom: 8px; letter-spacing: 1.5px; }
 
         input[type="text"], .btn-action { 
             width: 100%; background: var(--glass); border: 1px solid var(--border); 
             padding: 12px; border-radius: 12px; color: #fff; font-size: 10px; outline: none;
+            text-transform: uppercase;
         }
 
-        .flex-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .flex-group { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
         input[type="color"] { 
             -webkit-appearance: none; border: 1px solid var(--border);
-            width: 100%; height: 40px; border-radius: 12px; background: var(--glass); cursor: pointer;
+            width: 100%; height: 42px; border-radius: 12px; background: var(--glass); cursor: pointer;
         }
         input[type="color"]::-webkit-color-swatch { border: none; border-radius: 8px; }
 
@@ -71,33 +81,34 @@
             display: flex; align-items: center; gap: 10px;
         }
         input[type="range"] { -webkit-appearance: none; flex: 1; height: 2px; background: rgba(255,255,255,0.1); }
-        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; background: var(--accent); border-radius: 50%; cursor: pointer; }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; background: var(--accent); border-radius: 50%; cursor: pointer; box-shadow: 0 0 8px var(--accent); }
 
         .toggle-box {
             display: flex; align-items: center; justify-content: space-between;
-            padding: 12px; background: var(--glass); border-radius: 12px; border: 1px solid var(--border);
+            padding: 14px; background: var(--glass); border-radius: 12px; border: 1px solid var(--border);
         }
         .dot { width: 10px; height: 10px; border-radius: 50%; background: #333; transition: 0.3s; }
         input:checked + .dot { background: var(--accent); box-shadow: 0 0 10px var(--accent); }
 
-        .chips { display: flex; gap: 5px; overflow-x: auto; padding-bottom: 5px; }
+        .chips { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: none; }
+        .chips::-webkit-scrollbar { display: none; }
         .chip { 
-            padding: 6px 10px; background: var(--glass); border: 1px solid var(--border); 
-            border-radius: 8px; font-size: 8px; font-weight: 700; cursor: pointer; white-space: nowrap;
+            padding: 8px 12px; background: var(--glass); border: 1px solid var(--border); 
+            border-radius: 10px; font-size: 8px; font-weight: 700; cursor: pointer; white-space: nowrap; transition: 0.2s;
         }
-        .chip:hover { border-color: var(--accent); color: var(--accent); }
+        .chip:hover { border-color: var(--accent); color: var(--accent); background: rgba(137, 180, 250, 0.05); }
 
         .hidden-file { position: absolute; width: 1px; height: 1px; opacity: 0; }
     </style>
 </head>
 <body>
-    <div class="ambient-preview" id="bg-view"></div>
+    <div class="ambient-bg" id="bg-layer"></div>
     
     <div class="core-pane">
         <div class="nav">
-            <h2>SYSTEM_V3</h2>
+            <h2>SETTINGS</h2>
             <div class="close-btn" onclick="window.parent.postMessage('close', '*')">
-                <i data-lucide="x-circle" size="18"></i>
+                <i data-lucide="x" size="18"></i>
             </div>
         </div>
 
@@ -117,7 +128,7 @@
 
         <div class="row">
             <label>Remote Background URL</label>
-            <input type="text" id="bg" placeholder="https://...">
+            <input type="text" id="bg" placeholder="Paste link here...">
         </div>
 
         <div class="row">
@@ -140,29 +151,36 @@
         </div>
 
         <div class="row">
-            <label>Masking Presets</label>
+            <label>Identity Presets</label>
             <div class="chips" id="p-list"></div>
         </div>
 
         <div class="row">
             <div class="flex-group">
-                <input type="text" id="title" placeholder="Title">
-                <input type="text" id="fav" placeholder="Favicon URL">
+                <div class="group">
+                    <label>Tab Title</label>
+                    <input type="text" id="title" placeholder="Title">
+                </div>
+                <div class="group">
+                    <label>Favicon</label>
+                    <input type="text" id="fav" placeholder="URL">
+                </div>
             </div>
         </div>
     </div>
 
     <script>
         lucide.createIcons();
-        const msg = () => window.parent.postMessage('sync', '*');
+        const sync = () => window.parent.postMessage('sync', '*');
+        
         const presets = [
             {n:"Default", t:"HRN | CORE", f:"favicon.png"},
             {n:"Google", t:"Google", f:"https://google.com/favicon.ico"},
             {n:"Drive", t:"My Drive", f:"https://ssl.gstatic.com/docs/doclist/images/drive_2022q3_32dp.png"},
-            {n:"Mail", t:"Gmail", f:"https://ssl.gstatic.com/ui/v1/icons/mail/images/favicon5.ico"}
+            {n:"Mail", t:"Gmail", f:"https://ssl.gstatic.com/ui/v1/icons/mail/images/favicon5.ico"},
+            {n:"Classes", t:"Classes", f:"https://www.gstatic.com/classroom/favicon.png"}
         ];
 
-        // Init Presets
         presets.forEach(p => {
             const c = document.createElement('div');
             c.className = 'chip'; c.innerText = p.n;
@@ -171,48 +189,54 @@
                 document.getElementById('fav').value = p.f;
                 localStorage.setItem('hrn_title', p.t);
                 localStorage.setItem('hrn_fav', p.f);
-                msg();
+                sync();
             };
             document.getElementById('p-list').appendChild(c);
         });
 
-        // Background Logic
-        const setBg = (val) => {
-            localStorage.setItem('hrn_bg', val);
-            document.getElementById('bg-view').style.backgroundImage = `url(${val})`;
-            msg();
-        };
+        function updateBg(val) {
+            const bgLayer = document.getElementById('bg-layer');
+            if (val && val.length > 5) {
+                localStorage.setItem('hrn_bg', val);
+                bgLayer.style.backgroundImage = `url(${val})`;
+                bgLayer.style.display = 'block';
+            } else {
+                bgLayer.style.display = 'none';
+            }
+            sync();
+        }
 
         document.getElementById('bg-file').onchange = (e) => {
             const fr = new FileReader();
-            fr.onload = () => setBg(fr.result);
+            fr.onload = () => updateBg(fr.result);
             fr.readAsDataURL(e.target.files[0]);
         };
 
         document.getElementById('bg').onchange = async (e) => {
-            if(e.target.value.startsWith('http')) {
+            const url = e.target.value;
+            if(url.startsWith('http')) {
                 try {
-                    const r = await fetch(e.target.value);
+                    const r = await fetch(url);
                     const b = await r.blob();
                     const fr = new FileReader();
-                    fr.onloadend = () => { setBg(fr.result); e.target.value = ''; };
+                    fr.onloadend = () => { updateBg(fr.result); e.target.value = ''; };
                     fr.readAsDataURL(b);
-                } catch { setBg(e.target.value); }
+                } catch { updateBg(url); }
             }
         };
 
-        // Standard Fields
         ['title', 'clr', 'op', 'int', 'fav'].forEach(f => {
             const el = document.getElementById(f);
-            el.value = localStorage.getItem('hrn_'+f) || {title:'HRN', clr:'#89b4fa', op:0.8, int:1.1, fav:''}[f];
-            el.oninput = () => { localStorage.setItem('hrn_'+f, el.value); msg(); };
+            const defs = {title:'HRN | CORE', clr:'#89b4fa', op:0.8, int:1.1, fav:''};
+            el.value = localStorage.getItem('hrn_'+f) || defs[f];
+            el.oninput = () => { localStorage.setItem('hrn_'+f, el.value); sync(); };
         });
 
-        const p = document.getElementById('part');
-        p.checked = localStorage.getItem('hrn_part') !== 'false';
-        p.onchange = () => { localStorage.setItem('hrn_part', p.checked); msg(); };
+        const partCheck = document.getElementById('part');
+        partCheck.checked = localStorage.getItem('hrn_part') !== 'false';
+        partCheck.onchange = () => { localStorage.setItem('hrn_part', partCheck.checked); sync(); };
         
-        if(localStorage.getItem('hrn_bg')) setBg(localStorage.getItem('hrn_bg'));
+        updateBg(localStorage.getItem('hrn_bg'));
     </script>
 </body>
 </html>
