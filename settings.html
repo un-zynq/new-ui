@@ -7,86 +7,47 @@
         :root{--accent:#89b4fa;--bg:#030508;--glass:rgba(255,255,255,0.05);--border:rgba(255,255,255,0.12)}
         *{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',-apple-system,sans-serif;user-select:none;-webkit-tap-highlight-color:transparent}
         body{background:var(--bg);color:#fff;height:100dvh;display:flex;align-items:center;justify-content:center;text-transform:uppercase;letter-spacing:1px;overflow:hidden;touch-action:none}
-        
         .ambient-bg{position:fixed;inset:0;z-index:1;background-size:cover;background-position:center;filter:brightness(0.5);transition:opacity 0.5s ease}
         .overlay-dim{position:fixed;inset:0;z-index:2;background:radial-gradient(circle at center,transparent,rgba(0,0,0,0.5))}
-        
         .core-pane{position:relative;z-index:10;width:92%;max-width:380px;max-height:85dvh;background:rgba(8,10,15,0.9);backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);border:1px solid var(--border);border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:14px;box-shadow:0 40px 80px rgba(0,0,0,0.9);overflow-y:auto}
         .core-pane::-webkit-scrollbar{display:none}
-        
         .nav{display:flex;justify-content:space-between;align-items:center}
         .nav h2{font-size:10px;font-weight:900;color:var(--accent);letter-spacing:3px}
-        .close-btn{cursor:pointer;font-size:18px;opacity:0.4;padding:4px}
-        
+        .close-btn{cursor:pointer;font-size:18px;opacity:0.4;padding:4px;transition:0.2s}
+        .close-btn:hover{opacity:1;transform:scale(1.1)}
         .row{width:100%}
         label{font-size:8px;font-weight:800;opacity:0.4;display:block;margin-bottom:6px;letter-spacing:1px}
-        
-        input[type="text"],.btn-action{width:100%;background:var(--glass);border:1px solid var(--border);padding:12px;border-radius:8px;color:#fff;font-size:10px;font-weight:700;outline:none}
+        input[type="text"]{width:100%;background:var(--glass);border:1px solid var(--border);padding:12px;border-radius:8px;color:#fff;font-size:10px;font-weight:700;outline:none;cursor:text}
+        .btn-action{width:100%;background:var(--glass);border:1px solid var(--border);padding:12px;border-radius:8px;color:#fff;font-size:10px;font-weight:700;outline:none;cursor:pointer;transition:0.2s}
+        .btn-action:hover{background:rgba(255,255,255,0.1);border-color:var(--accent)}
         .flex-group{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-        .btn-reset{background:rgba(243,139,168,0.05);border-color:rgba(243,139,168,0.2);color:#f38ba8}
-        
+        .btn-reset{background:rgba(243,139,168,0.05);border-color:rgba(243,139,168,0.2);color:#f38ba8;cursor:pointer}
+        .btn-reset:hover{background:rgba(243,139,168,0.15);border-color:#f38ba8}
         input[type="color"]{-webkit-appearance:none;border:1px solid var(--border);width:100%;height:38px;border-radius:8px;background:var(--glass);cursor:pointer;padding:0}
         input[type="color"]::-webkit-color-swatch{border:none;border-radius:4px}
-        
-        /* --- CUSTOM SLIDER CSS --- */
-        .slider-wrap {
-            width: 100%;
-            height: 38px;
-            background: var(--glass);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            padding: 0 12px;
-            position: relative;
-            touch-action: none; /* Voorkom scrollen tijdens schuiven */
-        }
-        .slider-track {
-            width: 100%;
-            height: 2px;
-            background: rgba(255,255,255,0.1);
-            position: relative;
-            pointer-events: none;
-        }
-        .slider-fill {
-            position: absolute;
-            height: 100%;
-            background: var(--accent);
-            width: 0%;
-            pointer-events: none;
-        }
-        .slider-knob {
-            position: absolute;
-            width: 14px;
-            height: 14px;
-            background: var(--accent);
-            border-radius: 50%;
-            left: 0%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            box-shadow: 0 0 10px rgba(0,0,0,0.5);
-            pointer-events: none;
-        }
-
-        .toggle-box{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--glass);border-radius:8px;border:1px solid var(--border)}
+        .slider-wrap{width:100%;height:38px;background:var(--glass);border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;padding:0 12px;position:relative;touch-action:none;cursor:ew-resize}
+        .slider-track{width:100%;height:2px;background:rgba(255,255,255,0.1);position:relative;pointer-events:none}
+        .slider-fill{position:absolute;height:100%;background:var(--accent);width:0%;pointer-events:none}
+        .slider-knob{position:absolute;width:14px;height:14px;background:var(--accent);border-radius:50%;left:0%;top:50%;transform:translate(-50%,-50%);box-shadow:0 0 10px rgba(0,0,0,0.5);pointer-events:none}
+        .toggle-box{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--glass);border-radius:8px;border:1px solid var(--border);cursor:pointer;transition:0.2s}
+        .toggle-box:hover{border-color:var(--accent)}
         .dot{width:8px;height:8px;border-radius:50%;background:#222;transition:0.3s}
         .active .dot{background:var(--accent);box-shadow:0 0 10px var(--accent)}
-        
-        .chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px}
-        .chip{padding:8px 12px;background:var(--glass);border:1px solid var(--border);border-radius:6px;font-size:8px;font-weight:800;white-space:nowrap}
+        .chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+        .chips::-webkit-scrollbar{display:none}
+        .chip{padding:8px 12px;background:var(--glass);border:1px solid var(--border);border-radius:6px;font-size:8px;font-weight:800;white-space:nowrap;cursor:pointer;transition:0.2s}
+        .chip:hover{border-color:var(--accent);color:var(--accent)}
         .hidden-file{display:none}
     </style>
 </head>
 <body>
     <div class="ambient-bg" id="bg-layer"></div>
     <div class="overlay-dim"></div>
-
     <div class="core-pane">
         <div class="nav">
             <h2>SETTINGS</h2>
             <div class="close-btn" onclick="window.parent.postMessage('close', '*')">×</div>
         </div>
-
         <div class="row flex-group">
             <div class="group">
                 <label>ACCENT</label>
@@ -98,24 +59,20 @@
                 <input type="file" id="bg-file" class="hidden-file" accept="image/*">
             </div>
         </div>
-
         <div class="row">
             <label>REMOTE URL</label>
             <input type="text" id="bg" placeholder="PASTE LINK...">
         </div>
-
         <div class="row flex-group">
             <button class="btn-action btn-reset" onclick="resetBg()">RESET BG</button>
-            <button class="btn-action btn-reset" onclick="resetAll()">PURGE</button>
+            <button class="btn-action btn-reset" onclick="resetAll()">PURGE ALL</button>
         </div>
-
         <div class="row">
             <div class="toggle-box" id="part-toggle">
-                <label style="margin:0; opacity:1">PARTICLES</label>
+                <label style="margin:0; opacity:1; cursor:pointer">PARTICLES</label>
                 <div class="dot"></div>
             </div>
         </div>
-
         <div class="row flex-group">
             <div class="group">
                 <label>DENSITY</label>
@@ -136,61 +93,61 @@
                 </div>
             </div>
         </div>
-
         <div class="row">
             <label>PRESETS</label>
             <div class="chips" id="p-list"></div>
         </div>
-
         <div class="row flex-group">
             <div class="group"><label>TITLE</label><input type="text" id="title"></div>
             <div class="group"><label>FAVICON</label><input type="text" id="fav"></div>
         </div>
     </div>
-
     <script>
         const sync = () => window.parent.postMessage('sync', '*');
         const defaultBg = "https://img.freepik.com/free-vector/black-background-with-wavy-lines_52683-76524.jpg";
-        
-        // --- Custom Slider Logic ---
-        function initSlider(id, key, onChange) {
+        const fields = ['title', 'clr', 'fav', 'op', 'int'];
+        const defaults = {title:'HRN | CORE', clr:'#89b4fa', op:0.8, int:1.1, fav:''};
+        const presets = [
+            {n:"DEFAULT", t:"HRN | CORE", f:"/logo.svg"},
+            {n:"GOOGLE", t:"Google", f:"https://google.com/favicon.ico"},
+            {n:"DRIVE", t:"My Drive", f:"https://ssl.gstatic.com/docs/doclist/images/drive_2022q3_32dp.png"},
+        ];
+
+        function updateBg(val) {
+            const bgLayer = document.getElementById('bg-layer');
+            if (!val) val = defaultBg;
+            bgLayer.style.backgroundImage = `url('${val}')`;
+            localStorage.setItem('hrn_bg', val);
+            sync();
+        }
+
+        function initSlider(id, key) {
             const wrap = document.getElementById(id);
             const fill = wrap.querySelector('.slider-fill');
             const knob = wrap.querySelector('.slider-knob');
             const min = parseFloat(wrap.dataset.min);
             const max = parseFloat(wrap.dataset.max);
-            
             let isDragging = false;
-
-            function update(e) {
+            const update = (e) => {
                 const rect = wrap.getBoundingClientRect();
                 const clientX = e.touches ? e.touches[0].clientX : e.clientX;
                 let pos = (clientX - rect.left) / rect.width;
                 pos = Math.max(0, Math.min(1, pos));
-                
                 const val = min + (pos * (max - min));
-                const steppedVal = Math.round(val / wrap.dataset.step) * wrap.dataset.step;
-                
-                // UI Update
-                const percent = ((steppedVal - min) / (max - min)) * 100;
-                fill.style.width = percent + '%';
-                knob.style.left = percent + '%';
-                
-                localStorage.setItem('hrn_' + key, steppedVal);
-                if(onChange) onChange(steppedVal);
+                const stepped = Math.round(val / wrap.dataset.step) * wrap.dataset.step;
+                const p = ((stepped - min) / (max - min)) * 100;
+                fill.style.width = p + '%';
+                knob.style.left = p + '%';
+                localStorage.setItem('hrn_' + key, stepped);
                 sync();
-            }
-
+            };
             wrap.addEventListener('mousedown', (e) => { isDragging = true; update(e); });
             window.addEventListener('mousemove', (e) => { if(isDragging) update(e); });
-            window.addEventListener('mouseup', () => { isDragging = false; });
-            
-            wrap.addEventListener('touchstart', (e) => { isDragging = true; update(e); }, {passive: false});
-            window.addEventListener('touchmove', (e) => { if(isDragging) update(e); }, {passive: false});
-            window.addEventListener('touchend', () => { isDragging = false; });
-
-            // Set Initial
-            const saved = localStorage.getItem('hrn_' + key) || (id === 'slider-op' ? 0.8 : 1.1);
+            window.addEventListener('mouseup', () => isDragging = false);
+            wrap.addEventListener('touchstart', (e) => { isDragging = true; update(e); });
+            window.addEventListener('touchmove', (e) => { if(isDragging) update(e); });
+            window.addEventListener('touchend', () => isDragging = false);
+            const saved = localStorage.getItem('hrn_' + key) || defaults[key];
             const p = ((saved - min) / (max - min)) * 100;
             fill.style.width = p + '%';
             knob.style.left = p + '%';
@@ -199,15 +156,16 @@
         initSlider('slider-int', 'int');
         initSlider('slider-op', 'op');
 
-        // --- Other Controls ---
-        const fields = ['title', 'clr', 'fav'];
-        fields.forEach(f => {
+        fields.filter(f => !['op', 'int'].includes(f)).forEach(f => {
             const el = document.getElementById(f);
-            el.value = localStorage.getItem('hrn_' + f) || '';
-            el.oninput = () => { localStorage.setItem('hrn_' + f, el.value); sync(); };
+            el.value = localStorage.getItem('hrn_' + f) || defaults[f];
+            el.oninput = () => {
+                localStorage.setItem('hrn_' + f, el.value);
+                if(f === 'clr') document.documentElement.style.setProperty('--accent', el.value);
+                sync();
+            };
         });
 
-        // Toggle logic
         const partBtn = document.getElementById('part-toggle');
         let partActive = localStorage.getItem('hrn_part') !== 'false';
         if(partActive) partBtn.classList.add('active');
@@ -218,22 +176,35 @@
             sync();
         };
 
-        function updateBg(val) {
-            const bgLayer = document.getElementById('bg-layer');
-            if (!val) val = defaultBg;
-            bgLayer.style.backgroundImage = `url('${val}')`;
-            localStorage.setItem('hrn_bg', val);
-            sync();
-        }
+        const resetBg = () => { updateBg(defaultBg); document.getElementById('bg').value = ""; };
+        
+        const resetAll = () => (fields.forEach(f => (localStorage.removeItem('hrn_'+f), document.getElementById(f).value = defaults[f])), document.documentElement.style.setProperty('--accent', defaults.clr), localStorage.removeItem('hrn_part'), localStorage.removeItem('hrn_bg'), document.getElementById('part-toggle').classList.add('active'), [['slider-int', defaults.int, 0.1, 4.0], ['slider-op', defaults.op, 0.1, 1]].forEach(([id, v, min, max]) => { const w = document.getElementById(id); const p = ((v - min) / (max - min)) * 100; w.querySelector('.slider-fill').style.width = p + '%'; w.querySelector('.slider-knob').style.left = p + '%'; }), document.getElementById('bg').value = "", updateBg(defaultBg), sync());
 
-        document.getElementById('bg').onchange = (e) => updateBg(e.target.value);
         document.getElementById('bg-file').onchange = (e) => {
             const fr = new FileReader();
             fr.onload = () => updateBg(fr.result);
             fr.readAsDataURL(e.target.files[0]);
         };
 
-        const resetBg = () => { updateBg(defaultBg); document.getElementById('bg').value = ""; };
-        const resetAll = () => (fields.forEach(f => (localStorage.removeItem('hrn_'+f), document.getElementById(f).value = defaults[f])), document.documentElement.style.setProperty('--accent', defaults.clr), localStorage.removeItem('hrn_part'), localStorage.removeItem('hrn_bg'), document.getElementById('part-toggle').classList.add('active'), [['slider-int', defaults.int, 0.1, 4.0], ['slider-op', defaults.op, 0.1, 1]].forEach(([id, v, min, max]) => { const w = document.getElementById(id); const p = ((v - min) / (max - min)) * 100; w.querySelector('.slider-fill').style.width = p + '%'; w.querySelector('.slider-knob').style.left = p + '%'; }), document.getElementById('bg').value = "", updateBg(defaultBg), sync());    </script>
+        document.getElementById('bg').onchange = (e) => updateBg(e.target.value);
+
+        const list = document.getElementById('p-list');
+        presets.forEach(p => {
+            const c = document.createElement('div');
+            c.className = 'chip';
+            c.innerText = p.n;
+            c.onclick = () => {
+                document.getElementById('title').value = p.t;
+                document.getElementById('fav').value = p.f;
+                localStorage.setItem('hrn_title', p.t);
+                localStorage.setItem('hrn_fav', p.f);
+                sync();
+            };
+            list.appendChild(c);
+        });
+
+        updateBg(localStorage.getItem('hrn_bg'));
+        document.documentElement.style.setProperty('--accent', localStorage.getItem('hrn_clr') || defaults.clr);
+    </script>
 </body>
 </html>
