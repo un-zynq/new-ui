@@ -59,34 +59,31 @@
 
         <div class="row flex-group">
             <div><label>ACCENT</label><input type="color" id="clr"></div>
-            <div>
-                <label>WALLPAPER</label>
-                <button class="btn-action" onclick="document.getElementById('bg-file').click()">UPLOAD</button>
-                <input type="file" id="bg-file" class="hidden-file" accept="image/*">
-            </div>
+            <div><label>WALLPAPER</label><button class="btn-action" onclick="document.getElementById('bg-file').click()">UPLOAD</button><input type="file" id="bg-file" class="hidden-file" accept="image/*"></div>
         </div>
+
         <div class="row">
             <label>REMOTE URL</label>
             <input type="text" id="bg" placeholder="PASTE LINK...">
         </div>
+
         <div class="row flex-group">
             <button class="btn-action btn-reset" onclick="resetBg()">RESET BG</button>
             <button class="btn-action btn-reset" onclick="resetAll()">PURGE ALL</button>
         </div>
+
         <div class="row">
             <div class="toggle-box" id="part-toggle">
                 <label style="margin:0;opacity:1;cursor:pointer">PARTICLES</label>
                 <div class="dot"></div>
             </div>
         </div>
+
         <div class="row flex-group">
             <div><label>DENSITY</label><div class="slider-wrap" id="slider-int" data-min="0.1" data-max="4.0" data-step="0.1"><div class="slider-track"><div class="slider-fill"></div><div class="slider-knob"></div></div></div></div>
             <div><label>OPACITY</label><div class="slider-wrap" id="slider-op" data-min="0.1" data-max="1" data-step="0.05"><div class="slider-track"><div class="slider-fill"></div><div class="slider-knob"></div></div></div></div>
         </div>
-        <div class="row">
-            <label>PRESETS</label>
-            <div class="chips" id="p-list"></div>
-        </div>
+
         <div class="row flex-group">
             <div><label>TITLE</label><input type="text" id="title"></div>
             <div><label>FAVICON</label><input type="text" id="fav"></div>
@@ -94,197 +91,42 @@
     </div>
 
     <script>
-        const sync = () => window.parent.postMessage('sync','*');
-        const defaultBg = "https://img.freepik.com/free-vector/black-background-with-wavy-lines_52683-76524.jpg";
-        const defaults = {title:'HRN | CORE',clr:'#89b4fa',op:0.8,int:1.1,fav:'',part:true};
-        const presets = [
-            {n:"DEFAULT",t:"HRN | CORE",f:"/logo.svg"},
-            {n:"GOOGLE",t:"Google",f:"https://google.com/favicon.ico"},
-            {n:"DRIVE",t:"My Drive",f:"https://ssl.gstatic.com/docs/doclist/images/drive_2022q3_32dp.png"}
-        ];
-        let db;
-        const DB_NAME = "hrn_db";
-        const DB_VERSION = 1;
+        const sync=()=>window.parent.postMessage('sync','*');
+        const defaultBg="https://img.freepik.com/free-vector/black-background-with-wavy-lines_52683-76524.jpg";
+        const defaults={title:'HRN | CORE',clr:'#89b4fa',op:0.8,int:1.1,fav:'',part:true};
+        const presets=[{n:"DEFAULT",t:"HRN | CORE",f:"/logo.svg"},{n:"GOOGLE",t:"Google",f:"https://google.com/favicon.ico"},{n:"DRIVE",t:"My Drive",f:"https://ssl.gstatic.com/docs/doclist/images/drive_2022q3_32dp.png"}];
+        let db;const DB_NAME="hrn_db";const DB_VERSION=1;
 
-        function initDB() {
-            return new Promise((resolve) => {
-                const request = indexedDB.open(DB_NAME, DB_VERSION);
-                request.onupgradeneeded = e => {
-                    db = e.target.result;
-                    if (!db.objectStoreNames.contains('background')) db.createObjectStore('background', { keyPath: 'id' });
-                };
-                request.onsuccess = e => { db = e.target.result; resolve(); };
-                request.onerror = () => resolve();
-            });
-        }
+        function initDB(){return new Promise(r=>{const req=indexedDB.open(DB_NAME,DB_VERSION);req.onupgradeneeded=e=>{db=e.target.result;if(!db.objectStoreNames.contains('background'))db.createObjectStore('background',{keyPath:'id'})};req.onsuccess=e=>{db=e.target.result;r()};req.onerror=()=>r()})};
 
-        async function saveBackground(value) {
-            if (!db) await initDB();
-            return new Promise((resolve) => {
-                const tx = db.transaction('background', 'readwrite');
-                const store = tx.objectStore('background');
-                store.put({id:'current_bg',value:value,timestamp:Date.now()});
-                tx.oncomplete = () => resolve();
-            });
-        }
+        async function saveBackground(value){if(!db)await initDB();return new Promise(r=>{const tx=db.transaction('background','readwrite');const store=tx.objectStore('background');store.put({id:'current_bg',value:value,timestamp:Date.now()});tx.oncomplete=()=>r()})};
 
-        async function loadBackground() {
-            if (!db) await initDB();
-            return new Promise((resolve) => {
-                const tx = db.transaction('background', 'readonly');
-                const store = tx.objectStore('background');
-                const req = store.get('current_bg');
-                req.onsuccess = () => resolve(req.result ? req.result.value : defaultBg);
-                req.onerror = () => resolve(defaultBg);
-            });
-        }
+        async function loadBackground(){if(!db)await initDB();return new Promise(r=>{const tx=db.transaction('background','readonly');const store=tx.objectStore('background');const req=store.get('current_bg');req.onsuccess=()=>r(req.result?req.result.value:defaultBg);req.onerror=()=>r(defaultBg)})};
 
-        async function updateBg(val) {
-            const bgLayer = document.getElementById('bg-layer');
-            let displayUrl = defaultBg;
-            if (val instanceof Blob) {
-                await saveBackground(val);
-                displayUrl = URL.createObjectURL(val);
-            } else if (typeof val === 'string' && val.length > 0) {
-                await saveBackground(val);
-                displayUrl = val;
-            } else {
-                await saveBackground(defaultBg);
-                displayUrl = defaultBg;
-            }
-            bgLayer.style.backgroundImage = `url('${displayUrl}')`;
-            sync();
-        }
+        async function updateBg(val){const bgLayer=document.getElementById('bg-layer');let displayUrl=defaultBg;if(val instanceof Blob){await saveBackground(val);displayUrl=URL.createObjectURL(val)}else if(typeof val==='string'&&val.length>0){await saveBackground(val);displayUrl=val}else{await saveBackground(defaultBg);displayUrl=defaultBg}bgLayer.style.backgroundImage=`url('${displayUrl}')`;sync()};
 
-        function setSliderUI(id, val) {
-            const wrap = document.getElementById(id);
-            const min = parseFloat(wrap.dataset.min);
-            const max = parseFloat(wrap.dataset.max);
-            const p = ((val - min) / (max - min)) * 100;
-            wrap.querySelector('.slider-fill').style.width = p + '%';
-            wrap.querySelector('.slider-knob').style.left = p + '%';
-        }
+        function setSliderUI(id,val){const wrap=document.getElementById(id);const min=parseFloat(wrap.dataset.min);const max=parseFloat(wrap.dataset.max);const p=((val-min)/(max-min))*100;wrap.querySelector('.slider-fill').style.width=p+'%';wrap.querySelector('.slider-knob').style.left=p+'%'};
 
-        function initSlider(id, key) {
-            const wrap = document.getElementById(id);
-            const min = parseFloat(wrap.dataset.min);
-            const max = parseFloat(wrap.dataset.max);
-            const step = parseFloat(wrap.dataset.step);
-            let isDragging = false;
-            const update = (e) => {
-                const rect = wrap.getBoundingClientRect();
-                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-                let pos = (clientX - rect.left) / rect.width;
-                pos = Math.max(0, Math.min(1, pos));
-                let val = min + (pos * (max - min));
-                val = Math.round(val / step) * step;
-                setSliderUI(id, val);
-                localStorage.setItem('hrn_' + key, val.toFixed(2));
-                sync();
-            };
-            wrap.addEventListener('mousedown', (e) => { isDragging = true; update(e); });
-            window.addEventListener('mousemove', (e) => { if (isDragging) update(e); });
-            window.addEventListener('mouseup', () => isDragging = false);
-            wrap.addEventListener('touchstart', (e) => { isDragging = true; update(e); });
-            window.addEventListener('touchmove', (e) => { if (isDragging) update(e); });
-            window.addEventListener('touchend', () => isDragging = false);
-            const saved = localStorage.getItem('hrn_' + key) || defaults[key];
-            setSliderUI(id, parseFloat(saved));
-        }
+        function initSlider(id,key){const wrap=document.getElementById(id);const min=parseFloat(wrap.dataset.min);const max=parseFloat(wrap.dataset.max);const step=parseFloat(wrap.dataset.step);let isDragging=false;const update=e=>{const rect=wrap.getBoundingClientRect();const clientX=e.touches?e.touches[0].clientX:e.clientX;let pos=(clientX-rect.left)/rect.width;pos=Math.max(0,Math.min(1,pos));let val=min+(pos*(max-min));val=Math.round(val/step)*step;setSliderUI(id,val);localStorage.setItem('hrn_'+key,val.toFixed(2));sync()};wrap.addEventListener('mousedown',e=>{isDragging=true;update(e)});window.addEventListener('mousemove',e=>{if(isDragging)update(e)});window.addEventListener('mouseup',()=>isDragging=false);wrap.addEventListener('touchstart',e=>{isDragging=true;update(e)});window.addEventListener('touchmove',e=>{if(isDragging)update(e)});window.addEventListener('touchend',()=>isDragging=false);const saved=localStorage.getItem('hrn_'+key)||defaults[key];setSliderUI(id,parseFloat(saved))};
 
-        initSlider('slider-int', 'int');
-        initSlider('slider-op', 'op');
+        initSlider('slider-int','int');initSlider('slider-op','op');
 
-        ['title','clr','fav','bg'].forEach(id => {
-            const el = document.getElementById(id);
-            el.value = localStorage.getItem('hrn_' + id) || (id === 'bg' ? '' : defaults[id]);
-            el.oninput = () => {
-                localStorage.setItem('hrn_' + id, el.value);
-                if (id === 'clr') document.documentElement.style.setProperty('--accent', el.value);
-                if (id === 'bg') updateBg(el.value);
-                sync();
-            };
-        });
+        ['title','clr','fav','bg'].forEach(id=>{const el=document.getElementById(id);el.value=localStorage.getItem('hrn_'+id)||(id==='bg'?'':defaults[id]);el.oninput=()=>{localStorage.setItem('hrn_'+id,el.value);if(id==='clr')document.documentElement.style.setProperty('--accent',el.value);if(id==='bg')updateBg(el.value);sync()}});
 
-        // Navigation Mode Toggle
-        const navBtn = document.getElementById('nav-toggle');
-        let useSideNav = localStorage.getItem('hrn_nav_mode') !== 'bottom';
-        if (useSideNav) navBtn.classList.add('active');
+        const navBtn=document.getElementById('nav-toggle');let useSideNav=localStorage.getItem('hrn_nav_mode')!=='bottom';if(useSideNav)navBtn.classList.add('active');
+        navBtn.onclick=()=>{useSideNav=!useSideNav;navBtn.classList.toggle('active',useSideNav);localStorage.setItem('hrn_nav_mode',useSideNav?'side':'bottom');sync()};
 
-        navBtn.onclick = () => {
-            useSideNav = !useSideNav;
-            navBtn.classList.toggle('active', useSideNav);
-            localStorage.setItem('hrn_nav_mode', useSideNav ? 'side' : 'bottom');
-            sync();
-        };
+        const partBtn=document.getElementById('part-toggle');let partActive=localStorage.getItem('hrn_part')!=='false';if(partActive)partBtn.classList.add('active');
+        partBtn.onclick=()=>{partActive=!partActive;partBtn.classList.toggle('active',partActive);localStorage.setItem('hrn_part',partActive);sync()};
 
-        // Particles Toggle
-        const partBtn = document.getElementById('part-toggle');
-        let partActive = localStorage.getItem('hrn_part') !== 'false';
-        if (partActive) partBtn.classList.add('active');
-        partBtn.onclick = () => {
-            partActive = !partActive;
-            partBtn.classList.toggle('active', partActive);
-            localStorage.setItem('hrn_part', partActive);
-            sync();
-        };
+        window.resetBg=async()=>{document.getElementById('bg').value="";await saveBackground(defaultBg);updateBg(defaultBg)};
+        window.resetAll=async()=>{localStorage.clear();if(db){const tx=db.transaction('background','readwrite');tx.objectStore('background').delete('current_bg')}document.getElementById('title').value=defaults.title;document.getElementById('fav').value=defaults.fav;document.getElementById('clr').value=defaults.clr;document.getElementById('bg').value="";document.documentElement.style.setProperty('--accent',defaults.clr);setSliderUI('slider-int',defaults.int);setSliderUI('slider-op',defaults.op);partActive=true;partBtn.classList.add('active');await updateBg(defaultBg);sync()};
 
-        window.resetBg = async () => {
-            document.getElementById('bg').value = "";
-            await saveBackground(defaultBg);
-            updateBg(defaultBg);
-        };
+        document.getElementById('bg-file').onchange=async e=>{const file=e.target.files[0];if(!file)return;await saveBackground(file);const url=URL.createObjectURL(file);document.getElementById('bg-layer').style.backgroundImage=`url('${url}')`;document.getElementById('bg').value="Local File Uploaded";sync()};
 
-        window.resetAll = async () => {
-            localStorage.clear();
-            if (db) {
-                const tx = db.transaction('background', 'readwrite');
-                tx.objectStore('background').delete('current_bg');
-            }
-            document.getElementById('title').value = defaults.title;
-            document.getElementById('fav').value = defaults.fav;
-            document.getElementById('clr').value = defaults.clr;
-            document.getElementById('bg').value = "";
-            document.documentElement.style.setProperty('--accent', defaults.clr);
-            setSliderUI('slider-int', defaults.int);
-            setSliderUI('slider-op', defaults.op);
-            partActive = true;
-            partBtn.classList.add('active');
-            await updateBg(defaultBg);
-            sync();
-        };
+        const list=document.getElementById('p-list');presets.forEach(p=>{const c=document.createElement('div');c.className='chip';c.innerText=p.n;c.onclick=()=>{document.getElementById('title').value=p.t;document.getElementById('fav').value=p.f;localStorage.setItem('hrn_title',p.t);localStorage.setItem('hrn_fav',p.f);sync()};list.appendChild(c)});
 
-        document.getElementById('bg-file').onchange = async (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            await saveBackground(file);
-            const url = URL.createObjectURL(file);
-            document.getElementById('bg-layer').style.backgroundImage = `url('${url}')`;
-            document.getElementById('bg').value = "Local File Uploaded";
-            sync();
-        };
-
-        const list = document.getElementById('p-list');
-        presets.forEach(p => {
-            const c = document.createElement('div');
-            c.className = 'chip';
-            c.innerText = p.n;
-            c.onclick = () => {
-                document.getElementById('title').value = p.t;
-                document.getElementById('fav').value = p.f;
-                localStorage.setItem('hrn_title', p.t);
-                localStorage.setItem('hrn_fav', p.f);
-                sync();
-            };
-            list.appendChild(c);
-        });
-
-        async function startup() {
-            await initDB();
-            const bg = await loadBackground();
-            updateBg(bg);
-            document.documentElement.style.setProperty('--accent', localStorage.getItem('hrn_clr') || defaults.clr);
-        }
+        async function startup(){await initDB();const bg=await loadBackground();updateBg(bg);document.documentElement.style.setProperty('--accent',localStorage.getItem('hrn_clr')||defaults.clr)};
         startup();
     </script>
 </body>
