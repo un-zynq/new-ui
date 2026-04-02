@@ -26,24 +26,20 @@
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         html, body { height: 100%; width: 100%; background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; overflow: hidden; text-transform: uppercase; }
 
-        /* LOADER */
         #loader { position: fixed; inset: 0; z-index: 10000; background: var(--bg); display: flex; align-items: center; justify-content: center; transition: opacity 0.6s ease; }
         .load-line { width: 140px; height: 1px; background: rgba(255,255,255,0.08); position: relative; }
         #progress { position: absolute; height: 100%; width: 0%; background: var(--accent); transition: width 0.3s; box-shadow: 0 0 15px var(--accent); }
 
-        /* BG & EFFECTS */
         .ambient-bg { position: fixed; inset: 0; z-index: 1; pointer-events: none; background-size: cover; background-position: center; opacity: 0; filter: brightness(0.4); transition: opacity 1.5s; }
-        canvas { position: fixed; inset: 0; z-index: 2; pointer-events: none; }
+        canvas { position: fixed; inset: 0; z-index: 2; pointer-events: none; display: block; }
         #mouse-glow { position: fixed; width: 500px; height: 500px; border-radius: 50%; pointer-events: none; z-index: 3; background: radial-gradient(circle, rgba(var(--accent-rgb), 0.1) 0%, transparent 70%); transform: translate(-50%, -50%); filter: blur(50px); }
 
-        /* UI WRAPPER */
         .wrapper { position: relative; display: flex; flex-direction: column; height: 100dvh; width: 100%; z-index: 10; opacity: 0; transition: opacity 0.8s ease; }
         .wrapper.active { opacity: 1; }
 
         .header { position: absolute; top: 40px; width: 100%; display: flex; justify-content: center; }
         .status-pill { background: rgba(255,255,255,0.03); border: 1px solid var(--border); padding: 10px 25px; border-radius: 100px; backdrop-filter: blur(12px); font-size: 9px; font-weight: 900; letter-spacing: 2px; color: var(--text); display: flex; gap: 20px; }
 
-        /* BRANDING */
         .brand { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); text-align: center; pointer-events: none; display: flex; flex-direction: column; align-items: center; width: 100%; }
         .logo { 
             font-size: clamp(5rem, 22vw, 13rem); font-weight: 900; letter-spacing: -0.07em; line-height: 0.8; 
@@ -53,7 +49,6 @@
         .tagline { font-size: 10px; letter-spacing: 11px; color: var(--text); margin-top: 30px; opacity: 0; transform: translateY(15px); transition: 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.5s; font-weight: 500; }
         .tagline.show { opacity: calc(var(--logo-opacity) - 0.2); transform: translateY(0); }
 
-        /* NAVIGATION */
         .side-nav { position: absolute; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 25px; padding: 0 55px; z-index: 20; transition: 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s; }
         .nav-left { left: -100px; opacity: 0; }
         .nav-right { right: -100px; opacity: 0; }
@@ -69,7 +64,6 @@
             cursor: pointer; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); 
             pointer-events: all; backdrop-filter: blur(8px); 
         }
-
         .btn:hover, .btn.active { 
             opacity: var(--hover-opacity); 
             color: var(--accent); border: 1px solid var(--accent); 
@@ -82,7 +76,6 @@
             .side-nav { display: none !important; }
             .mobile-nav { display: flex; }
             .logo { font-size: clamp(6rem, 28vw, 10rem); }
-            .btn:hover { transform: scale(1.05); } 
         }
 
         #container { position: fixed; inset: 0; z-index: 1000; background: var(--bg); display: none; }
@@ -133,27 +126,36 @@
         let particles = [];
         let w, h, cachedAccent;
 
-        function resize() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
-        window.onresize = resize; resize();
+        function resize() { 
+            w = canvas.width = window.innerWidth; 
+            h = canvas.height = window.innerHeight; 
+        }
+        window.onresize = resize; 
+        resize();
 
         function updateCachedColor() {
-            cachedAccent = getComputedStyle(document.documentElement).getPropertyValue('--accent');
+            cachedAccent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
         }
 
         class P {
             constructor() { this.init(); }
             init() {
-                this.x = Math.random() * w; this.y = Math.random() * h;
+                this.x = Math.random() * w; 
+                this.y = Math.random() * h;
                 this.s = Math.random() * 1.5;
-                this.vx = Math.random() * 0.3 - 0.15; this.vy = Math.random() * 0.3 - 0.15;
+                this.vx = Math.random() * 0.4 - 0.2; 
+                this.vy = Math.random() * 0.4 - 0.2;
                 this.o = Math.random() * 0.5;
             }
             draw() {
                 ctx.fillStyle = cachedAccent;
                 ctx.globalAlpha = this.o;
-                ctx.beginPath(); ctx.arc(this.x, this.y, this.s, 0, 7); ctx.fill();
-                this.x += this.vx; this.y += this.vy;
-                if(this.x<0 || this.x>w || this.y<0 || this.y>h) this.init();
+                ctx.beginPath(); 
+                ctx.arc(this.x, this.y, this.s, 0, Math.PI * 2); 
+                ctx.fill();
+                this.x += this.vx; 
+                this.y += this.vy;
+                if(this.x < 0 || this.x > w || this.y < 0 || this.y > h) this.init();
             }
         }
 
@@ -168,7 +170,7 @@
                 if (!r.ok) throw new Error();
                 cache[name] = await r.text();
             } catch(e) { 
-                cache[name] = `<body style="background:#030508; display:flex; align-items:center; justify-content:center; height:100vh;"><button onclick="window.parent.postMessage('close','*')" style="background:none; border:1px solid rgba(255,255,255,0.2); color:white; padding:15px 30px; border-radius:8px; cursor:pointer; font-family:sans-serif; font-size:10px; letter-spacing:4px; font-weight:900; text-transform:uppercase;">EXIT</button></body>`; 
+                cache[name] = `<body style="background:#030508; color:white; display:flex; align-items:center; justify-content:center; height:100vh; font-family:sans-serif;"><button onclick="window.parent.postMessage('close','*')" style="background:none; border:1px solid rgba(255,255,255,0.2); color:white; padding:15px 30px; border-radius:8px; cursor:pointer; font-weight:900; text-transform:uppercase;">EXIT</button></body>`; 
             }
         }
 
@@ -182,8 +184,9 @@
                 $('progress').style.width = (loaded / pages.length * 100) + '%';
             }));
 
-            for(let i=0; i<45; i++) particles.push(new P());
+            for(let i=0; i<60; i++) particles.push(new P());
             loop();
+
             setTimeout(() => {
                 $('loader').style.opacity = '0';
                 setTimeout(() => $('loader').style.display = 'none', 600);
@@ -191,10 +194,14 @@
                 $('tagline').textContent = TAGLINES[Math.floor(Math.random()*TAGLINES.length)];
                 $('tagline').classList.add('show');
                 checkHash();
-            }, 500);
+            }, 800);
         }
 
-        function loop() { ctx.clearRect(0,0,w,h); particles.forEach(p => p.draw()); requestAnimationFrame(loop); }
+        function loop() { 
+            ctx.clearRect(0,0,w,h); 
+            particles.forEach(p => p.draw()); 
+            requestAnimationFrame(loop); 
+        }
 
         function sync() {
             const c = localStorage.getItem('hrn_clr') || "#89b4fa";
