@@ -4,79 +4,76 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <style>
-        :root{--accent:#89b4fa;--bg:#030508;--glass:rgba(255,255,255,0.03);--border:rgba(255,255,255,0.12)}
-        *{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',-apple-system,sans-serif}
+        :root{--accent:#89b4fa;--bg:#030508;--glass:rgba(255,255,255,0.05);--border:rgba(255,255,255,0.12)}
+        *{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',-apple-system,sans-serif;user-select:none;-webkit-tap-highlight-color:transparent}
         body{background:var(--bg);color:#fff;height:100dvh;display:flex;align-items:center;justify-content:center;text-transform:uppercase;letter-spacing:1px;overflow:hidden;touch-action:none}
         
         .ambient-bg{position:fixed;inset:0;z-index:1;background-size:cover;background-position:center;filter:brightness(0.5);transition:opacity 0.5s ease}
         .overlay-dim{position:fixed;inset:0;z-index:2;background:radial-gradient(circle at center,transparent,rgba(0,0,0,0.5))}
         
-        .core-pane{position:relative;z-index:10;width:92%;max-width:400px;max-height:85dvh;background:rgba(8,10,15,0.85);backdrop-filter:blur(30px) saturate(150%);-webkit-backdrop-filter:blur(30px) saturate(150%);border:1px solid var(--border);border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:14px;box-shadow:0 40px 80px rgba(0,0,0,0.9);overflow-y:auto;scrollbar-width:none}
+        .core-pane{position:relative;z-index:10;width:92%;max-width:380px;max-height:85dvh;background:rgba(8,10,15,0.9);backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);border:1px solid var(--border);border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:14px;box-shadow:0 40px 80px rgba(0,0,0,0.9);overflow-y:auto}
         .core-pane::-webkit-scrollbar{display:none}
         
-        .nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:2px}
+        .nav{display:flex;justify-content:space-between;align-items:center}
         .nav h2{font-size:10px;font-weight:900;color:var(--accent);letter-spacing:3px}
-        .close-btn{cursor:pointer;font-size:18px;opacity:0.4;padding:5px}
+        .close-btn{cursor:pointer;font-size:18px;opacity:0.4;padding:4px}
         
         .row{width:100%}
         label{font-size:8px;font-weight:800;opacity:0.4;display:block;margin-bottom:6px;letter-spacing:1px}
         
         input[type="text"],.btn-action{width:100%;background:var(--glass);border:1px solid var(--border);padding:12px;border-radius:8px;color:#fff;font-size:10px;font-weight:700;outline:none}
-        
-        /* Verbeterde Grid voor mobiel */
-        .flex-group{display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%;}
-        
-        @media (max-width: 360px) {
-            .flex-group { grid-template-columns: 1fr; } /* Zet alles onder elkaar op hele kleine schermen */
-        }
-
-        .group{width: 100%; min-width: 0;} /* min-width: 0 is cruciaal voor sliders in grid */
-
-        .btn-action{cursor:pointer; transition: 0.2s;}
+        .flex-group{display:grid;grid-template-columns:1fr 1fr;gap:10px}
         .btn-reset{background:rgba(243,139,168,0.05);border-color:rgba(243,139,168,0.2);color:#f38ba8}
         
         input[type="color"]{-webkit-appearance:none;border:1px solid var(--border);width:100%;height:38px;border-radius:8px;background:var(--glass);cursor:pointer;padding:0}
-        input[type="color"]::-webkit-color-swatch-wrapper{padding:4px}
         input[type="color"]::-webkit-color-swatch{border:none;border-radius:4px}
         
-        /* SLIDER FIX */
-        .slider-box{background:var(--glass);padding:0 12px;border-radius:8px;border:1px solid var(--border);display:flex;align-items:center;height:38px;width:100%;}
-        
-        input[type="range"]{
-            -webkit-appearance:none;
-            width: 100% !important;
-            background: transparent;
-            margin: 0;
+        /* --- CUSTOM SLIDER CSS --- */
+        .slider-wrap {
+            width: 100%;
+            height: 38px;
+            background: var(--glass);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            padding: 0 12px;
+            position: relative;
+            touch-action: none; /* Voorkom scrollen tijdens schuiven */
         }
-
-        input[type="range"]:focus { outline: none; }
-
-        /* Track styling */
-        input[type="range"]::-webkit-slider-runnable-track {
+        .slider-track {
             width: 100%;
             height: 2px;
             background: rgba(255,255,255,0.1);
-            border-radius: 2px;
+            position: relative;
+            pointer-events: none;
         }
-
-        /* Thumb styling - groter voor Samsung/Touch */
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            height: 16px;
-            width: 16px;
-            border-radius: 50%;
+        .slider-fill {
+            position: absolute;
+            height: 100%;
             background: var(--accent);
-            cursor: pointer;
-            margin-top: -7px; /* (track height / 2) - (thumb height / 2) */
-            box-shadow: 0 0 5px rgba(0,0,0,0.5);
+            width: 0%;
+            pointer-events: none;
+        }
+        .slider-knob {
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            background: var(--accent);
+            border-radius: 50%;
+            left: 0%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            pointer-events: none;
         }
 
-        .toggle-box{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--glass);border-radius:8px;border:1px solid var(--border);cursor:pointer}
+        .toggle-box{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--glass);border-radius:8px;border:1px solid var(--border)}
         .dot{width:8px;height:8px;border-radius:50%;background:#222;transition:0.3s}
-        input:checked+.dot{background:var(--accent);box-shadow:0 0 10px var(--accent)}
+        .active .dot{background:var(--accent);box-shadow:0 0 10px var(--accent)}
         
-        .chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
-        .chip{padding:8px 12px;background:var(--glass);border:1px solid var(--border);border-radius:6px;font-size:8px;font-weight:800;cursor:pointer;white-space:nowrap}
+        .chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px}
+        .chip{padding:8px 12px;background:var(--glass);border:1px solid var(--border);border-radius:6px;font-size:8px;font-weight:800;white-space:nowrap}
         .hidden-file{display:none}
     </style>
 </head>
@@ -90,34 +87,31 @@
             <div class="close-btn" onclick="window.parent.postMessage('close', '*')">×</div>
         </div>
 
-        <div class="row">
-            <div class="flex-group">
-                <div class="group">
-                    <label>ACCENT</label>
-                    <input type="color" id="clr">
-                </div>
-                <div class="group">
-                    <label>WALLPAPER</label>
-                    <button class="btn-action" onclick="document.getElementById('bg-file').click()">UPLOAD</button>
-                    <input type="file" id="bg-file" class="hidden-file" accept="image/*">
-                </div>
+        <div class="row flex-group">
+            <div class="group">
+                <label>ACCENT</label>
+                <input type="color" id="clr">
+            </div>
+            <div class="group">
+                <label>WALLPAPER</label>
+                <button class="btn-action" onclick="document.getElementById('bg-file').click()">UPLOAD</button>
+                <input type="file" id="bg-file" class="hidden-file" accept="image/*">
             </div>
         </div>
 
         <div class="row">
             <label>REMOTE URL</label>
-            <input type="text" id="bg" placeholder="PASTE IMAGE LINK...">
+            <input type="text" id="bg" placeholder="PASTE LINK...">
         </div>
 
         <div class="row flex-group">
             <button class="btn-action btn-reset" onclick="resetBg()">RESET BG</button>
-            <button class="btn-action btn-reset" onclick="resetAll()">PURGE ALL</button>
+            <button class="btn-action btn-reset" onclick="resetAll()">PURGE</button>
         </div>
 
         <div class="row">
-            <div class="toggle-box" onclick="document.getElementById('part').click()">
+            <div class="toggle-box" id="part-toggle">
                 <label style="margin:0; opacity:1">PARTICLES</label>
-                <input type="checkbox" id="part" hidden>
                 <div class="dot"></div>
             </div>
         </div>
@@ -125,11 +119,21 @@
         <div class="row flex-group">
             <div class="group">
                 <label>DENSITY</label>
-                <div class="slider-box"><input type="range" id="int" min="0.1" max="4.0" step="0.1"></div>
+                <div class="slider-wrap" id="slider-int" data-min="0.1" data-max="4.0" data-step="0.1">
+                    <div class="slider-track">
+                        <div class="slider-fill"></div>
+                        <div class="slider-knob"></div>
+                    </div>
+                </div>
             </div>
             <div class="group">
                 <label>OPACITY</label>
-                <div class="slider-box"><input type="range" id="op" min="0.1" max="1" step="0.05"></div>
+                <div class="slider-wrap" id="slider-op" data-min="0.1" data-max="1" data-step="0.05">
+                    <div class="slider-track">
+                        <div class="slider-fill"></div>
+                        <div class="slider-knob"></div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -139,14 +143,8 @@
         </div>
 
         <div class="row flex-group">
-            <div class="group">
-                <label>TITLE</label>
-                <input type="text" id="title" placeholder="TAB">
-            </div>
-            <div class="group">
-                <label>FAVICON</label>
-                <input type="text" id="fav" placeholder="URL">
-            </div>
+            <div class="group"><label>TITLE</label><input type="text" id="title"></div>
+            <div class="group"><label>FAVICON</label><input type="text" id="fav"></div>
         </div>
     </div>
 
@@ -154,83 +152,91 @@
         const sync = () => window.parent.postMessage('sync', '*');
         const defaultBg = "https://img.freepik.com/free-vector/black-background-with-wavy-lines_52683-76524.jpg";
         
-        const presets = [
-            {n:"DEFAULT", t:"HRN | CORE", f:"/logo.svg"},
-            {n:"GOOGLE", t:"Google", f:"https://google.com/favicon.ico"},
-            {n:"DRIVE", t:"My Drive", f:"https://ssl.gstatic.com/docs/doclist/images/drive_2022q3_32dp.png"},
-            {n:"GMAIL", t:"Inbox", f:"https://ssl.gstatic.com/ui/v1/icons/mail/images/favicon5.ico"}
-        ];
+        // --- Custom Slider Logic ---
+        function initSlider(id, key, onChange) {
+            const wrap = document.getElementById(id);
+            const fill = wrap.querySelector('.slider-fill');
+            const knob = wrap.querySelector('.slider-knob');
+            const min = parseFloat(wrap.dataset.min);
+            const max = parseFloat(wrap.dataset.max);
+            
+            let isDragging = false;
+
+            function update(e) {
+                const rect = wrap.getBoundingClientRect();
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                let pos = (clientX - rect.left) / rect.width;
+                pos = Math.max(0, Math.min(1, pos));
+                
+                const val = min + (pos * (max - min));
+                const steppedVal = Math.round(val / wrap.dataset.step) * wrap.dataset.step;
+                
+                // UI Update
+                const percent = ((steppedVal - min) / (max - min)) * 100;
+                fill.style.width = percent + '%';
+                knob.style.left = percent + '%';
+                
+                localStorage.setItem('hrn_' + key, steppedVal);
+                if(onChange) onChange(steppedVal);
+                sync();
+            }
+
+            wrap.addEventListener('mousedown', (e) => { isDragging = true; update(e); });
+            window.addEventListener('mousemove', (e) => { if(isDragging) update(e); });
+            window.addEventListener('mouseup', () => { isDragging = false; });
+            
+            wrap.addEventListener('touchstart', (e) => { isDragging = true; update(e); }, {passive: false});
+            window.addEventListener('touchmove', (e) => { if(isDragging) update(e); }, {passive: false});
+            window.addEventListener('touchend', () => { isDragging = false; });
+
+            // Set Initial
+            const saved = localStorage.getItem('hrn_' + key) || (id === 'slider-op' ? 0.8 : 1.1);
+            const p = ((saved - min) / (max - min)) * 100;
+            fill.style.width = p + '%';
+            knob.style.left = p + '%';
+        }
+
+        initSlider('slider-int', 'int');
+        initSlider('slider-op', 'op');
+
+        // --- Other Controls ---
+        const fields = ['title', 'clr', 'fav'];
+        fields.forEach(f => {
+            const el = document.getElementById(f);
+            el.value = localStorage.getItem('hrn_' + f) || '';
+            el.oninput = () => { localStorage.setItem('hrn_' + f, el.value); sync(); };
+        });
+
+        // Toggle logic
+        const partBtn = document.getElementById('part-toggle');
+        let partActive = localStorage.getItem('hrn_part') !== 'false';
+        if(partActive) partBtn.classList.add('active');
+        partBtn.onclick = () => {
+            partActive = !partActive;
+            partBtn.classList.toggle('active');
+            localStorage.setItem('hrn_part', partActive);
+            sync();
+        };
 
         function updateBg(val) {
             const bgLayer = document.getElementById('bg-layer');
-            if (!val || val.trim() === "") val = defaultBg;
+            if (!val) val = defaultBg;
             bgLayer.style.backgroundImage = `url('${val}')`;
             localStorage.setItem('hrn_bg', val);
             sync();
         }
 
-        function resetBg() {
-            updateBg(defaultBg);
-            document.getElementById('bg').value = "";
-        }
-
-        const fields = ['title', 'clr', 'op', 'int', 'fav'];
-        const defaults = {title:'HRN | CORE', clr:'#89b4fa', op:0.8, int:1.1, fav:''};
-
-        const resetAll = () => {
-            fields.forEach(f => {
-                localStorage.removeItem('hrn_'+f);
-                document.getElementById(f).value = defaults[f];
-            });
-            localStorage.removeItem('hrn_part');
-            localStorage.removeItem('hrn_bg');
-            document.getElementById('part').checked = true;
-            document.getElementById('bg').value = "";
-            updateBg(defaultBg);
-            sync();
-        };
-
+        document.getElementById('bg').onchange = (e) => updateBg(e.target.value);
         document.getElementById('bg-file').onchange = (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
             const fr = new FileReader();
             fr.onload = () => updateBg(fr.result);
-            fr.readAsDataURL(file);
+            fr.readAsDataURL(e.target.files[0]);
         };
 
-        fields.forEach(f => {
-            const el = document.getElementById(f);
-            const saved = localStorage.getItem('hrn_' + f);
-            el.value = saved !== null ? saved : defaults[f];
-            el.oninput = () => {
-                localStorage.setItem('hrn_' + f, el.value);
-                sync();
-            };
-        });
+        const resetBg = () => { updateBg(defaultBg); document.getElementById('bg').value = ""; };
+        const resetAll = () => { localStorage.clear(); location.reload(); };
 
-        const partCheck = document.getElementById('part');
-        partCheck.checked = localStorage.getItem('hrn_part') !== 'false';
-        partCheck.onchange = () => {
-            localStorage.setItem('hrn_part', partCheck.checked);
-            sync();
-        };
-
-        const list = document.getElementById('p-list');
-        presets.forEach(p => {
-            const c = document.createElement('div');
-            c.className = 'chip';
-            c.innerText = p.n;
-            c.onclick = () => {
-                document.getElementById('title').value = p.t;
-                document.getElementById('fav').value = p.f;
-                localStorage.setItem('hrn_title', p.t);
-                localStorage.setItem('hrn_fav', p.f);
-                sync();
-            };
-            list.appendChild(c);
-        });
-
-        updateBg(localStorage.getItem('hrn_bg') || defaultBg);
+        updateBg(localStorage.getItem('hrn_bg'));
     </script>
 </body>
 </html>
