@@ -43,7 +43,7 @@ input[type="color"]::-webkit-color-swatch{border:none;border-radius:4px}
 <div class="core-pane">
 <div class="nav">
 <h2>SETTINGS</h2>
-<div class="close-btn" onclick="window.parent.postMessage('close','*')">×</div>
+<div class="close-btn" id="closeBtn">×</div>
 </div>
 
 <div class="row">
@@ -60,7 +60,7 @@ input[type="color"]::-webkit-color-swatch{border:none;border-radius:4px}
 </div>
 <div>
 <label>WALLPAPER</label>
-<button class="btn-action" onclick="document.getElementById('bg-file').click()">UPLOAD</button>
+<button class="btn-action" id="uploadBtn">UPLOAD</button>
 <input type="file" id="bg-file" class="hidden-file" accept="image/*">
 </div>
 </div>
@@ -71,8 +71,8 @@ input[type="color"]::-webkit-color-swatch{border:none;border-radius:4px}
 </div>
 
 <div class="row flex-group">
-<button class="btn-action btn-reset" onclick="resetBg()">RESET BG</button>
-<button class="btn-action btn-reset" onclick="resetAll()">PURGE ALL</button>
+<button class="btn-action btn-reset" id="resetBgBtn">RESET BG</button>
+<button class="btn-action btn-reset" id="resetAllBtn">PURGE ALL</button>
 </div>
 
 <div class="row">
@@ -110,12 +110,12 @@ input[type="color"]::-webkit-color-swatch{border:none;border-radius:4px}
 </div>
 
 <script>
-const sync = () => window.parent.postMessage('sync','*');
+const sync = ()=>window.parent.postMessage('sync','*');
 const defaultBg = "https://img.freepik.com/free-vector/black-background-with-wavy-lines_52683-76524.jpg";
 const defaults = {title:'HRN | CORE', clr:'#89b4fa', op:0.8, int:1.1, fav:'', part:true};
 let db; const DB_NAME="hrn_db"; const DB_VERSION=1;
 
-// Helper: Blob → Data URL
+// Blob to DataURL
 function blobToDataURL(blob){
   return new Promise(res=>{
     const fr = new FileReader();
@@ -138,17 +138,14 @@ function initDB(){
   });
 }
 
-// Save bg (string URL or Blob)
+// Save bg
 async function saveBackground(value){
   if(!db) await initDB();
   let storeVal = value;
-  if(value instanceof Blob){
-    storeVal = await blobToDataURL(value);
-  }
+  if(value instanceof Blob) storeVal = await blobToDataURL(value);
   return new Promise(r=>{
     const tx = db.transaction('background','readwrite');
-    const store = tx.objectStore('background');
-    store.put({id:'current_bg', value:storeVal, timestamp:Date.now()});
+    tx.objectStore('background').put({id:'current_bg', value:storeVal, timestamp:Date.now()});
     tx.oncomplete = ()=>r();
   });
 }
@@ -158,142 +155,128 @@ async function loadBackground(){
   if(!db) await initDB();
   return new Promise(r=>{
     const tx = db.transaction('background','readonly');
-    const store = tx.objectStore('background');
-    const req = store.get('current_bg');
-    req.onsuccess = ()=>r(req.result ? req.result.value : defaultBg);
+    const req = tx.objectStore('background').get('current_bg');
+    req.onsuccess = ()=>r(req.result?req.result.value:defaultBg);
     req.onerror = ()=>r(defaultBg);
   });
 }
 
-// Update bg layer
+// Update bg
 async function updateBg(val){
   const bgLayer = document.getElementById('bg-layer');
   let displayUrl = defaultBg;
-  if(val instanceof Blob){
-    displayUrl = URL.createObjectURL(val);
-    await saveBackground(val);
-  } else if(typeof val==='string' && val.length>0){
-    displayUrl = val;
-    await saveBackground(val);
-  } else {
-    displayUrl = defaultBg;
-    await saveBackground(defaultBg);
-  }
-  bgLayer.style.backgroundImage = `url('${displayUrl}')`;
+  if(val instanceof Blob){ displayUrl = URL.createObjectURL(val); await saveBackground(val); }
+  else if(typeof val==='string' && val.length>0){ displayUrl=val; await saveBackground(val); }
+  else { displayUrl=defaultBg; await saveBackground(defaultBg); }
+  bgLayer.style.backgroundImage=`url('${displayUrl}')`;
   sync();
 }
 
-// Slider UI
+// Reset functions
+async function resetBg(){
+  document.getElementById('bg').value="";
+  await updateBg(defaultBg);
+}
+async function resetAll(){
+  localStorage.clear();
+  if(db) db.transaction('background','readwrite').objectStore('background').delete('current_bg');
+  document.getElementById('title').value=defaults.title;
+  document.getElementById('fav').value=defaults.fav;
+  document.getElementById('clr').value=defaults.clr;
+  document.getElementById('bg').value="";
+  document.documentElement.style.setProperty('--accent',defaults.clr);
+  setSliderUI('slider-int',defaults.int);
+  setSliderUI('slider-op',defaults.op);
+  partBtn.classList.add('active');
+  navBtn.classList.add('active');
+  await updateBg(defaultBg);
+  sync();
+}
+
+// Sliders
 function setSliderUI(id,val){
-  const wrap = document.getElementById(id);
-  const min = parseFloat(wrap.dataset.min);
-  const max = parseFloat(wrap.dataset.max);
-  const p = ((val - min)/(max - min))*100;
-  wrap.querySelector('.slider-fill').style.width = p+'%';
-  wrap.querySelector('.slider-knob').style.left = p+'%';
+  const wrap=document.getElementById(id);
+  const min=parseFloat(wrap.dataset.min), max=parseFloat(wrap.dataset.max);
+  const p=((val-min)/(max-min))*100;
+  wrap.querySelector('.slider-fill').style.width=p+'%';
+  wrap.querySelector('.slider-knob').style.left=p+'%';
 }
 function initSlider(id,key){
-  const wrap = document.getElementById(id);
-  const min = parseFloat(wrap.dataset.min);
-  const max = parseFloat(wrap.dataset.max);
-  const step = parseFloat(wrap.dataset.step);
-  let isDragging = false;
-  const update = e=>{
-    const rect = wrap.getBoundingClientRect();
-    const clientX = e.touches?e.touches[0].clientX:e.clientX;
-    let pos = (clientX - rect.left)/rect.width;
-    pos = Math.max(0, Math.min(1,pos));
+  const wrap=document.getElementById(id);
+  const min=parseFloat(wrap.dataset.min), max=parseFloat(wrap.dataset.max), step=parseFloat(wrap.dataset.step);
+  let dragging=false;
+  const update=e=>{
+    const rect=wrap.getBoundingClientRect();
+    const x=e.touches?e.touches[0].clientX:e.clientX;
+    let pos=(x-rect.left)/rect.width;
+    pos=Math.max(0,Math.min(1,pos));
     let val = min + pos*(max-min);
     val = Math.round(val/step)*step;
     setSliderUI(id,val);
     localStorage.setItem('hrn_'+key,val.toFixed(2));
     sync();
   };
-  wrap.addEventListener('mousedown',e=>{isDragging=true;update(e)});
-  window.addEventListener('mousemove',e=>{if(isDragging)update(e)});
-  window.addEventListener('mouseup',()=>isDragging=false);
-  wrap.addEventListener('touchstart',e=>{isDragging=true;update(e)});
-  window.addEventListener('touchmove',e=>{if(isDragging)update(e)});
-  window.addEventListener('touchend',()=>isDragging=false);
-  const saved = localStorage.getItem('hrn_'+key)||defaults[key];
+  wrap.addEventListener('mousedown',e=>{dragging=true;update(e)});
+  window.addEventListener('mousemove',e=>{if(dragging)update(e)});
+  window.addEventListener('mouseup',()=>dragging=false);
+  wrap.addEventListener('touchstart',e=>{dragging=true;update(e)});
+  window.addEventListener('touchmove',e=>{if(dragging)update(e)});
+  window.addEventListener('touchend',()=>dragging=false);
+  const saved=localStorage.getItem('hrn_'+key)||defaults[key];
   setSliderUI(id,parseFloat(saved));
 }
 initSlider('slider-int','int'); initSlider('slider-op','op');
 
 // Inputs
 ['title','clr','fav','bg'].forEach(id=>{
-  const el = document.getElementById(id);
-  el.value = localStorage.getItem('hrn_'+id)||(id==='bg'?'':defaults[id]);
-  el.oninput = ()=> {
+  const el=document.getElementById(id);
+  el.value=localStorage.getItem('hrn_'+id)||(id==='bg'?'':defaults[id]);
+  el.addEventListener('input',()=> {
     localStorage.setItem('hrn_'+id,el.value);
     if(id==='clr') document.documentElement.style.setProperty('--accent',el.value);
     if(id==='bg') updateBg(el.value);
     sync();
-  };
+  });
 });
 
 // Toggles
-const navBtn = document.getElementById('nav-toggle');
-let useSideNav = localStorage.getItem('hrn_nav_mode')!=='bottom';
+const navBtn=document.getElementById('nav-toggle');
+let useSideNav=localStorage.getItem('hrn_nav_mode')!=='bottom';
 if(useSideNav) navBtn.classList.add('active');
-navBtn.onclick = ()=>{
-  useSideNav = !useSideNav;
+navBtn.addEventListener('click',()=>{
+  useSideNav=!useSideNav;
   navBtn.classList.toggle('active',useSideNav);
-  localStorage.setItem('hrn_nav_mode', useSideNav?'side':'bottom');
+  localStorage.setItem('hrn_nav_mode',useSideNav?'side':'bottom');
   sync();
-};
-
-const partBtn = document.getElementById('part-toggle');
-let partActive = localStorage.getItem('hrn_part')!=='false';
+});
+const partBtn=document.getElementById('part-toggle');
+let partActive=localStorage.getItem('hrn_part')!=='false';
 if(partActive) partBtn.classList.add('active');
-partBtn.onclick = ()=>{
-  partActive = !partActive;
+partBtn.addEventListener('click',()=>{
+  partActive=!partActive;
   partBtn.classList.toggle('active',partActive);
-  localStorage.setItem('hrn_part', partActive);
-  sync();
-};
-
-// Reset buttons
-window.resetBg = async ()=>{
-  document.getElementById('bg').value = "";
-  await updateBg(defaultBg);
-};
-window.resetAll = async ()=>{
-  localStorage.clear();
-  if(db){
-    const tx = db.transaction('background','readwrite');
-    tx.objectStore('background').delete('current_bg');
-  }
-  document.getElementById('title').value = defaults.title;
-  document.getElementById('fav').value = defaults.fav;
-  document.getElementById('clr').value = defaults.clr;
-  document.getElementById('bg').value = "";
-  document.documentElement.style.setProperty('--accent',defaults.clr);
-  setSliderUI('slider-int',defaults.int);
-  setSliderUI('slider-op',defaults.op);
-  partActive=true; partBtn.classList.add('active');
-  useSideNav=true; navBtn.classList.add('active');
-  await updateBg(defaultBg);
-  sync();
-};
-
-// File upload
-document.getElementById('bg-file').addEventListener('change',async e=>{
-  const file = e.target.files[0];
-  if(!file) return;
-  await updateBg(file);
-  document.getElementById('bg').value="Local File Uploaded";
+  localStorage.setItem('hrn_part',partActive);
   sync();
 });
 
+// Upload file
+document.getElementById('uploadBtn').addEventListener('click',()=>document.getElementById('bg-file').click());
+document.getElementById('bg-file').addEventListener('change',async e=>{
+  const file=e.target.files[0]; if(!file) return;
+  await updateBg(file);
+  document.getElementById('bg').value="Local File Uploaded";
+});
+
+// Close btn
+document.getElementById('closeBtn').addEventListener('click',()=>window.parent.postMessage('close','*'));
+
 // Startup
-async function startup(){
+(async function startup(){
   document.documentElement.style.setProperty('--accent',localStorage.getItem('hrn_clr')||defaults.clr);
   await initDB();
   const bg = await loadBackground();
   await updateBg(bg);
-}
-startup();
+})();
 </script>
 </body>
 </html>
