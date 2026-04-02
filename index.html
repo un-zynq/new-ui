@@ -146,11 +146,13 @@
         async function updateBg(val) {
             const bgLayer = $('bg');
             let displayUrl = defaultBg;
+
             if (val instanceof Blob) {
                 displayUrl = URL.createObjectURL(val);
             } else if (typeof val === 'string' && val.length > 0) {
                 displayUrl = val;
             }
+
             bgLayer.style.backgroundImage = `url('${displayUrl}')`;
             bgLayer.classList.add('loaded');
         }
@@ -218,7 +220,7 @@
             }
 
             const bgValue = await loadBackground();
-            updateBg(bgValue);
+            await updateBg(bgValue);
         }
 
         function render() {
@@ -271,7 +273,7 @@
             $('tagline').textContent = taglines[Math.floor(Math.random() * taglines.length)];
             initGL();
             await initDB();
-            sync();
+            await sync();
             render();
             const pages = ['settings', 'games', 'about', 'add'];
             let loadedCount = 0;
