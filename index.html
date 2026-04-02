@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title id="dynamic-title">HRN</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap" rel="stylesheet">
+    <title id="dynamic-title">HRN | Gaming Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
@@ -12,84 +12,117 @@
             --accent: #89b4fa;
             --text: #f0f4ff;
             --dim: rgba(255, 255, 255, 0.4);
-            --border: rgba(255, 255, 255, 0.1);
+            --border: rgba(255, 255, 255, 0.08);
             --logo-opacity: 0.5;
         }
-        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         html, body { height: 100%; width: 100%; background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; overflow: hidden; }
 
-        /* Minimal Loader */
+        /* Full-Screen Minimal Loader */
         #loader {
-            position: fixed; inset: 0; z-index: 9999; background: var(--bg);
-            display: flex; align-items: center; justify-content: center;
-            transition: opacity 0.5s ease;
+            position: fixed; inset: 0; z-index: 10000; background: var(--bg);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .load-line { width: 150px; height: 1px; background: rgba(255,255,255,0.1); position: relative; }
-        #progress { position: absolute; height: 100%; width: 0%; background: var(--accent); transition: width 0.3s; }
+        .load-bar-container { width: 180px; height: 1px; background: rgba(255,255,255,0.05); position: relative; overflow: hidden; margin-top: 20px; }
+        #progress { position: absolute; height: 100%; width: 0%; background: var(--accent); transition: width 0.4s ease; box-shadow: 0 0 15px var(--accent); }
 
-        /* UI */
-        .wrapper { 
-            position: relative; display: flex; flex-direction: column; height: 100dvh; padding: 30px; 
-            z-index: 10; opacity: 0; transition: opacity 0.5s ease;
-        }
-        .wrapper.active { opacity: 1; }
-
-        .ambient-bg { position: fixed; inset: 0; z-index: 1; pointer-events: none; background: center/cover no-repeat; opacity: 0; filter: brightness(0.4); transition: opacity 1s; }
+        /* Background Layers */
+        .ambient-bg { position: fixed; inset: 0; z-index: 1; pointer-events: none; background-size: cover; background-position: center; opacity: 0; filter: brightness(0.4); transition: opacity 1.5s ease; }
         canvas { position: fixed; inset: 0; z-index: 2; pointer-events: none; }
-        
+        #mouse-glow { 
+            position: fixed; width: 600px; height: 600px; border-radius: 50%; pointer-events: none; z-index: 3;
+            background: radial-gradient(circle, rgba(137, 180, 250, 0.1) 0%, transparent 70%);
+            transform: translate(-50%, -50%); mix-blend-mode: screen; filter: blur(60px);
+        }
+
+        /* UI Wrapper */
+        .wrapper { 
+            position: relative; display: flex; flex-direction: column; height: 100dvh; padding: 40px; 
+            z-index: 10; opacity: 0; transform: scale(1.05); transition: opacity 0.8s ease, transform 0.8s ease; 
+        }
+        .wrapper.active { opacity: 1; transform: scale(1); }
+
+        /* Header */
         .header { display: flex; justify-content: center; margin-bottom: auto; }
-        .pill { background: rgba(255,255,255,0.03); border: 1px solid var(--border); padding: 8px 20px; border-radius: 100px; backdrop-filter: blur(10px); font-size: 11px; color: var(--dim); display: flex; gap: 15px; }
+        .status-pill { 
+            background: rgba(255,255,255,0.03); border: 1px solid var(--border); padding: 10px 24px; 
+            border-radius: 100px; backdrop-filter: blur(15px); font-size: 11px; font-weight: 600; 
+            letter-spacing: 1.5px; color: var(--dim); display: flex; gap: 20px; text-transform: uppercase;
+        }
 
+        /* Main Section */
         .main { display: flex; align-items: center; justify-content: space-between; margin: auto 0; width: 100%; }
-        .side-nav { display: flex; flex-direction: column; gap: 15px; }
+        .side-nav { display: flex; flex-direction: column; gap: 20px; }
         .btn { 
-            width: 56px; height: 56px; border-radius: 18px; background: rgba(255,255,255,0.02); 
+            width: 60px; height: 60px; border-radius: 20px; background: rgba(255,255,255,0.02); 
             border: 1px solid var(--border); color: var(--dim); display: flex; align-items: center; 
-            justify-content: center; cursor: pointer; transition: 0.2s; pointer-events: all;
+            justify-content: center; cursor: pointer; transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+            pointer-events: all;
         }
-        .btn:hover, .btn.active { color: var(--accent); border-color: var(--accent); background: rgba(255,255,255,0.05); }
+        .btn:hover, .btn.active { color: var(--accent); border-color: var(--accent); background: rgba(255,255,255,0.05); transform: translateY(-3px); }
 
-        .brand { flex: 1; text-align: center; }
+        .brand { flex: 1; text-align: center; pointer-events: none; }
         .logo { 
-            font-size: clamp(4rem, 15vw, 10rem); font-weight: 900; letter-spacing: -0.05em; line-height: 0.8;
-            background: linear-gradient(180deg, #fff 40%, var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            opacity: var(--logo-opacity); transition: 0.3s;
+            font-size: clamp(5rem, 18vw, 12rem); font-weight: 900; letter-spacing: -0.06em; line-height: 0.8;
+            background: linear-gradient(180deg, #fff 40%, var(--accent) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            opacity: var(--logo-opacity); transition: 0.4s;
         }
-        .tagline { font-size: 11px; letter-spacing: 6px; color: var(--dim); text-transform: uppercase; margin-top: 20px; }
+        .tagline { 
+            font-size: 12px; letter-spacing: 8px; color: var(--dim); text-transform: uppercase; 
+            margin-top: 25px; opacity: 0; transform: translateY(10px); transition: 1s ease 0.5s; 
+        }
+        .tagline.show { opacity: 1; transform: translateY(0); }
 
-        /* Iframe Logic */
-        #container { position: fixed; inset: 0; z-index: 100; background: var(--bg); display: none; }
+        /* Iframe Modal */
+        #container { position: fixed; inset: 0; z-index: 1000; background: var(--bg); display: none; }
         #container.active { display: block; }
         iframe { width: 100%; height: 100%; border: none; }
 
-        @media (max-width: 768px) { .main { flex-direction: column; gap: 40px; } .side-nav { flex-direction: row; } }
+        @media (max-width: 768px) { 
+            .main { flex-direction: column; gap: 60px; } 
+            .side-nav { flex-direction: row; }
+            .desktop-only { display: none; }
+        }
     </style>
 </head>
 <body>
-    <div id="loader"><div class="load-line"><div id="progress"></div></div></div>
+    <div id="loader">
+        <div style="font-size: 10px; letter-spacing: 4px; color: var(--dim); font-weight: 900; text-transform: uppercase;">System Booting</div>
+        <div class="load-bar-container"><div id="progress"></div></div>
+    </div>
+
     <div class="ambient-bg" id="bg"></div>
-    <canvas id="p"></canvas>
+    <div id="mouse-glow"></div>
+    <canvas id="particles"></canvas>
 
     <div class="wrapper" id="ui">
         <div class="header">
-            <div class="pill"><span id="date">--</span><span id="clock">00:00</span></div>
+            <div class="status-pill">
+                <span id="date">CALCULATING</span>
+                <span id="clock">00:00</span>
+            </div>
         </div>
+
         <div class="main">
             <div class="side-nav">
-                <div class="btn" onclick="openPage('settings')"><i data-lucide="settings"></i></div>
-                <div class="btn" onclick="openPage('games')"><i data-lucide="gamepad-2"></i></div>
-                <div class="btn" onclick="openPage('bookmarklets')"><i data-lucide="bookmark"></i></div>
+                <div class="btn" onclick="openPage('settings')" title="Settings"><i data-lucide="settings"></i></div>
+                <div class="btn" onclick="openPage('games')" title="Library"><i data-lucide="gamepad-2"></i></div>
+                <div class="btn" onclick="openPage('bookmarklets')" title="Tools"><i data-lucide="bookmark"></i></div>
             </div>
+
             <div class="brand">
-                <h1 class="logo">HRN</h1>
-                <p class="tagline">SYSTEM READY</p>
+                <h1 class="logo" id="logo-text">HRN</h1>
+                <p class="tagline" id="tagline">Neural Interface Ready</p>
             </div>
-            <div class="side-nav">
-                <div class="btn" onclick="openPage('about')"><i data-lucide="info"></i></div>
-                <div class="btn" onclick="openPage('add')"><i data-lucide="plus"></i></div>
+
+            <div class="side-nav desktop-only">
+                <div class="btn" onclick="openPage('about')" title="Info"><i data-lucide="info"></i></div>
+                <div class="btn" onclick="openPage('add')" title="Add Content"><i data-lucide="plus"></i></div>
             </div>
         </div>
-        <div style="height: 50px;"></div>
+
+        <div style="height: 60px;"></div>
     </div>
 
     <div id="container"><iframe id="frame"></iframe></div>
@@ -98,67 +131,126 @@
         lucide.createIcons();
         const $ = id => document.getElementById(id);
         const cache = {};
+        const taglines = ["NEURAL LINK STABLE", "BUILT DIFFERENT", "STAY AHEAD", "SYSTEM LOADED", "ELITE INTERFACE"];
 
-        // Robust Page Loader
-        async function loadPageData(name) {
-            try {
-                const res = await fetch(name + '.html');
-                if (!res.ok) throw new Error();
-                cache[name] = await res.text();
-            } catch (e) {
-                cache[name] = `<body style="background:#030508;color:#89b4fa;font-family:sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;margin:0;">
-                    <h1 style="font-size:1.2rem;letter-spacing:2px;">PAGE NOT FOUND</h1>
-                    <p style="color:rgba(255,255,255,0.3);font-size:0.8rem;margin-top:10px;">${name}.html is missing</p>
-                    <button onclick="window.parent.postMessage('close','*')" style="margin-top:20px;background:none;border:1px solid #89b4fa;color:#89b4fa;padding:10px 20px;border-radius:5px;cursor:pointer;">Go Back</button>
-                </body>`;
+        // 1. Particle System
+        const canvas = $('particles');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let w, h;
+
+        function resize() {
+            w = canvas.width = window.innerWidth;
+            h = canvas.height = window.innerHeight;
+        }
+        window.onresize = resize;
+        resize();
+
+        class P {
+            constructor() { this.init(); }
+            init() {
+                this.x = Math.random() * w; this.y = Math.random() * h;
+                this.s = Math.random() * 2;
+                this.vx = Math.random() * 0.4 - 0.2; this.vy = Math.random() * 0.4 - 0.2;
+                this.o = Math.random() * 0.5;
             }
+            draw() {
+                ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent');
+                ctx.globalAlpha = this.o;
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.s, 0, 7); ctx.fill();
+                this.x += this.vx; this.y += this.vy;
+                if(this.x<0 || this.x>w || this.y<0 || this.y>h) this.init();
+            }
+        }
+
+        // 2. Core Logic
+        async function loadPage(name) {
+            try {
+                const r = await fetch(name + '.html');
+                cache[name] = r.ok ? await r.text() : generateError(name);
+            } catch(e) { cache[name] = generateError(name); }
+        }
+
+        function generateError(n) {
+            return `<body style="background:#030508;color:#89b4fa;font-family:sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;margin:0;text-align:center;">
+                <h1 style="letter-spacing:5px;font-size:15px;">MODULE_NOT_FOUND</h1>
+                <p style="opacity:0.4;font-size:10px;margin-top:10px;">The page "${n}.html" could not be localized.</p>
+                <button onclick="window.parent.postMessage('close','*')" style="margin-top:30px;background:none;border:1px solid #89b4fa;color:#89b4fa;padding:10px 25px;border-radius:5px;cursor:pointer;font-size:10px;text-transform:uppercase;">Return to Hub</button>
+            </body>`;
         }
 
         async function init() {
             const pages = ['settings', 'games', 'about', 'add', 'bookmarklets'];
             let done = 0;
-            
+
+            // Load Settings & Bg first
+            sync();
+
             for (const p of pages) {
-                await loadPageData(p);
+                await loadPage(p);
                 done++;
                 $('progress').style.width = (done / pages.length * 100) + '%';
             }
 
-            syncSettings();
-            
+            // Start Animation Loop
+            for(let i=0; i<60; i++) particles.push(new P());
+            loop();
+
+            // Fade Out Loader
             setTimeout(() => {
                 $('loader').style.opacity = '0';
-                setTimeout(() => $('loader').style.display = 'none', 500);
+                setTimeout(() => $('loader').style.display = 'none', 600);
                 $('ui').classList.add('active');
-            }, 600);
+                $('tagline').textContent = taglines[Math.floor(Math.random()*taglines.length)];
+                $('tagline').classList.add('show');
+            }, 800);
         }
 
-        function syncSettings() {
-            const clr = localStorage.getItem('hrn_clr') || "#89b4fa";
-            const op = localStorage.getItem('hrn_op') || "0.5";
-            const bg = localStorage.getItem('hrn_bg');
-            
-            document.documentElement.style.setProperty('--accent', clr);
-            document.documentElement.style.setProperty('--logo-opacity', op);
-            if(bg) { $('bg').style.backgroundImage = `url(${bg})`; $('bg').style.opacity = 0.5; }
+        function loop() {
+            ctx.clearRect(0,0,w,h);
+            particles.forEach(p => p.draw());
+            requestAnimationFrame(loop);
+        }
+
+        function sync() {
+            const c = localStorage.getItem('hrn_clr') || "#89b4fa";
+            const o = localStorage.getItem('hrn_op') || "0.5";
+            const b = localStorage.getItem('hrn_bg');
+            const t = localStorage.getItem('hrn_title') || "HRN | Gaming Hub";
+
+            document.documentElement.style.setProperty('--accent', c);
+            document.documentElement.style.setProperty('--logo-opacity', o);
+            document.getElementById('mouse-glow').style.background = `radial-gradient(circle, ${c}1A 0%, transparent 70%)`;
+            document.title = t;
+
+            if(b) { $('bg').style.backgroundImage = `url(${b})`; $('bg').style.opacity = 0.5; }
         }
 
         function openPage(name) {
-            const f = $('frame');
-            f.srcdoc = cache[name];
-            $('container').style.display = 'block';
+            $('frame').srcdoc = cache[name];
+            $('container').classList.add('active');
+            document.querySelectorAll('.btn').forEach(b => {
+                if(b.getAttribute('onclick').includes(name)) b.classList.add('active');
+            });
         }
 
         window.addEventListener('message', e => {
-            if(e.data === 'close') $('container').style.display = 'none';
-            if(e.data === 'sync') syncSettings();
+            if(e.data === 'close') {
+                $('container').classList.remove('active');
+                document.querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
+            }
+            if(e.data === 'sync') sync();
         });
 
-        // Clock logic
+        window.onmousemove = (e) => {
+            $('mouse-glow').style.left = e.clientX + 'px';
+            $('mouse-glow').style.top = e.clientY + 'px';
+        };
+
         setInterval(() => {
             const n = new Date();
-            $('clock').textContent = n.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
-            $('date').textContent = n.toLocaleDateString([], {weekday:'short',day:'numeric'});
+            $('clock').textContent = n.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+            $('date').textContent = n.toLocaleDateString([], {weekday:'long',day:'numeric',month:'short'});
         }, 1000);
 
         window.onload = init;
