@@ -104,16 +104,14 @@
         }
 
 function syncSettings() {
-    // Haal de waarden op uit localStorage
     const themeColor = localStorage.getItem('hrn_theme_color') || "#89b4fa";
     const tabTitle = localStorage.getItem('hrn_tab_title') || "HRN | Gaming Hub";
-    const faviconUrl = localStorage.getItem('hrn_favicon_url');
+    const faviconUrl = localStorage.getItem('hrn_favicon_url'); // Kan leeg zijn
     
-    // 1. Update de Titel instant
+    // 1. Titel Update
     document.title = tabTitle;
 
-    // 2. Update de Favicon instant
-    // We maken een nieuwe link-tag of passen de bestaande aan om de browser te dwingen te refreshen
+    // 2. Favicon Update (met Fallback)
     let link = document.getElementById('dynamic-favicon');
     if (!link) {
         link = document.createElement('link');
@@ -121,14 +119,17 @@ function syncSettings() {
         link.rel = 'icon';
         document.head.appendChild(link);
     }
-    
-    if (faviconUrl) {
-        // We voegen een kleine timestamp toe (?t=...) zodat de browser 
-        // de cache negeert en de nieuwe icon meteen pakt
+
+    if (faviconUrl && faviconUrl.trim() !== "") {
+        // Gebruik de nieuwe URL met cache-buster voor instant resultaat
         link.href = faviconUrl + "?t=" + new Date().getTime();
+    } else {
+        // Als de waarde leeg is, terug naar standaard of leeg
+        link.href = "favicon.ico"; 
+        // Wil je hem écht helemaal weg? Gebruik dan: link.href = "about:blank";
     }
 
-    // 3. Update de rest (Accent & Particles)
+    // 3. Accent & Ambient Sync
     currentAccentColor = themeColor;
     document.documentElement.style.setProperty('--accent', themeColor);
     document.documentElement.style.setProperty('--accent-glow', themeColor + '26');
