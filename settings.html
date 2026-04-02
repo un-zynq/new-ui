@@ -23,13 +23,27 @@
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: var(--ui-border); border-radius: 10px; }
         
+        .ambient-bg { 
+            position: fixed; 
+            inset: -50px; 
+            z-index: 1; 
+            pointer-events: none; 
+            background-size: cover; 
+            background-position: center; 
+            opacity: 0.4; 
+            filter: brightness(0.4) blur(0px);
+            display: none; 
+        }
+
         .wrapper { 
+            position: relative;
             display: flex; 
             align-items: center; 
             justify-content: center; 
             min-height: 100dvh; 
             width: 100%; 
             padding: 40px 20px;
+            z-index: 10;
         }
         .pane { 
             width: 100%;
@@ -71,7 +85,7 @@
         .group { display: flex; flex-direction: column; gap: 8px; }
         label { font-size: 8px; font-weight: 700; opacity: 0.4; letter-spacing: 1.5px; }
 
-        input[type="text"], select { 
+        input[type="text"] { 
             width: 100%; background: rgba(255,255,255,0.04); border: 1px solid var(--ui-border); 
             padding: 12px; border-radius: 12px; color: #fff; font-size: 10px; outline: none;
             font-family: inherit; text-transform: uppercase;
@@ -87,7 +101,7 @@
             width: 100%; padding: 12px; background: rgba(255,255,255,0.04); border: 1px solid var(--ui-border);
             border-radius: 12px; color: #fff; font-size: 9px; cursor: pointer; text-align: center;
         }
-        #bg-file { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+        #bg-file { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; }
 
         input[type="range"] { -webkit-appearance: none; width: 100%; height: 2px; background: rgba(255,255,255,0.1); margin: 15px 0; }
         input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; background: var(--accent); border-radius: 50%; cursor: pointer; box-shadow: 0 0 10px var(--accent); }
@@ -111,6 +125,7 @@
     </style>
 </head>
 <body>
+    <div class="ambient-bg" id="bg-layer"></div>
     <div class="wrapper">
         <div class="pane">
             <div class="header">
@@ -191,6 +206,18 @@
         const fields = ['title', 'clr', 'op', 'int', 'fav'];
         const defaults = { title: 'HRN | CORE', clr: '#89b4fa', op: '0.8', int: '1.1', part: true, fav: '' };
 
+        function updatePreview(url) {
+            const bgLayer = document.getElementById('bg-layer');
+            if (url && url.length > 10) {
+                bgLayer.style.backgroundImage = `url(${url})`;
+                bgLayer.style.display = 'block';
+                document.getElementById('file-label').innerText = "Image Loaded";
+            } else {
+                bgLayer.style.display = 'none';
+                document.getElementById('file-label').innerText = "Upload Image";
+            }
+        }
+
         function initPresets() {
             const container = document.getElementById('preset-container');
             presets.forEach(p => {
@@ -212,8 +239,9 @@
             if (!file) return;
             const reader = new FileReader();
             reader.onload = (e) => {
-                localStorage.setItem('hrn_bg', e.target.result);
-                document.getElementById('file-label').innerText = "Image Loaded";
+                const base64 = e.target.result;
+                localStorage.setItem('hrn_bg', base64);
+                updatePreview(base64);
                 window.parent.postMessage('sync', '*');
             };
             reader.readAsDataURL(file);
@@ -221,6 +249,7 @@
 
         function load() {
             initPresets();
+            updatePreview(localStorage.getItem('hrn_bg'));
 
             fields.forEach(f => {
                 const stored = localStorage.getItem('hrn_' + f);
