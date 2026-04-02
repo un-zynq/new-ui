@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title id="dynamic-title">HRN | CORE</title>
-    
     <link id="app-favicon" rel="icon" type="image/png" href="favicon.png">
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;900&display=swap" rel="stylesheet">
@@ -41,11 +39,7 @@
         .status-pill { background: rgba(255,255,255,0.03); border: 1px solid var(--border); padding: 10px 25px; border-radius: 100px; backdrop-filter: blur(12px); font-size: 9px; font-weight: 900; letter-spacing: 2px; color: var(--text); display: flex; gap: 20px; }
 
         .brand { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); text-align: center; pointer-events: none; display: flex; flex-direction: column; align-items: center; width: 100%; }
-        .logo { 
-            font-size: clamp(5rem, 22vw, 13rem); font-weight: 900; letter-spacing: -0.07em; line-height: 0.8; 
-            background: linear-gradient(180deg, #fff 50%, var(--accent) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
-            opacity: var(--logo-opacity); transition: opacity 0.4s ease; 
-        }
+        .logo { font-size: clamp(5rem, 22vw, 13rem); font-weight: 900; letter-spacing: -0.07em; line-height: 0.8; background: linear-gradient(180deg, #fff 50%, var(--accent) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; opacity: var(--logo-opacity); transition: 0.4s ease; }
         .tagline { font-size: 10px; letter-spacing: 11px; color: var(--text); margin-top: 30px; opacity: 0; transform: translateY(15px); transition: 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.5s; font-weight: 500; }
         .tagline.show { opacity: calc(var(--logo-opacity) - 0.2); transform: translateY(0); }
 
@@ -55,21 +49,8 @@
         .wrapper.active .nav-left { left: 0; opacity: 1; }
         .wrapper.active .nav-right { right: 0; opacity: 1; }
         
-        .btn { 
-            width: 62px; height: 62px; border-radius: 22px; 
-            background: rgba(255,255,255,0.02); border: 1px solid var(--border); color: var(--text);
-            opacity: var(--logo-opacity);
-            display: flex; align-items: center; justify-content: center; 
-            cursor: pointer; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); 
-            pointer-events: all; backdrop-filter: blur(8px); 
-        }
-        .btn:hover, .btn.active { 
-            opacity: var(--hover-opacity); 
-            color: var(--accent); border: 1px solid var(--accent); 
-            background: rgba(var(--accent-rgb), 0.05); 
-            transform: scale(1.1) translateY(-2px); 
-            box-shadow: 0 10px 30px -10px rgba(var(--accent-rgb), 0.3); 
-        }
+        .btn { width: 62px; height: 62px; border-radius: 22px; background: rgba(255,255,255,0.02); border: 1px solid var(--border); color: var(--text); opacity: var(--logo-opacity); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); pointer-events: all; backdrop-filter: blur(8px); }
+        .btn:hover, .btn.active { opacity: var(--hover-opacity); color: var(--accent); border: 1px solid var(--accent); background: rgba(var(--accent-rgb), 0.05); transform: scale(1.1) translateY(-2px); box-shadow: 0 10px 30px -10px rgba(var(--accent-rgb), 0.3); }
 
         #container { position: fixed; inset: 0; z-index: 1000; background: var(--bg); display: none; }
         #container.active { display: block; }
@@ -90,10 +71,7 @@
             <div class="btn" onclick="setHash('settings')"><i data-lucide="settings"></i></div>
             <div class="btn" onclick="setHash('games')"><i data-lucide="gamepad-2"></i></div>
         </div>
-        <div class="brand">
-            <h1 class="logo">HRN</h1>
-            <p class="tagline" id="tagline">SYSTEM READY</p>
-        </div>
+        <div class="brand"><h1 class="logo">HRN</h1><p class="tagline" id="tagline">SYSTEM READY</p></div>
         <div class="side-nav nav-right">
             <div class="btn" onclick="setHash('about')"><i data-lucide="info"></i></div>
             <div class="btn" onclick="setHash('add')"><i data-lucide="plus"></i></div>
@@ -110,67 +88,60 @@
         const ctx = canvas.getContext('2d');
         let particles = [];
         let w, h, cachedAccent;
-        let particlesEnabled = true;
+        let pEnabled = true;
+        let pIntensity = 0.5;
 
         function resize() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
         window.onresize = resize; resize();
 
-        function updateCachedColor() {
-            cachedAccent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || "#89b4fa";
-        }
+        function updateColor() { cachedAccent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || "#89b4fa"; }
 
         class P {
             constructor() { this.init(); }
             init() {
                 this.x = Math.random() * w; this.y = Math.random() * h;
-                this.s = Math.random() * 1.8;
-                this.vx = Math.random() * 0.6 - 0.3; this.vy = Math.random() * 0.6 - 0.3;
-                this.o = Math.random() * 0.6;
+                this.s = (Math.random() * 1.5) + (pIntensity * 2); 
+                this.vx = (Math.random() * 0.4 - 0.2) * (pIntensity * 5); 
+                this.vy = (Math.random() * 0.4 - 0.2) * (pIntensity * 5);
+                this.o = Math.random() * 0.5;
             }
             draw() {
-                if(!particlesEnabled) return;
-                ctx.fillStyle = cachedAccent;
-                ctx.globalAlpha = this.o;
-                ctx.beginPath(); ctx.arc(this.x, this.y, this.s, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = cachedAccent; ctx.globalAlpha = this.o;
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.s, 0, 7); ctx.fill();
                 this.x += this.vx; this.y += this.vy;
                 if(this.x<0 || this.x>w || this.y<0 || this.y>h) this.init();
             }
         }
 
-        function loop() { 
-            ctx.clearRect(0,0,w,h); 
-            if(particlesEnabled) particles.forEach(p => p.draw()); 
-            requestAnimationFrame(loop); 
+        function loop() { ctx.clearRect(0,0,w,h); if(pEnabled) particles.forEach(p => p.draw()); requestAnimationFrame(loop); }
+
+        function sync() {
+            const c = localStorage.getItem('hrn_clr') || "#89b4fa";
+            const o = parseFloat(localStorage.getItem('hrn_op')) || 0.8;
+            pEnabled = localStorage.getItem('hrn_part') !== 'false';
+            pIntensity = parseFloat(localStorage.getItem('hrn_int')) || 0.5;
+            
+            document.documentElement.style.setProperty('--accent', c);
+            document.documentElement.style.setProperty('--logo-opacity', o);
+            document.documentElement.style.setProperty('--hover-opacity', Math.min(o + 0.2, 1.0));
+            $('dynamic-title').textContent = localStorage.getItem('hrn_title') || "HRN | CORE";
+            if(localStorage.getItem('hrn_bg')) { $('bg').style.backgroundImage = `url(${localStorage.getItem('hrn_bg')})`; $('bg').style.opacity = 0.5; }
+            if(localStorage.getItem('hrn_fav')) $('app-favicon').href = localStorage.getItem('hrn_fav');
+            
+            updateColor();
+            // Herschep particles voor nieuwe intensiteit
+            particles = [];
+            let count = Math.floor(pIntensity * 150);
+            for(let i=0; i<count; i++) particles.push(new P());
         }
 
         async function init() {
             sync();
             const pages = ['settings', 'games', 'about', 'add'];
             let loaded = 0;
-            await Promise.all(pages.map(async p => { await fetch(p+'.html').then(r => r.text()).then(t => cache[p]=t); loaded++; $('progress').style.width = (loaded/pages.length*100)+'%'; }));
-            
-            for(let i=0; i<70; i++) particles.push(new P());
-            updateCachedColor();
+            await Promise.all(pages.map(async p => { cache[p] = await fetch(p+'.html').then(r => r.text()); loaded++; $('progress').style.width = (loaded/pages.length*100)+'%'; }));
             loop();
-
             setTimeout(() => { $('loader').style.opacity='0'; setTimeout(()=>$('loader').style.display='none', 600); $('ui').classList.add('active'); $('tagline').classList.add('show'); checkHash(); }, 800);
-        }
-
-        function sync() {
-            const c = localStorage.getItem('hrn_clr') || "#89b4fa";
-            const o = parseFloat(localStorage.getItem('hrn_op')) || 0.8;
-            const b = localStorage.getItem('hrn_bg');
-            const t = localStorage.getItem('hrn_title') || "HRN | CORE";
-            const f = localStorage.getItem('hrn_fav'); 
-            particlesEnabled = localStorage.getItem('hrn_part') !== 'false';
-            
-            document.documentElement.style.setProperty('--accent', c);
-            document.documentElement.style.setProperty('--logo-opacity', o);
-            document.documentElement.style.setProperty('--hover-opacity', Math.min(o + 0.2, 1.0));
-            $('dynamic-title').textContent = t;
-            if(b) { $('bg').style.backgroundImage = `url(${b})`; $('bg').style.opacity = 0.5; }
-            if(f) { $('app-favicon').href = f; }
-            updateCachedColor();
         }
 
         function setHash(n) { window.location.hash = n; }
