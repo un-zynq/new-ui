@@ -10,14 +10,246 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        :root{--bg:#030508;--accent:#89b4fa;--accent-rgb:137,180,250;--ui-silver:rgba(235,240,255,0.85);--ui-border:rgba(255,255,255,0.1)}*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}body,html{height:100%;width:100%;background:var(--bg);color:var(--ui-silver);font-family:Inter,sans-serif;overflow:hidden;text-transform:uppercase}#webgl-canvas{position:fixed;inset:0;z-index:2;pointer-events:none}.ambient-bg{position:fixed;inset:-50px;z-index:1;pointer-events:none;background-size:cover;background-position:center;opacity:0;filter:brightness(.3) blur(40px);transition:2.5s cubic-bezier(.4,0,.2,1)}.ambient-bg.loaded{opacity:.4;filter:brightness(.4) blur(0)}
-        
-        /* Loader Styles */
-        #loader{position:fixed;inset:0;z-index:10000;background:var(--bg);display:flex;align-items:center;justify-content:center;transition:opacity .8s cubic-bezier(0.4, 0, 0.2, 1), visibility .8s}
-        .load-line{width:220px;height:2px;background:rgba(255,255,255,.05);position:relative;overflow:hidden;border-radius:10px}
-        #progress{position:absolute;height:100%;width:0%;background:var(--accent);transition:width 0.6s cubic-bezier(0.22, 1, 0.36, 1);box-shadow:0 0 15px var(--accent)}
-        
-        .wrapper{position:relative;display:flex;flex-direction:column;height:100dvh;width:100%;z-index:10;opacity:0;transform:scale(1.02);transition:1.5s cubic-bezier(.16,1,.3,1)}.wrapper.active{opacity:1;transform:scale(1)}.header{position:absolute;top:38px;width:100%;display:flex;justify-content:center;z-index:100}.status-pill{background:rgba(255,255,255,.02);border:1px solid var(--ui-border);padding:11px 28px;border-radius:100px;backdrop-filter:blur(20px);font-size:9px;font-weight:900;letter-spacing:2.5px;display:flex;gap:28px;transition:.6s ease;color:var(--ui-silver)}.brand{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none;width:100%;display:flex;flex-direction:column;align-items:center}.logo{font-size:clamp(5.5rem,22vw,11.5rem);font-weight:900;letter-spacing:-.06em;line-height:.75;background:linear-gradient(180deg,#fff 50%,var(--accent) 150%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;opacity:.5;transition:.8s}.tagline{font-size:10px;font-weight:600;letter-spacing:9px;color:#fff;margin-top:32px;opacity:0;transform:translateY(20px);transition:1.5s cubic-bezier(.16,1,.3,1) .5s;text-shadow:0 0 15px rgba(255,255,255,.08);line-height:1.8;display:inline-block;max-width:80%;word-wrap:break-word}.tagline.show{opacity:.7;transform:translateY(0)}.side-nav{position:absolute;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:25px;padding:0 55px;z-index:20;transition:1.2s cubic-bezier(.16,1,.3,1)}.nav-left{left:-150px;opacity:0}.nav-right{right:-150px;opacity:0}.wrapper.active .nav-left{left:0;opacity:1}.wrapper.active .nav-right{right:0;opacity:1}.mobile-nav{display:none;gap:18px;margin-top:45px;pointer-events:all;justify-content:center}.btn{width:62px;height:62px;border-radius:20px;background:rgba(255,255,255,.03);border:1px solid var(--ui-border);color:var(--ui-silver);opacity:.85;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.4s cubic-bezier(.16,1,.3,1);pointer-events:all;backdrop-filter:blur(12px)}.btn svg{width:23px;height:23px;stroke-width:1.8px}.btn.active,.btn:hover{opacity:1;color:#fff;border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.08);transform:scale(1.08) translateY(-3px);box-shadow:0 12px 25px -10px rgba(255,255,255,.1)}@media (max-width:900px){.side-nav{display:none!important}.mobile-nav{display:flex}}#container{position:fixed;inset:0;z-index:1000;background:var(--bg);display:none;opacity:0;transition:opacity .5s ease-in-out}#container.active{display:block;opacity:1}iframe{width:100%;height:100%;border:none}
+        :root {
+            --bg: #030508;
+            --accent: #89b4fa;
+            --accent-rgb: 137, 180, 250;
+            --ui-silver: rgba(235,240,255,0.85);
+            --ui-border: rgba(255,255,255,0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body, html {
+            height: 100%;
+            width: 100%;
+            background: var(--bg);
+            color: var(--ui-silver);
+            font-family: Inter, sans-serif;
+            overflow: hidden;
+            text-transform: uppercase;
+        }
+
+        #webgl-canvas {
+            position: fixed;
+            inset: 0;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .ambient-bg {
+            position: fixed;
+            inset: -50px;
+            z-index: 1;
+            pointer-events: none;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            filter: brightness(.3) blur(40px);
+            transition: 2.5s cubic-bezier(.4, 0, .2, 1);
+        }
+
+        .ambient-bg.loaded {
+            opacity: .4;
+            filter: brightness(.4) blur(0);
+        }
+
+        #loader {
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            background: var(--bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity .8s cubic-bezier(0.4, 0, 0.2, 1), visibility .8s;
+        }
+
+        .load-line {
+            width: 220px;
+            height: 2px;
+            background: rgba(255,255,255,.05);
+            position: relative;
+            overflow: hidden;
+            border-radius: 10px;
+        }
+
+        #progress {
+            position: absolute;
+            height: 100%;
+            width: 0%;
+            background: var(--accent);
+            transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+            box-shadow: 0 0 15px var(--accent);
+        }
+
+        .wrapper {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            height: 100dvh;
+            width: 100%;
+            z-index: 10;
+            opacity: 0;
+            transform: scale(1.02);
+            transition: 1.5s cubic-bezier(.16, 1, .3, 1);
+        }
+
+        .wrapper.active {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .header {
+            position: absolute;
+            top: 38px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        .status-pill {
+            background: rgba(255,255,255,.02);
+            border: 1px solid var(--ui-border);
+            padding: 11px 28px;
+            border-radius: 100px;
+            backdrop-filter: blur(20px);
+            font-size: 9px;
+            font-weight: 900;
+            letter-spacing: 2.5px;
+            display: flex;
+            gap: 28px;
+            transition: .6s ease;
+            color: var(--ui-silver);
+        }
+
+        .brand {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            pointer-events: none;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: clamp(5.5rem, 22vw, 11.5rem);
+            font-weight: 900;
+            letter-spacing: -.06em;
+            line-height: .75;
+            background: linear-gradient(180deg, #fff 50%, var(--accent) 150%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            opacity: .5;
+            transition: .8s;
+        }
+
+        .tagline {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 9px;
+            color: #fff;
+            margin-top: 32px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: 1.5s cubic-bezier(.16, 1, .3, 1) .5s;
+            text-shadow: 0 0 15px rgba(255,255,255,.08);
+            line-height: 1.8;
+            display: inline-block;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+
+        .tagline.show {
+            opacity: .7;
+            transform: translateY(0);
+        }
+
+        .side-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            padding: 0 55px;
+            z-index: 20;
+            transition: 1.2s cubic-bezier(.16, 1, .3, 1);
+        }
+
+        .nav-left { left: -150px; opacity: 0; }
+        .nav-right { right: -150px; opacity: 0; }
+
+        .wrapper.active .nav-left { left: 0; opacity: 1; }
+        .wrapper.active .nav-right { right: 0; opacity: 1; }
+
+        .mobile-nav {
+            display: none;
+            gap: 18px;
+            margin-top: 45px;
+            pointer-events: all;
+            justify-content: center;
+        }
+
+        .btn {
+            width: 62px;
+            height: 62px;
+            border-radius: 20px;
+            background: rgba(255,255,255,.03);
+            border: 1px solid var(--ui-border);
+            color: var(--ui-silver);
+            opacity: .85;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: .4s cubic-bezier(.16, 1, .3, 1);
+            pointer-events: all;
+            backdrop-filter: blur(12px);
+        }
+
+        .btn svg { width: 23px; height: 23px; stroke-width: 1.8px; }
+
+        .btn.active, .btn:hover {
+            opacity: 1;
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.35);
+            background: rgba(255,255,255,0.08);
+            transform: scale(1.08) translateY(-3px);
+            box-shadow: 0 12px 25px -10px rgba(255,255,255,0.1);
+        }
+
+        @media (max-width: 900px) {
+            .side-nav { display: none !important; }
+            .mobile-nav { display: flex; }
+        }
+
+        #container {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            background: var(--bg);
+            display: none;
+            opacity: 0;
+            transition: opacity .5s ease-in-out;
+        }
+
+        #container.active {
+            display: block;
+            opacity: 1;
+        }
+
+        iframe { width: 100%; height: 100%; border: none; }
     </style>
 </head>
 <body>
@@ -26,7 +258,12 @@
     <canvas id="webgl-canvas"></canvas>
     
     <div class="wrapper" id="ui">
-        <div class="header"><div class="status-pill" id="status-pill"><span id="date">SYNCING</span><span id="clock">00:00:00</span></div></div>
+        <div class="header">
+            <div class="status-pill" id="status-pill">
+                <span id="date">SYNCING</span>
+                <span id="clock">00:00:00</span>
+            </div>
+        </div>
         <div class="side-nav nav-left">
             <div class="btn" onclick="setHash('settings')"><i data-lucide="settings"></i></div>
             <div class="btn" onclick="setHash('games')"><i data-lucide="gamepad-2"></i></div>
@@ -45,21 +282,30 @@
             <div class="btn" onclick="setHash('add')"><i data-lucide="plus"></i></div>
         </div>
     </div>
+
     <div id="container"><iframe id="frame"></iframe></div>
 
     <script id="vs" type="x-shader/x-vertex">
-        attribute vec2 a_pos; attribute float a_size; attribute float a_op;
-        uniform vec2 u_res; varying float v_op;
+        attribute vec2 a_pos;
+        attribute float a_size;
+        attribute float a_op;
+        uniform vec2 u_res;
+        uniform float u_time;
+        varying float v_op;
         void main() {
             vec2 zeroToOne = a_pos / u_res;
             vec2 clipSpace = (zeroToOne * 2.0) - 1.0;
             gl_Position = vec4(clipSpace * vec2(1, -1), 0, 1);
-            gl_PointSize = a_size * 1.5;
+            float pulse = 0.85 + (sin(u_time * 1.5 + a_op * 10.0) * 0.15);
+            gl_PointSize = a_size * 1.5 * pulse;
             v_op = a_op;
         }
     </script>
+
     <script id="fs" type="x-shader/x-fragment">
-        precision mediump float; uniform vec3 u_color; varying float v_op;
+        precision mediump float;
+        uniform vec3 u_color;
+        varying float v_op;
         void main() {
             float dist = distance(gl_PointCoord, vec2(0.5));
             if (dist > 0.5) discard;
@@ -72,32 +318,59 @@
         const $ = id => document.getElementById(id);
         const canvas = $('webgl-canvas');
         const gl = canvas.getContext('webgl', { antialias: true, alpha: true });
-        let particles = [], pAmount = 0, pEnabled = true;
-        let program, posAttr, sizeAttr, opAttr, resUni, colUni;
-        let cache = {};
-
-        function createShader(gl, type, source) { const s = gl.createShader(type); gl.shaderSource(s, source); gl.compileShader(s); return s; }
         
+        let particles = [], pAmount = 0, pEnabled = true;
+        let program, posAttr, sizeAttr, opAttr, resUni, colUni, timeUni;
+        let posBuffer, sizeBuffer, opBuffer;
+        let cache = {};
+        let startTime = Date.now();
+
+        function createShader(gl, type, source) {
+            const s = gl.createShader(type);
+            gl.shaderSource(s, source);
+            gl.compileShader(s);
+            return s;
+        }
+
         function initGL() {
             const vS = createShader(gl, gl.VERTEX_SHADER, $('vs').text);
             const fS = createShader(gl, gl.FRAGMENT_SHADER, $('fs').text);
-            program = gl.createProgram(); gl.attachShader(program, vS); gl.attachShader(program, fS); gl.linkProgram(program); gl.useProgram(program);
-            posAttr = gl.getAttribLocation(program, "a_pos"); sizeAttr = gl.getAttribLocation(program, "a_size"); opAttr = gl.getAttribLocation(program, "a_op");
-            resUni = gl.getUniformLocation(program, "u_res"); colUni = gl.getUniformLocation(program, "u_color");
-            gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+            program = gl.createProgram();
+            gl.attachShader(program, vS);
+            gl.attachShader(program, fS);
+            gl.linkProgram(program);
+            gl.useProgram(program);
+
+            posAttr = gl.getAttribLocation(program, "a_pos");
+            sizeAttr = gl.getAttribLocation(program, "a_size");
+            opAttr = gl.getAttribLocation(program, "a_op");
+            resUni = gl.getUniformLocation(program, "u_res");
+            colUni = gl.getUniformLocation(program, "u_color");
+            timeUni = gl.getUniformLocation(program, "u_time");
+
+            posBuffer = gl.createBuffer();
+            sizeBuffer = gl.createBuffer();
+            opBuffer = gl.createBuffer();
+
+            gl.enable(gl.BLEND);
+            gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
         }
 
         function sync() {
             const c = localStorage.getItem('hrn_clr') || "#89b4fa";
             const o = parseFloat(localStorage.getItem('hrn_op')) || 0.8;
-            const density = parseFloat(localStorage.getItem('hrn_int')) || 1.1; 
+            const density = parseFloat(localStorage.getItem('hrn_int')) || 1.1;
             const area = (window.innerWidth * window.innerHeight) / 10000;
             const newpAmount = Math.floor(area * density);
             
             pEnabled = localStorage.getItem('hrn_part') !== 'false';
             const r = parseInt(c.slice(1,3), 16)/255, g = parseInt(c.slice(3,5), 16)/255, b = parseInt(c.slice(5,7), 16)/255;
             
-            if(program) { gl.useProgram(program); gl.uniform3f(colUni, r, g, b); }
+            if(program) {
+                gl.useProgram(program);
+                gl.uniform3f(colUni, r, g, b);
+            }
+            
             document.documentElement.style.setProperty('--accent', c);
             $('dynamic-title').textContent = localStorage.getItem('hrn_title') || "HRN | CORE";
 
@@ -105,50 +378,84 @@
                 particles = [];
                 pAmount = newpAmount;
                 for(let i=0; i<pAmount; i++) {
-                    particles.push({ 
-                        x: Math.random()*window.innerWidth, y: Math.random()*window.innerHeight, 
-                        s: Math.random()*4+2.5, vx: (Math.random()-0.5)*0.4, vy: (Math.random()-0.5)*0.4, 
-                        o: o * (Math.random() * 0.5 + 0.5) 
+                    particles.push({
+                        x: Math.random()*window.innerWidth,
+                        y: Math.random()*window.innerHeight,
+                        s: Math.random()*4+2.5,
+                        vx: (Math.random()-0.5)*0.4,
+                        vy: (Math.random()-0.5)*0.4,
+                        o: o * (Math.random() * 0.5 + 0.5)
                     });
                 }
             }
-            if(localStorage.getItem('hrn_bg')) { $('bg').style.backgroundImage = `url(${localStorage.getItem('hrn_bg')})`; $('bg').classList.add('loaded'); }
+            if(localStorage.getItem('hrn_bg')) {
+                $('bg').style.backgroundImage = `url(${localStorage.getItem('hrn_bg')})`;
+                $('bg').classList.add('loaded');
+            }
             if(localStorage.getItem('hrn_fav')) $('app-favicon').href = localStorage.getItem('hrn_fav');
         }
 
         function render() {
-            if(!pEnabled || pAmount === 0) { gl.clear(gl.COLOR_BUFFER_BIT); requestAnimationFrame(render); return; }
-            const posData = new Float32Array(pAmount * 2), sizeData = new Float32Array(pAmount), opData = new Float32Array(pAmount);
-            for(let i=0; i<pAmount; i++) {
-                let p = particles[i]; p.x += p.vx; p.y += p.vy;
-                if(p.x<0) p.x=window.innerWidth; if(p.x>window.innerWidth) p.x=0;
-                if(p.y<0) p.y=window.innerHeight; if(p.y>window.innerHeight) p.y=0;
-                posData[i*2] = p.x; posData[i*2+1] = p.y; sizeData[i] = p.s; opData[i] = p.o;
+            if(!pEnabled || pAmount === 0) {
+                gl.clear(gl.COLOR_BUFFER_BIT);
+                requestAnimationFrame(render);
+                return;
             }
-            gl.clear(gl.COLOR_BUFFER_BIT); gl.uniform2f(resUni, window.innerWidth, window.innerHeight);
-            const bPos = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, bPos); gl.bufferData(gl.ARRAY_BUFFER, posData, gl.STATIC_DRAW);
-            gl.enableVertexAttribArray(posAttr); gl.vertexAttribPointer(posAttr, 2, gl.FLOAT, false, 0, 0);
-            const bSize = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, bSize); gl.bufferData(gl.ARRAY_BUFFER, sizeData, gl.STATIC_DRAW);
-            gl.enableVertexAttribArray(sizeAttr); gl.vertexAttribPointer(sizeAttr, 1, gl.FLOAT, false, 0, 0);
-            const bOp = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, bOp); gl.bufferData(gl.ARRAY_BUFFER, opData, gl.STATIC_DRAW);
-            gl.enableVertexAttribArray(opAttr); gl.vertexAttribPointer(opAttr, 1, gl.FLOAT, false, 0, 0);
-            gl.drawArrays(gl.POINTS, 0, pAmount); requestAnimationFrame(render);
+
+            const elapsed = (Date.now() - startTime) / 1000;
+            const posData = new Float32Array(pAmount * 2);
+            const sizeData = new Float32Array(pAmount);
+            const opData = new Float32Array(pAmount);
+
+            for(let i=0; i<pAmount; i++) {
+                let p = particles[i];
+                p.x += p.vx; p.y += p.vy;
+                if(p.x<0) p.x=window.innerWidth;
+                if(p.x>window.innerWidth) p.x=0;
+                if(p.y<0) p.y=window.innerHeight;
+                if(p.y>window.innerHeight) p.y=0;
+                posData[i*2] = p.x;
+                posData[i*2+1] = p.y;
+                sizeData[i] = p.s;
+                opData[i] = p.o;
+            }
+
+            gl.clear(gl.COLOR_BUFFER_BIT);
+            gl.useProgram(program);
+            gl.uniform2f(resUni, window.innerWidth, window.innerHeight);
+            gl.uniform1f(timeUni, elapsed);
+
+            gl.bindBuffer(gl.ARRAY_BUFFER, posBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER, posData, gl.DYNAMIC_DRAW);
+            gl.enableVertexAttribArray(posAttr);
+            gl.vertexAttribPointer(posAttr, 2, gl.FLOAT, false, 0, 0);
+
+            gl.bindBuffer(gl.ARRAY_BUFFER, sizeBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER, sizeData, gl.DYNAMIC_DRAW);
+            gl.enableVertexAttribArray(sizeAttr);
+            gl.vertexAttribPointer(sizeAttr, 1, gl.FLOAT, false, 0, 0);
+
+            gl.bindBuffer(gl.ARRAY_BUFFER, opBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER, opData, gl.DYNAMIC_DRAW);
+            gl.enableVertexAttribArray(opAttr);
+            gl.vertexAttribPointer(opAttr, 1, gl.FLOAT, false, 0, 0);
+
+            gl.drawArrays(gl.POINTS, 0, pAmount);
+            requestAnimationFrame(render);
         }
 
         async function init() {
-            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-            gl.viewport(0,0,canvas.width,canvas.height);
-            initGL(); 
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            gl.viewport(0, 0, canvas.width, canvas.height);
+            initGL();
             sync();
             render();
 
             const pages = ['settings', 'games', 'about', 'add'];
             let loadedCount = 0;
-
-            // Start progress bar op een klein percentage voor visuele feedback
             $('progress').style.width = '10%';
 
-            // Inladen van alle pagina's
             await Promise.all(pages.map(async (p) => {
                 try {
                     const r = await fetch(p + '.html');
@@ -157,21 +464,15 @@
                     cache[p] = 'Page not found';
                 }
                 loadedCount++;
-                // Update progress bar netjes
                 let percentage = 10 + (loadedCount / pages.length * 80);
                 $('progress').style.width = percentage + '%';
             }));
 
-            // Forceer naar 100%
             $('progress').style.width = '100%';
 
-            // Check of we direct een hash moeten tonen
             const h = window.location.hash.slice(1);
-            if (h && cache[h]) {
-                checkHash(); // Bereid de iframe alvast voor op de achtergrond
-            }
+            if (h && cache[h]) checkHash();
 
-            // Wacht tot de 100% animatie visueel klaar is (0.6s transitie)
             setTimeout(() => {
                 $('loader').style.opacity = '0';
                 setTimeout(() => {
@@ -187,32 +488,32 @@
         function checkHash() {
             const h = window.location.hash.slice(1), container = $('container'), frame = $('frame');
             if(h && cache[h]) {
-                frame.srcdoc = cache[h]; 
+                frame.srcdoc = cache[h];
                 container.style.display = 'block';
-                // Trigger reflow voor animatie
                 void container.offsetWidth;
                 container.classList.add('active');
             } else {
                 container.classList.remove('active');
-                setTimeout(() => { 
-                    if(!window.location.hash) { 
-                        container.style.display = 'none'; 
-                        frame.srcdoc = ''; 
-                    } 
+                setTimeout(() => {
+                    if(!window.location.hash) {
+                        container.style.display = 'none';
+                        frame.srcdoc = '';
+                    }
                 }, 500);
             }
         }
 
-        window.onresize = () => { 
-            canvas.width = window.innerWidth; canvas.height = window.innerHeight; 
-            gl.viewport(0,0,canvas.width,canvas.height); 
-            sync(); 
+        window.onresize = () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            gl.viewport(0, 0, canvas.width, canvas.height);
+            sync();
         };
 
         window.addEventListener('hashchange', checkHash);
-        window.addEventListener('message', e => { 
-            if(e.data === 'sync') sync(); 
-            if(e.data === 'close') setHash(''); 
+        window.addEventListener('message', e => {
+            if(e.data === 'sync') sync();
+            if(e.data === 'close') setHash('');
         });
 
         setInterval(() => {
