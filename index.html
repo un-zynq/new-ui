@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title id="dynamic-title">HRN</title>
-    <link rel="icon" id="dynamic-favicon" href="/logo.svg">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -13,60 +12,57 @@
             --accent: #89b4fa;
             --text: #f0f4ff;
             --dim: rgba(255, 255, 255, 0.4);
-            --border: rgba(255, 255, 255, 0.08);
+            --border: rgba(255, 255, 255, 0.1);
             --logo-opacity: 0.5;
         }
-        /* Global Reset - No more margin/padding bugs */
-        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
-        html, body { height: 100dvh; width: 100%; background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; overflow: hidden; }
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; width: 100%; background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; overflow: hidden; }
 
-        /* Ultra Minimal Loader */
+        /* Minimal Loader */
         #loader {
             position: fixed; inset: 0; z-index: 9999; background: var(--bg);
             display: flex; align-items: center; justify-content: center;
-            transition: opacity 0.4s ease, visibility 0.4s;
+            transition: opacity 0.5s ease;
         }
-        .load-line { width: 120px; height: 1px; background: rgba(255,255,255,0.1); position: relative; overflow: hidden; }
-        #progress { position: absolute; height: 100%; width: 0%; background: var(--accent); transition: width 0.3s ease; box-shadow: 0 0 10px var(--accent); }
+        .load-line { width: 150px; height: 1px; background: rgba(255,255,255,0.1); position: relative; }
+        #progress { position: absolute; height: 100%; width: 0%; background: var(--accent); transition: width 0.3s; }
 
-        /* Layout */
+        /* UI */
         .wrapper { 
-            display: flex; flex-direction: column; height: 100%; padding: 30px; 
-            opacity: 0; transform: translateY(10px); transition: all 0.8s ease; 
+            position: relative; display: flex; flex-direction: column; height: 100dvh; padding: 30px; 
+            z-index: 10; opacity: 0; transition: opacity 0.5s ease;
         }
-        .wrapper.ready { opacity: 1; transform: translateY(0); }
+        .wrapper.active { opacity: 1; }
 
-        .ambient-bg { position: fixed; inset: 0; z-index: 1; background: center/cover no-repeat; opacity: 0; transition: opacity 1s; pointer-events: none; filter: brightness(0.4); }
+        .ambient-bg { position: fixed; inset: 0; z-index: 1; pointer-events: none; background: center/cover no-repeat; opacity: 0; filter: brightness(0.4); transition: opacity 1s; }
         canvas { position: fixed; inset: 0; z-index: 2; pointer-events: none; }
         
-        .header { display: flex; justify-content: center; margin-bottom: auto; z-index: 10; }
-        .pill { background: rgba(255,255,255,0.03); border: 1px solid var(--border); padding: 8px 20px; border-radius: 100px; backdrop-filter: blur(10px); font-size: 11px; font-weight: 600; letter-spacing: 1px; color: var(--dim); display: flex; gap: 15px; }
+        .header { display: flex; justify-content: center; margin-bottom: auto; }
+        .pill { background: rgba(255,255,255,0.03); border: 1px solid var(--border); padding: 8px 20px; border-radius: 100px; backdrop-filter: blur(10px); font-size: 11px; color: var(--dim); display: flex; gap: 15px; }
 
-        .main { display: flex; align-items: center; justify-content: space-between; margin: auto 0; z-index: 10; }
-        .side-nav { display: flex; flex-direction: column; gap: 12px; }
+        .main { display: flex; align-items: center; justify-content: space-between; margin: auto 0; width: 100%; }
+        .side-nav { display: flex; flex-direction: column; gap: 15px; }
         .btn { 
-            width: 54px; height: 54px; border-radius: 16px; background: rgba(255,255,255,0.02); 
+            width: 56px; height: 56px; border-radius: 18px; background: rgba(255,255,255,0.02); 
             border: 1px solid var(--border); color: var(--dim); display: flex; align-items: center; 
-            justify-content: center; cursor: pointer; transition: all 0.2s; backdrop-filter: blur(10px);
+            justify-content: center; cursor: pointer; transition: 0.2s; pointer-events: all;
         }
-        .btn:hover, .btn.active { color: var(--accent); border-color: rgba(255,255,255,0.15); background: rgba(255,255,255,0.05); transform: scale(1.05); }
+        .btn:hover, .btn.active { color: var(--accent); border-color: var(--accent); background: rgba(255,255,255,0.05); }
 
-        .brand { text-align: center; }
+        .brand { flex: 1; text-align: center; }
         .logo { 
-            font-size: clamp(5rem, 20vw, 12rem); font-weight: 900; letter-spacing: -0.06em; line-height: 0.8;
-            background: linear-gradient(180deg, #fff 30%, var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            opacity: var(--logo-opacity); transition: opacity 0.3s ease; cursor: default;
+            font-size: clamp(4rem, 15vw, 10rem); font-weight: 900; letter-spacing: -0.05em; line-height: 0.8;
+            background: linear-gradient(180deg, #fff 40%, var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            opacity: var(--logo-opacity); transition: 0.3s;
         }
-        .logo:hover { opacity: calc(var(--logo-opacity) + 0.15); }
-        .tagline { font-size: 12px; letter-spacing: 8px; color: var(--dim); text-transform: uppercase; margin-top: 20px; opacity: 0; transition: 1s ease 0.4s; }
-        .tagline.show { opacity: 1; }
+        .tagline { font-size: 11px; letter-spacing: 6px; color: var(--dim); text-transform: uppercase; margin-top: 20px; }
 
-        /* Iframe */
-        #container { position: fixed; inset: 0; z-index: 100; background: var(--bg); visibility: hidden; opacity: 0; transition: 0.3s; }
-        #container.active { visibility: visible; opacity: 1; }
+        /* Iframe Logic */
+        #container { position: fixed; inset: 0; z-index: 100; background: var(--bg); display: none; }
+        #container.active { display: block; }
         iframe { width: 100%; height: 100%; border: none; }
 
-        @media (max-width: 768px) { .main { flex-direction: column; gap: 50px; } .side-nav { flex-direction: row; } .desktop-only { display: none; } }
+        @media (max-width: 768px) { .main { flex-direction: column; gap: 40px; } .side-nav { flex-direction: row; } }
     </style>
 </head>
 <body>
@@ -76,93 +72,93 @@
 
     <div class="wrapper" id="ui">
         <div class="header">
-            <div class="pill"><span id="date"></span><span id="clock"></span></div>
+            <div class="pill"><span id="date">--</span><span id="clock">00:00</span></div>
         </div>
         <div class="main">
             <div class="side-nav">
-                <div class="btn" data-p="settings"><i data-lucide="settings"></i></div>
-                <div class="btn" data-p="games"><i data-lucide="gamepad-2"></i></div>
-                <div class="btn" data-p="bookmarklets"><i data-lucide="bookmark"></i></div>
+                <div class="btn" onclick="openPage('settings')"><i data-lucide="settings"></i></div>
+                <div class="btn" onclick="openPage('games')"><i data-lucide="gamepad-2"></i></div>
+                <div class="btn" onclick="openPage('bookmarklets')"><i data-lucide="bookmark"></i></div>
             </div>
             <div class="brand">
                 <h1 class="logo">HRN</h1>
-                <p class="tagline" id="tag">ELITE HUB</p>
+                <p class="tagline">SYSTEM READY</p>
             </div>
-            <div class="side-nav desktop-only">
-                <div class="btn" data-p="about"><i data-lucide="info"></i></div>
-                <div class="btn" data-p="add"><i data-lucide="plus"></i></div>
+            <div class="side-nav">
+                <div class="btn" onclick="openPage('about')"><i data-lucide="info"></i></div>
+                <div class="btn" onclick="openPage('add')"><i data-lucide="plus"></i></div>
             </div>
         </div>
-        <div style="height: 60px;"></div> </div>
+        <div style="height: 50px;"></div>
+    </div>
 
     <div id="container"><iframe id="frame"></iframe></div>
 
     <script>
         lucide.createIcons();
-        const cache = {};
         const $ = id => document.getElementById(id);
-        
-        async function init() {
-            const set = (p) => $("progress").style.width = p + "%";
-            
-            // Step 1: Config
-            set(30);
-            updateUI();
-            
-            // Step 2: Background
-            const bgImg = localStorage.getItem('hrn_bg');
-            if (bgImg) {
-                await new Promise(r => { const i = new Image(); i.src = bgImg; i.onload = r; i.onerror = r; });
-            }
-            set(60);
+        const cache = {};
 
-            // Step 3: Pages
-            const pages = ['settings', 'games', 'about', 'add', 'bookmarklets'];
-            await Promise.all(pages.map(async p => {
-                try { const r = await fetch(p + '.html'); if(r.ok) cache[p] = await r.text(); } catch(e){}
-            }));
-            
-            set(100);
-            setTimeout(() => {
-                $("loader").style.opacity = 0;
-                $("ui").classList.add('ready');
-                $("tag").classList.add('show');
-                if(window.location.hash) openPage(window.location.hash.slice(1));
-            }, 500);
+        // Robust Page Loader
+        async function loadPageData(name) {
+            try {
+                const res = await fetch(name + '.html');
+                if (!res.ok) throw new Error();
+                cache[name] = await res.text();
+            } catch (e) {
+                cache[name] = `<body style="background:#030508;color:#89b4fa;font-family:sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;margin:0;">
+                    <h1 style="font-size:1.2rem;letter-spacing:2px;">PAGE NOT FOUND</h1>
+                    <p style="color:rgba(255,255,255,0.3);font-size:0.8rem;margin-top:10px;">${name}.html is missing</p>
+                    <button onclick="window.parent.postMessage('close','*')" style="margin-top:20px;background:none;border:1px solid #89b4fa;color:#89b4fa;padding:10px 20px;border-radius:5px;cursor:pointer;">Go Back</button>
+                </body>`;
+            }
         }
 
-        function updateUI() {
+        async function init() {
+            const pages = ['settings', 'games', 'about', 'add', 'bookmarklets'];
+            let done = 0;
+            
+            for (const p of pages) {
+                await loadPageData(p);
+                done++;
+                $('progress').style.width = (done / pages.length * 100) + '%';
+            }
+
+            syncSettings();
+            
+            setTimeout(() => {
+                $('loader').style.opacity = '0';
+                setTimeout(() => $('loader').style.display = 'none', 500);
+                $('ui').classList.add('active');
+            }, 600);
+        }
+
+        function syncSettings() {
             const clr = localStorage.getItem('hrn_clr') || "#89b4fa";
             const op = localStorage.getItem('hrn_op') || "0.5";
+            const bg = localStorage.getItem('hrn_bg');
+            
             document.documentElement.style.setProperty('--accent', clr);
             document.documentElement.style.setProperty('--logo-opacity', op);
-            document.title = localStorage.getItem('hrn_title') || "HRN";
-            
-            const bg = localStorage.getItem('hrn_bg');
-            if(bg) { $("bg").style.backgroundImage = `url(${bg})`; $("bg").style.opacity = 0.5; }
+            if(bg) { $('bg').style.backgroundImage = `url(${bg})`; $('bg').style.opacity = 0.5; }
         }
 
-        function openPage(p) {
-            if(!cache[p]) return;
-            $("frame").srcdoc = cache[p];
-            $("container").classList.add('active');
-            document.querySelectorAll('.btn').forEach(b => b.classList.toggle('active', b.dataset.p === p));
+        function openPage(name) {
+            const f = $('frame');
+            f.srcdoc = cache[name];
+            $('container').style.display = 'block';
         }
 
         window.addEventListener('message', e => {
-            if(e.data === 'close') {
-                $("container").classList.remove('active');
-                setTimeout(() => $("frame").srcdoc = "", 300);
-                document.querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
-            }
-            if(e.data === 'sync') updateUI();
+            if(e.data === 'close') $('container').style.display = 'none';
+            if(e.data === 'sync') syncSettings();
         });
 
-        document.querySelectorAll('.btn').forEach(b => b.onclick = () => openPage(b.dataset.p));
+        // Clock logic
         setInterval(() => {
             const n = new Date();
-            $("clock").textContent = n.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
-            $("date").textContent = n.toLocaleDateString([], {weekday:'short',day:'numeric'});
+            $('clock').textContent = n.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+            $('date').textContent = n.toLocaleDateString([], {weekday:'short',day:'numeric'});
         }, 1000);
 
         window.onload = init;
