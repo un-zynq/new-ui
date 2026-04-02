@@ -1,263 +1,218 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title id="dynamic-title">HRN | GAMES</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
             --bg: #030508;
             --accent: #89b4fa;
-            --accent-rgb: 137, 180, 250;
             --ui-silver: rgba(235, 240, 255, .85);
             --ui-border: rgba(255, 255, 255, .1);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        
-        html, body {
-            height: 100%;
-            background: var(--bg);
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: transparent;
             color: var(--ui-silver);
-            font-family: 'Inter', sans-serif;
+            font-family: Inter, sans-serif;
             text-transform: uppercase;
+            padding: 40px 20px;
+            overflow-x: hidden;
         }
 
-        /* ACHTERGROND & CANVAS */
-        #webgl-canvas { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
-        .ambient-bg {
-            position: fixed; inset: 0; z-index: 0;
-            background-size: cover; background-position: center;
-            opacity: 0; filter: brightness(.3) contrast(1.1);
-            transition: 2.5s cubic-bezier(.4, 0, .2, 1);
-        }
-        .ambient-bg.loaded { opacity: 1; }
-        .overlay-dim { position: fixed; inset: 0; z-index: 1; background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.4) 100%); pointer-events: none; }
+        /* Scrollbar styling passend bij HRN */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--ui-border); border-radius: 10px; }
 
-        /* LOADER */
-        #loader {
-            position: fixed; inset: 0; z-index: 10000;
-            background: var(--bg); display: flex; align-items: center; justify-content: center;
-            transition: opacity .8s ease;
-        }
-        .load-line { width: 220px; height: 2px; background: rgba(255,255,255,.05); position: relative; overflow: hidden; border-radius: 10px; }
-        #progress { position: absolute; height: 100%; width: 0; background: var(--accent); transition: width 0.4s ease; }
-
-        /* CONTENT WRAPPER */
-        .wrapper {
-            position: relative;
-            z-index: 10;
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
             opacity: 0;
-            padding: 60px 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            transition: 1.2s cubic-bezier(.16, 1, .3, 1);
+            transform: translateY(20px);
+            transition: 1s cubic-bezier(.16, 1, .3, 1);
         }
-        .wrapper.active { opacity: 1; }
 
-        .section-title {
-            font-size: clamp(2rem, 8vw, 3.5rem);
-            letter-spacing: 20px; font-weight: 900; color: #fff;
-            margin-bottom: 50px; text-shadow: 0 0 30px rgba(var(--accent-rgb), 0.5);
+        .container.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .header-box {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 40px;
+            padding: 0 10px;
+        }
+
+        .title {
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: 5px;
+            color: var(--accent);
+        }
+
+        .close-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: rgba(0, 0, 0, .4);
+            border: 1px solid var(--ui-border);
+            color: var(--ui-silver);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: .3s cubic-bezier(.16, 1, .3, 1);
+            backdrop-filter: blur(12px);
+        }
+
+        .close-btn:hover {
+            border-color: rgba(255, 255, 255, .3);
+            transform: scale(1.05);
+            color: #fff;
+        }
+
+        /* Game Grid */
+        #games-grid {
+            display: grid;
+            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        }
+
+        @media (min-width: 901px) {
+            #games-grid { grid-template-columns: repeat(5, 1fr); }
+        }
+
+        .game-card {
+            position: relative;
+            aspect-ratio: 16/10;
+            background: rgba(0, 0, 0, .4);
+            border: 1px solid var(--ui-border);
+            border-radius: 16px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: .4s cubic-bezier(.16, 1, .3, 1);
+            backdrop-filter: blur(10px);
+        }
+
+        .game-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            border-color: var(--accent);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .game-img {
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0.6;
+            transition: .6s ease;
+        }
+
+        .game-card:hover .game-img {
+            opacity: 0.9;
+            transform: scale(1.1);
+        }
+
+        .game-info {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
             text-align: center;
         }
 
-        /* GRID FIX: GEEN OVERLAP */
-        #games-container {
-            display: grid;
-            width: 100%;
-            max-width: 1600px;
-            gap: 25px;
-            /* Mobiel: 1 of 2 kolommen */
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            pointer-events: all;
+        .game-name {
+            font-size: 9px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            color: #fff;
         }
 
-        /* PC: STRIKT 5 KOLOMMEN */
-        @media (min-width: 1200px) {
-            #games-container {
-                grid-template-columns: repeat(5, 1fr);
-            }
-        }
-
-        /* CARD STYLING */
-        .game-card {
-            position: relative; 
-            aspect-ratio: 16/9;
-            background: rgba(255,255,255,0.03); 
-            border-radius: 15px;
-            border: 1px solid var(--ui-border); 
-            overflow: hidden;
-            cursor: pointer; 
-            transition: 0.4s cubic-bezier(.16, 1, .3, 1);
-            backdrop-filter: blur(10px);
-        }
-        .game-card:hover { 
-            transform: translateY(-10px); 
-            border-color: var(--accent); 
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-        }
-        
-        .game-thumb { 
-            width: 100%; height: 100%; 
-            background-size: cover; 
-            background-position: center; 
-            transition: 0.8s ease; 
-        }
-        .game-card:hover .game-thumb { transform: scale(1.1); }
-
-        .game-info {
-            position: absolute; bottom: 0; left: 0; width: 100%;
-            padding: 15px; 
-            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
-            font-size: 11px; letter-spacing: 1px; font-weight: 800;
-            text-align: center; color: #fff;
-        }
     </style>
 </head>
 <body>
 
-    <div id="loader"><div class="load-line"><div id="progress"></div></div></div>
-    <div class="ambient-bg" id="bg"></div>
-    <div class="overlay-dim"></div>
-    <canvas id="webgl-canvas"></canvas>
+    <div class="container" id="main-container">
+        <div class="header-box">
+            <div class="title">AVAILABLE ENTITIES</div>
+            <div class="close-btn" onclick="window.parent.postMessage('close', '*')">
+                <i data-lucide="x"></i>
+            </div>
+        </div>
 
-    <div class="wrapper" id="ui">
-        <h2 class="section-title">GAMES</h2>
-        <div id="games-container"></div>
+        <div id="games-grid">
+            </div>
     </div>
 
-    <script id="vs" type="x-shader/x-vertex">
-        attribute vec2 a_pos; attribute float a_size; attribute float a_op; uniform vec2 u_res; uniform float u_time; varying float v_op;
-        void main(){
-            vec2 clipSpace = (a_pos / u_res) * 2.0 - 1.0;
-            gl_Position = vec4(clipSpace * vec2(1, -1), 0, 1);
-            gl_PointSize = a_size * (0.9 + (sin(u_time + a_op) * 0.1));
-            v_op = a_op;
-        }
-    </script>
-    <script id="fs" type="x-shader/x-fragment">
-        precision mediump float; uniform vec3 u_color; varying float v_op;
-        void main(){
-            if(distance(gl_PointCoord, vec2(0.5)) > 0.5) discard;
-            gl_FragColor = vec4(u_color, v_op);
-        }
-    </script>
-
     <script>
-        const $ = id => document.getElementById(id);
-        const canvas = $('webgl-canvas');
-        const gl = canvas.getContext('webgl');
-        let particles = [], pAmount = 0, program, startTime = Date.now();
+        // Init Lucide
+        lucide.createIcons();
 
-        // 1. DATA LADEN (g1 t/m g5 destructureren)
-        async function loadGames() {
+        // Consistent accent color vanuit localStorage
+        const accent = localStorage.getItem('hrn_clr') || "#89b4fa";
+        document.documentElement.style.setProperty('--accent', accent);
+
+        async function fetchGames() {
+            const grid = document.getElementById('games-grid');
             try {
                 const response = await fetch('https://un-zynq.github.io/games2.json');
                 const data = await response.json();
-                const container = $('games-container');
-                container.innerHTML = ''; 
+                
+                grid.innerHTML = '';
 
-                // De JSON is een array van groepen: [{g1:{...}}, {g2:{...}}]
+                // Loop door de array met objecten (g1, g2, etc.)
                 data.forEach(groupWrapper => {
-                    const groupKey = Object.keys(groupWrapper)[0]; 
-                    const gamesList = groupWrapper[groupKey];
+                    const groupKey = Object.keys(groupWrapper)[0];
+                    const games = groupWrapper[groupKey];
 
-                    Object.values(gamesList).forEach(game => {
-                        if(game.name && game.alias) {
-                            const card = document.createElement('div');
-                            card.className = 'game-card';
-                            
-                            // Placeholder met Game Naam
-                            const thumbUrl = `https://placehold.co/600x337/0a0c10/89b4fa?text=${encodeURIComponent(game.name)}`;
-                            
-                            card.innerHTML = `
-                                <div class="game-thumb" style="background-image:url('${thumbUrl}')"></div>
-                                <div class="game-info">${game.name}</div>
-                            `;
-                            
-                            card.onclick = () => window.location.href = `/game/${game.alias}`;
-                            container.appendChild(card);
-                        }
+                    Object.values(games).forEach(game => {
+                        const card = document.createElement('div');
+                        card.className = 'game-card';
+                        
+                        // Placeholder image met naam van de game
+                        const thumb = `https://placehold.co/400x250/030508/89b4fa?text=${encodeURIComponent(game.name)}`;
+                        
+                        card.innerHTML = `
+                            <div class="game-img" style="background-image: url('${thumb}')"></div>
+                            <div class="game-info">
+                                <div class="game-name">${game.name}</div>
+                            </div>
+                        `;
+
+                        card.onclick = () => {
+                            window.parent.location.href = `/game/${game.alias}`;
+                        };
+
+                        grid.appendChild(card);
                     });
                 });
-            } catch (err) {
-                console.error("Fout bij laden van games:", err);
+
+                // Laat de container zien na het laden
+                document.getElementById('main-container').classList.add('active');
+
+            } catch (error) {
+                grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; font-size: 10px; opacity: 0.5;">FAILED TO SYNC DATA</div>`;
+                console.error(error);
             }
         }
 
-        // 2. WEBGL ACHTERGROND
-        function initGL() {
-            if(!gl) return;
-            const vS = gl.createShader(gl.VERTEX_SHADER); gl.shaderSource(vS, $('vs').textContent); gl.compileShader(vS);
-            const fS = gl.createShader(gl.FRAGMENT_SHADER); gl.shaderSource(fS, $('fs').textContent); gl.compileShader(fS);
-            program = gl.createProgram(); gl.attachShader(program, vS); gl.attachShader(program, fS); gl.linkProgram(program);
-            gl.useProgram(program);
-            gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
-        }
-
-        function setupParticles() {
-            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-            gl.viewport(0, 0, canvas.width, canvas.height);
-            pAmount = 80; // Vast aantal voor stabiliteit
-            particles = Array.from({length: pAmount}, () => ({
-                x: Math.random() * canvas.width, y: Math.random() * canvas.height,
-                s: Math.random() * 3 + 1, vx: (Math.random() - 0.5) * 0.5, vy: (Math.random() - 0.5) * 0.5,
-                o: Math.random() * 0.5
-            }));
-        }
-
-        function render() {
-            if(!gl) return;
-            const posArr = new Float32Array(pAmount * 2), sizeArr = new Float32Array(pAmount), opArr = new Float32Array(pAmount);
-            particles.forEach((p, i) => {
-                p.x = (p.x + p.vx + canvas.width) % canvas.width;
-                p.y = (p.y + p.vy + canvas.height) % canvas.height;
-                posArr[i*2] = p.x; posArr[i*2+1] = p.y; sizeArr[i] = p.s; opArr[i] = p.o;
-            });
-            gl.clear(gl.COLOR_BUFFER_BIT);
-            gl.uniform3f(gl.getUniformLocation(program, "u_color"), 0.54, 0.71, 0.98);
-            gl.uniform2f(gl.getUniformLocation(program, "u_res"), canvas.width, canvas.height);
-            gl.uniform1f(gl.getUniformLocation(program, "u_time"), (Date.now() - startTime)/1000);
-            
-            const buffer = (name, data, size) => {
-                const b = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, b);
-                gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
-                const a = gl.getAttribLocation(program, name); gl.enableVertexAttribArray(a);
-                gl.vertexAttribPointer(a, size, gl.FLOAT, false, 0, 0);
-            };
-            buffer("a_pos", posArr, 2); buffer("a_size", sizeArr, 1); buffer("a_op", opArr, 1);
-            gl.drawArrays(gl.POINTS, 0, pAmount);
-            requestAnimationFrame(render);
-        }
-
-        // 3. STARTUP SEQUENCE
-        window.onload = async () => {
-            const bgUrl = localStorage.getItem('custom_bg') || "https://img.freepik.com/free-vector/black-background-with-wavy-lines_52683-76524.jpg";
-            $('bg').style.backgroundImage = `url('${bgUrl}')`;
-            $('bg').classList.add('loaded');
-            
-            initGL();
-            setupParticles();
-            render();
-            
-            $('progress').style.width = '30%';
-            await loadGames();
-            $('progress').style.width = '100%';
-
-            setTimeout(() => {
-                $('loader').style.opacity = '0';
-                $('ui').classList.add('active');
-                setTimeout(() => $('loader').style.display = 'none', 800);
-            }, 400);
-        };
-
-        window.onresize = setupParticles;
+        window.onload = fetchGames;
     </script>
 </body>
 </html>
