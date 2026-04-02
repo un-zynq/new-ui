@@ -17,12 +17,12 @@
             --glass: rgba(255, 255, 255, 0.03);
             --glass-border: rgba(255, 255, 255, 0.08);
             --transition: all .2s cubic-bezier(.23, 1, .32, 1);
+            --logo-opacity: 0.5; /* Default */
         }
         * { margin: 0; padding: 0; box-sizing: border-box; scrollbar-width: none; }
         *::-webkit-scrollbar { display: none; }
         html, body { height: 100dvh; width: 100%; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text-main); overflow: hidden; user-select: none; }
         
-        /* Geen blur op de bg voor scherpte */
         .ambient-bg { position: fixed; inset: 0; z-index: 1; background-size: cover; background-position: center; opacity: 0; transition: opacity .4s ease; pointer-events: none; filter: brightness(0.6); }
         #particles { position: fixed; inset: 0; z-index: 3; pointer-events: none; }
         .glow { position: fixed; width: 500px; height: 500px; background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%); border-radius: 50%; pointer-events: none; z-index: 4; opacity: 0.4; filter: blur(60px); mix-blend-mode: screen; transform: translate(-50%, -50%); }
@@ -33,7 +33,6 @@
         
         .main { display: flex; justify-content: space-between; align-items: center; flex-grow: 1; position: relative; z-index: 20; }
         
-        /* Zachtere contrast achter icons */
         .side-nav { display: flex; flex-direction: column; gap: 15px; z-index: 30; }
         .side-link { 
             width: 58px; 
@@ -59,7 +58,25 @@
         .side-link.active::after { content: ''; position: absolute; left: -10px; width: 3px; height: 18px; background: var(--accent); border-radius: 10px; box-shadow: 0 0 10px var(--accent); }
         
         .center-brand { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px; }
-        .logo { font-size: clamp(4.5rem, 18vw, 11rem); font-weight: 900; letter-spacing: -.05em; line-height: .8; background: linear-gradient(180deg, #fff 40%, var(--accent) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 15px 30px rgba(0,0,0,0.5)); }
+        
+        /* Titel met instelbare opacity en hover effect */
+        .logo { 
+            font-size: clamp(4.5rem, 18vw, 11rem); 
+            font-weight: 900; 
+            letter-spacing: -.05em; 
+            line-height: .8; 
+            background: linear-gradient(180deg, #fff 40%, var(--accent) 100%); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+            filter: drop-shadow(0 15px 30px rgba(0,0,0,0.5)); 
+            opacity: var(--logo-opacity);
+            transition: opacity 0.3s ease;
+        }
+        .logo:hover {
+            /* Altijd 10% (0.1) erbij, max 1.0 */
+            opacity: calc(var(--logo-opacity) + 0.1);
+        }
+
         .tagline { font-size: 0.9rem; letter-spacing: 5px; color: var(--text-dim); text-transform: uppercase; opacity: 0; transform: translateY(10px); transition: 0.5s ease; }
         .tagline.show { opacity: 1; transform: translateY(0); }
 
@@ -92,7 +109,7 @@
                 <div class="side-link" data-page="bookmarklets"><i data-lucide="bookmark"></i></div>
             </nav>
             <div class="center-brand">
-                <h1 class="logo">HRN</h1>
+                <h1 class="logo" id="main-logo">HRN</h1>
                 <p class="tagline" id="tagline-text"></p>
             </div>
             <nav class="side-nav desktop-nav-right">
@@ -113,7 +130,6 @@
         const glow = document.getElementById('mouse-glow');
         let currentPage = null;
 
-        // Instant tijd update
         function updateTime() {
             const now = new Date();
             document.getElementById('clock').textContent = now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
@@ -137,11 +153,12 @@
             const themeColor = localStorage.getItem('hrn_theme_color') || "#89b4fa";
             const tabTitle = localStorage.getItem('hrn_tab_title') || "HRN | Gaming Hub";
             const faviconUrl = localStorage.getItem('hrn_favicon_url');
+            const logoOpacity = localStorage.getItem('hrn_logo_opacity') || "0.5";
             
             document.title = tabTitle;
-            let link = document.getElementById('dynamic-favicon');
+            document.documentElement.style.setProperty('--logo-opacity', logoOpacity);
             
-            // Fallback logica voor favicon
+            let link = document.getElementById('dynamic-favicon');
             if (faviconUrl && faviconUrl.trim() !== "") {
                 link.href = faviconUrl;
                 link.onerror = () => { link.href = "/logo.svg"; };
