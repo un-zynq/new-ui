@@ -63,16 +63,14 @@
             <div class="chips" id="p-list"></div>
         </div>
 
-        <div class="row">
-            <div class="flex-group">
-                <div class="group">
-                    <label>Tab Title</label>
-                    <input type="text" id="title" placeholder="Title">
-                </div>
-                <div class="group">
-                    <label>Favicon</label>
-                    <input type="text" id="fav" placeholder="URL">
-                </div>
+        <div class="row flex-group">
+            <div class="group">
+                <label>Tab Title</label>
+                <input type="text" id="title" placeholder="Title">
+            </div>
+            <div class="group">
+                <label>Favicon</label>
+                <input type="text" id="fav" placeholder="URL">
             </div>
         </div>
     </div>
@@ -81,31 +79,81 @@
         lucide.createIcons();
         const sync = () => window.parent.postMessage('sync', '*');
         const defaultBg = "https://img.freepik.com/free-vector/black-background-with-wavy-lines_52683-76524.jpg?semt=ais_incoming&w=740&q=80";
-        const presets = [{n:"Default",t:"HRN",f:"/logo.svg"},{n:"Google",t:"Google",f:"https://google.cm/favicon.ico"},{n:"Drive",t:"My Drive",f:"https://ssl.gstatic.com/docs/doclist/images/drive_2022q3_32dp.png"},{n:"Mail",t:"Gmail",f:"https://ssl.gstatic.com/ui/v1/icons/mail/images/favicon5.ico"},{n:"Classroom",t:"Home - Classroom",f:"https://www.gstatic.com/classroom/favicon.png"}];
+        
+        const presets = [
+            {n:"Default",t:"HRN",f:"/logo.svg"},
+            {n:"Google",t:"Google",f:"https://google.cm/favicon.ico"},
+            {n:"Drive",t:"My Drive",f:"https://ssl.gstatic.com/docs/doclist/images/drive_2022q3_32dp.png"},
+            {n:"Mail",t:"Gmail",f:"https://ssl.gstatic.com/ui/v1/icons/mail/images/favicon5.ico"},
+            {n:"Classroom",t:"Home - Classroom",f:"https://www.gstatic.com/classroom/favicon.png"}
+        ];
+
         presets.forEach(p => {
-            const c = document.createElement('div'); c.className = 'chip'; c.innerText = p.n;
-            c.onclick = () => { document.getElementById('title').value = p.t; document.getElementById('fav').value = p.f; localStorage.setItem('hrn_title', p.t); localStorage.setItem('hrn_fav', p.f); sync(); };
+            const c = document.createElement('div'); 
+            c.className = 'chip'; 
+            c.innerText = p.n;
+            c.onclick = () => { 
+                document.getElementById('title').value = p.t; 
+                document.getElementById('fav').value = p.f; 
+                localStorage.setItem('hrn_title', p.t); 
+                localStorage.setItem('hrn_fav', p.f); 
+                sync(); 
+            };
             document.getElementById('p-list').appendChild(c);
         });
+
         function updateBg(val) {
             const bgLayer = document.getElementById('bg-layer');
             const bgToSet = (val && val.length > 5) ? val : defaultBg;
-            localStorage.setItem('hrn_bg', bgToSet); bgLayer.style.backgroundImage = `url(${bgToSet})`; sync();
+            localStorage.setItem('hrn_bg', bgToSet); 
+            bgLayer.style.backgroundImage = `url(${bgToSet})`; 
+            sync();
         }
-        document.getElementById('bg-file').onchange = (e) => { const fr = new FileReader(); fr.onload = () => updateBg(fr.result); fr.readAsDataURL(e.target.files[0]); };
-        document.getElementById('bg').onchange = async (e) => {
-            const url = e.target.value;
-            if(url.startsWith('http')) {
-                try { const r = await fetch(url); const b = await r.blob(); const fr = new FileReader(); fr.onloadend = () => { updateBg(fr.result); e.target.value = ''; }; fr.readAsDataURL(b); } catch { updateBg(url); }
+        document.getElementById('bg-file').onchange = (e) => { 
+            if(!e.target.files[0]) return;
+            const fr = new FileReader(); 
+            fr.onload = () => updateBg(fr.result); 
+            fr.readAsDataURL(e.target.files[0]); 
+        };
+        const bgInput = document.getElementById('bg');
+        bgInput.onchange = async () => {
+            const url = bgInput.value.trim();
+            if(!url || !url.startsWith('http')) return;
+
+            try { 
+                const r = await fetch(url); 
+                if (!r.ok) throw new Error();
+                const b = await r.blob(); 
+                const fr = new FileReader(); 
+                fr.onloadend = () => updateBg(fr.result); 
+                fr.readAsDataURL(b); 
+            } catch (err) { 
+                updateBg(url); 
             }
         };
         ['title', 'clr', 'op', 'int', 'fav'].forEach(f => {
-            const el = document.getElementById(f); const defs = {title:'HRN | CORE', clr:'#89b4fa', op:0.8, int:1.1, fav:''};
-            el.value = localStorage.getItem('hrn_'+f) || defs[f]; el.oninput = () => { localStorage.setItem('hrn_'+f, el.value); sync(); };
+            const el = document.getElementById(f); 
+            const defs = {title:'HRN | CORE', clr:'#89b4fa', op:0.8, int:1.1, fav:''};
+                        const saved = localStorage.getItem('hrn_'+f);
+            el.value = saved !== null ? saved : defs[f]; 
+            el.oninput = () => { 
+                localStorage.setItem('hrn_'+f, el.value); 
+                sync(); 
+            };
         });
-        const partCheck = document.getElementById('part'); partCheck.checked = localStorage.getItem('hrn_part') !== 'false';
-        partCheck.onchange = () => { localStorage.setItem('hrn_part', partCheck.checked); sync(); };
-        updateBg(localStorage.getItem('hrn_bg'));
+        const partCheck = document.getElementById('part'); 
+        partCheck.checked = localStorage.getItem('hrn_part') !== 'false';
+        partCheck.onchange = () => { 
+            localStorage.setItem('hrn_part', partCheck.checked); 
+            sync(); 
+        };
+        const initialBg = localStorage.getItem('hrn_bg');
+        if(initialBg) {
+            updateBg(initialBg);
+            if(initialBg.startsWith('http')) bgInput.value = initialBg;
+        } else {
+            updateBg(defaultBg);
+        }
     </script>
 </body>
 </html>
