@@ -103,23 +103,43 @@
             checkHash();
         }
 
-        function syncSettings() {
-            currentAccentColor = localStorage.getItem('hrn_theme_color') || "#89b4fa";
-            const bgUrl = localStorage.getItem('hrn_bg_url');
-            const tabTitle = localStorage.getItem('hrn_tab_title') || "HRN | Gaming Hub";
-            const favicon = localStorage.getItem('hrn_favicon_url');
-            
-            document.documentElement.style.setProperty('--accent', currentAccentColor);
-            document.documentElement.style.setProperty('--accent-glow', currentAccentColor + '26'); // 15% hex alpha
-            document.getElementById('dynamic-title').textContent = tabTitle;
-            if(favicon) document.getElementById('dynamic-favicon').href = favicon;
-            
-            const ambient = document.getElementById('ambient-bg');
-            ambient.style.backgroundImage = bgUrl ? `url('${bgUrl}')` : "none";
-            ambient.style.opacity = bgUrl ? "0.4" : "0";
-            
-            initParticles(localStorage.getItem('hrn_particle_amount') || "mid");
-        }
+function syncSettings() {
+    // Haal de waarden op uit localStorage
+    const themeColor = localStorage.getItem('hrn_theme_color') || "#89b4fa";
+    const tabTitle = localStorage.getItem('hrn_tab_title') || "HRN | Gaming Hub";
+    const faviconUrl = localStorage.getItem('hrn_favicon_url');
+    
+    // 1. Update de Titel instant
+    document.title = tabTitle;
+
+    // 2. Update de Favicon instant
+    // We maken een nieuwe link-tag of passen de bestaande aan om de browser te dwingen te refreshen
+    let link = document.getElementById('dynamic-favicon');
+    if (!link) {
+        link = document.createElement('link');
+        link.id = 'dynamic-favicon';
+        link.rel = 'icon';
+        document.head.appendChild(link);
+    }
+    
+    if (faviconUrl) {
+        // We voegen een kleine timestamp toe (?t=...) zodat de browser 
+        // de cache negeert en de nieuwe icon meteen pakt
+        link.href = faviconUrl + "?t=" + new Date().getTime();
+    }
+
+    // 3. Update de rest (Accent & Particles)
+    currentAccentColor = themeColor;
+    document.documentElement.style.setProperty('--accent', themeColor);
+    document.documentElement.style.setProperty('--accent-glow', themeColor + '26');
+    
+    const bgUrl = localStorage.getItem('hrn_bg_url');
+    const ambient = document.getElementById('ambient-bg');
+    ambient.style.backgroundImage = bgUrl ? `url('${bgUrl}')` : "none";
+    ambient.style.opacity = bgUrl ? "0.4" : "0";
+    
+    initParticles(localStorage.getItem('hrn_particle_amount') || "mid");
+}
 
         function openPage(page) {
             if (!page || !pageCache[page]) return;
