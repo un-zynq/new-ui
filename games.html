@@ -1205,7 +1205,7 @@
                 const card = document.createElement('a');
                 card.className = 'featured-card animate-in';
                 card.style.animationDelay = `${i * 0.05}s`;
-                card.href = `./game/${f.id}`;
+                card.href = `/game/${f.id}`;
                 card.onclick = () => saveRecent(f.id);
                 card.innerHTML = `
                     <div class="featured-emoji">${f.emoji}</div>
