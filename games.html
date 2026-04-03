@@ -22,7 +22,7 @@
             inset: -20px;
             background-size: cover;
             background-position: center;
-            filter: brightness(.3) blur(15px); 
+            filter: brightness(.3) blur(20px); 
             z-index: 0;
             transform: translateZ(0);
         }
@@ -63,23 +63,15 @@
             font-size: 14px;
         }
         
-        /* Hidden Scrollbar Logic */
         #viewport {
             flex: 1;
             overflow-y: auto;
             position: relative;
             contain: size layout style;
-            /* Firefox */
             scrollbar-width: none; 
-            /* IE/Edge */
             -ms-overflow-style: none; 
         }
-        /* Chrome, Safari, Edge */
-        #viewport::-webkit-scrollbar {
-            display: none;
-            width: 0 !important;
-            height: 0 !important;
-        }
+        #viewport::-webkit-scrollbar { display: none; }
 
         #spacer {
             position: absolute;
@@ -90,7 +82,7 @@
             position: absolute;
             top: 0; left: 0; right: 0;
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
             gap: 10px;
             will-change: transform;
             transform: translate3d(0,0,0);
@@ -105,12 +97,11 @@
             text-align: center;
             font-size: 11px;
             font-weight: 500;
-            text-transform: capitalize;
             cursor: pointer;
-            height: 70px;
-            padding: 8px;
+            height: 72px;
+            padding: 10px;
             user-select: none;
-            transition: background 0.1s, border-color 0.1s;
+            transition: background 0.1s;
         }
         .card:hover {
             background: rgba(255, 255, 255, .1);
@@ -130,7 +121,7 @@
             </div>
             <h1>Games</h1>
         </div>
-        <input id="search" placeholder="Quick search..." autocomplete="off">
+        <input id="search" placeholder="Search games..." autocomplete="off">
     </div>
     
     <div id="viewport">
@@ -149,14 +140,14 @@
     let allGames = [];
     let filteredGames = [];
     
-    const CARD_HEIGHT = 70;
+    const CARD_HEIGHT = 72;
     const GAP = 10;
-    const OVERSCAN = 3;
+    const OVERSCAN = 4;
     let columns = 0;
     let ticking = false;
 
-    function openGame(slug, group) {
-        const url = `${window.location.origin}/${group}/${slug}`;
+    function openGame(alias, group) {
+        const url = `${window.location.origin}/${group}/${alias}`;
         const win = window.open('about:blank', '_blank');
         if (!win) return;
 
@@ -171,7 +162,7 @@
                     <link rel="icon" href="data:image/x-icon;base64,AAABAAEAAQEAAAEAIAAwAAAAFgAAACgAAAABAAAAAgAAAAEAIAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAP//AAAAAA==">
                     <style>
                         * { margin: 0; padding: 0; border: none; outline: none; }
-                        body, html { height: 100%; width: 100%; background: #000; }
+                        body, html { height: 100%; width: 100%; background: #000; overflow: hidden; }
                         iframe { width: 100vw; height: 100vh; display: block; }
                     </style>
                 </head>
@@ -197,7 +188,7 @@
 
     function calculateLayout() {
         const containerWidth = viewport.clientWidth;
-        columns = Math.floor((containerWidth + GAP) / (150 + GAP)) || 1;
+        columns = Math.floor((containerWidth + GAP) / (155 + GAP)) || 1;
         spacer.style.height = `${Math.ceil(filteredGames.length / columns) * (CARD_HEIGHT + GAP)}px`;
     }
 
@@ -216,7 +207,7 @@
         let html = '';
         for (let i = startIndex; i < endIndex; i++) {
             const game = filteredGames[i];
-            html += `<div class="card" onclick="openGame('${game.name}', '${game.group}')">${game.name.replace(/-/g, ' ')}</div>`;
+            html += `<div class="card" onclick="openGame('${game.alias}', '${game.group}')">${game.name}</div>`;
         }
         grid.innerHTML = html;
         ticking = false;
@@ -224,24 +215,34 @@
 
     async function loadGames() {
         try {
-            const res = await fetch("https://un-zynq.github.io/games.json");
-            const data = await res.json();
+            const res = await fetch("https://un-zynq.github.io/games2.json");
+            const rawData = await res.json();
+            
+            // games2.json is een array met 1 object bevattende g1, g2 etc.
+            const groups = rawData[0]; 
             
             allGames = [];
-            for (const group in data) {
-                data[group].forEach(name => allGames.push({ name, group }));
+            for (const groupKey in groups) {
+                const gamesInGroup = groups[groupKey];
+                for (const gameId in gamesInGroup) {
+                    allGames.push({
+                        name: gamesInGroup[gameId].name,
+                        alias: gamesInGroup[gameId].alias,
+                        group: groupKey
+                    });
+                }
             }
 
             filteredGames = allGames;
             calculateLayout();
             updateVirtualScroll();
-        } catch(e) {}
+        } catch(e) { console.error("Error loading games:", e); }
     }
 
     search.addEventListener("input", () => {
-        const q = search.value.toLowerCase().replace(/[\s-]/g, '');
+        const q = search.value.toLowerCase().trim();
         filteredGames = allGames.filter(g => 
-            g.name.toLowerCase().replace(/-/g, '').includes(q)
+            g.name.toLowerCase().includes(q) || g.alias.toLowerCase().includes(q)
         );
         viewport.scrollTop = 0;
         calculateLayout();
