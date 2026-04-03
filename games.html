@@ -19,10 +19,11 @@
         }
         #bg {
             position: fixed;
-            inset: -20px;
+            inset: -10px;
             background-size: cover;
             background-position: center;
-            filter: brightness(.3) blur(20px); 
+            /* Minder blur voor betere performance en clarity */
+            filter: brightness(.35) blur(12px); 
             z-index: 0;
             transform: translateZ(0);
         }
@@ -153,13 +154,12 @@
 
         const doc = win.document;
         doc.open();
+        // Geen title tag, geen favicon tag voor stealth
         doc.write(`
             <!DOCTYPE html>
             <html style="margin:0;padding:0;height:100%;overflow:hidden;">
                 <head>
                     <meta charset="UTF-8">
-                    <title>\u200E</title>
-                    <link rel="icon" href="data:image/x-icon;base64,AAABAAEAAQEAAAEAIAAwAAAAFgAAACgAAAABAAAAAgAAAAEAIAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAP//AAAAAA==">
                     <style>
                         * { margin: 0; padding: 0; border: none; outline: none; }
                         body, html { height: 100%; width: 100%; background: #000; overflow: hidden; }
@@ -220,13 +220,9 @@
             const rawData = await res.json();
             
             allGames = [];
-            
-            // Loop door elk object in de array (meestal is er maar 1, maar dit pakt alles)
             rawData.forEach(entry => {
-                // Loop door g1, g2, g3, etc.
                 for (const groupKey in entry) {
                     const gamesInGroup = entry[groupKey];
-                    // Loop door de individuele game objecten
                     for (const gameId in gamesInGroup) {
                         const gameData = gamesInGroup[gameId];
                         allGames.push({
