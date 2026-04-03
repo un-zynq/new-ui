@@ -3,32 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <base href="https://un-zynq.github.io/">
     <title>HRN | Games</title>
     <link rel="icon" type="image/png" href="/logo.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
     <style>
+        /* Voor body en alle elementen */
+* {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE 10+ */
+}
+
+*::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Edge */
+}
         :root {
             --bg: #030508;
-            --bg-elevated: rgba(8, 12, 18, 0.85);
-            --bg-card: rgba(12, 16, 24, 0.9);
+            --bg-card: rgba(12, 16, 24, 0.85);
             --border: rgba(255, 255, 255, 0.08);
             --border-hover: rgba(137, 180, 250, 0.3);
             --text: rgba(235, 240, 255, 0.95);
             --text-muted: rgba(235, 240, 255, 0.5);
             --text-dim: rgba(235, 240, 255, 0.25);
             --accent: #89b4fa;
-            --accent-rgb: 137, 180, 250;
-            --accent-glow: rgba(137, 180, 250, 0.25);
-            --accent-soft: rgba(137, 180, 250, 0.1);
-            --hot: #f38ba8;
-            --hot-glow: rgba(243, 139, 168, 0.25);
-            --success: #a6e3a1;
-            --radius-sm: 8px;
-            --radius: 12px;
-            --radius-lg: 18px;
+            --accent-soft: rgba(137, 180, 250, 0.15);
         }
 
         * {
@@ -38,20 +38,16 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        html {
-            scroll-behavior: smooth;
-        }
-
         body {
-            font-family: 'Inter', -apple-system, sans-serif;
+            font-family: 'Inter', sans-serif;
             background: var(--bg);
             color: var(--text);
             min-height: 100vh;
-            line-height: 1.5;
             overflow-x: hidden;
             text-transform: uppercase;
         }
 
+        /* --- Background Effects (No Blur) --- */
         #webgl-canvas {
             position: fixed;
             inset: 0;
@@ -71,18 +67,17 @@
             transition: 2.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .ambient-bg.loaded {
-            opacity: 1;
-        }
+        .ambient-bg.loaded { opacity: 1; }
 
         .overlay-dim {
             position: fixed;
             inset: 0;
             z-index: 1;
-            background: rgba(3, 5, 8, 0.5);
+            background: rgba(3, 5, 8, 0.7);
             pointer-events: none;
         }
 
+        /* --- Loading --- */
         #loader {
             position: fixed;
             inset: 0;
@@ -91,978 +86,281 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.8s;
+            transition: opacity 0.8s, visibility 0.8s;
         }
+        .load-line { width: 180px; height: 2px; background: rgba(255, 255, 255, 0.05); border-radius: 10px; overflow: hidden; }
+        #progress { height: 100%; width: 0; background: var(--accent); transition: width 0.4s; box-shadow: 0 0 15px var(--accent); }
 
-        .load-line {
-            width: 220px;
-            height: 2px;
-            background: rgba(255, 255, 255, 0.05);
-            position: relative;
-            overflow: hidden;
-            border-radius: 10px;
-        }
-
-        #progress {
-            position: absolute;
-            height: 100%;
-            width: 0;
-            background: var(--accent);
-            transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-            box-shadow: 0 0 15px var(--accent);
-        }
-
+        /* --- Container --- */
         #app {
             position: relative;
             z-index: 10;
-            max-width: 1400px;
+            max-width: 900px;
             margin: 0 auto;
-            padding: 0 28px 100px;
+            padding: 0 24px 80px;
             opacity: 0;
-            transform: scale(1.02);
-            transition: 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+            transform: translateY(10px);
+            transition: 0.8s cubic-bezier(0.16, 1, 0.3, 1);
         }
+        #app.active { opacity: 1; transform: translateY(0); }
 
-        #app.active {
-            opacity: 1;
-            transform: scale(1);
-        }
-
-        header {
-            padding: 32px 0 28px;
+        /* --- Header --- */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 20px 0 16px;
+            background: var(--bg);
             border-bottom: 1px solid var(--border);
-            margin-bottom: 32px;
+            margin-bottom: 24px;
         }
 
-        .header-top {
+        .header-row {
             display: flex;
-            justify-content: space-between;
+            gap: 12px;
             align-items: center;
-            margin-bottom: 28px;
+            margin-bottom: 16px;
         }
 
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
-
-        .logo-mark {
-            width: 44px;
-            height: 44px;
-            background: linear-gradient(135deg, var(--accent) 0%, #74c7ec 100%);
-            border-radius: var(--radius-sm);
+        .back-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            color: var(--text);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 900;
-            font-size: 20px;
-            color: var(--bg);
-            box-shadow: 0 4px 24px var(--accent-glow);
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
         }
+        .back-btn:hover { background: var(--accent-soft); border-color: var(--accent); }
+        .back-btn svg { width: 18px; height: 18px; }
 
-        .logo-text {
-            font-size: 22px;
-            font-weight: 900;
-            letter-spacing: -0.5px;
-        }
-
-        .logo-text span {
-            color: var(--text-muted);
-            font-weight: 400;
-        }
-
-        .stats-pill {
-            display: flex;
-            align-items: center;
-            gap: 18px;
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid var(--border);
-            padding: 10px 22px;
-            border-radius: 100px;
-            backdrop-filter: blur(12px);
-            font-size: 9px;
-            font-weight: 600;
-            letter-spacing: 2px;
-            color: var(--text-muted);
-        }
-
-        .stats-pill strong {
-            color: var(--accent);
-            font-weight: 700;
-        }
-
-        .stats-divider {
-            width: 1px;
-            height: 16px;
-            background: var(--border);
-        }
-
-        .search-section {
-            display: flex;
-            gap: 14px;
-            align-items: stretch;
-        }
-
-        .search-wrapper {
-            flex: 1;
-            position: relative;
-        }
-
-        .search-icon {
-            position: absolute;
-            left: 18px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-dim);
-            pointer-events: none;
-            transition: color 0.2s;
-        }
-
+        .search-wrapper { flex: 1; position: relative; }
+        
         .search-input {
             width: 100%;
-            background: rgba(0, 0, 0, 0.4);
+            background: rgba(0, 0, 0, 0.3);
             border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 16px 18px 16px 52px;
+            border-radius: 10px;
+            padding: 12px 16px 12px 44px;
             font-size: 11px;
-            font-weight: 500;
+            font-weight: 600;
             letter-spacing: 1.5px;
             color: var(--text);
             font-family: inherit;
             outline: none;
             transition: all 0.2s;
-            backdrop-filter: blur(12px);
         }
+        .search-input::placeholder { color: var(--text-dim); }
+        .search-input:focus { border-color: var(--accent); background: rgba(0, 0, 0, 0.5); }
 
-        .search-input::placeholder {
+        .search-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
             color: var(--text-dim);
+            pointer-events: none;
         }
 
-        .search-input:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px var(--accent-soft);
-        }
-
-        .search-input:focus + .search-icon {
-            color: var(--accent);
-        }
-
-        .btn-random {
-            background: linear-gradient(135deg, var(--hot) 0%, #eba0ac 100%);
-            border: none;
-            color: white;
-            padding: 0 28px;
-            border-radius: var(--radius);
-            font-family: inherit;
-            font-size: 10px;
-            font-weight: 700;
-            letter-spacing: 2px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            white-space: nowrap;
-            box-shadow: 0 4px 20px var(--hot-glow);
-        }
-
-        .btn-random:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 32px var(--hot-glow);
-        }
-
-        .btn-random:active {
-            transform: translateY(0);
-        }
-
+        /* --- Tabs --- */
         .tabs-wrapper {
-            margin-top: 22px;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
-        }
-
-        .tabs-wrapper::-webkit-scrollbar {
-            display: none;
-        }
-
-        .tabs {
             display: flex;
             gap: 8px;
-            padding: 5px;
-            background: rgba(0, 0, 0, 0.4);
-            border-radius: var(--radius);
-            width: max-content;
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--border);
+            overflow-x: auto;
+            padding-bottom: 4px;
+            scrollbar-width: none;
         }
+        .tabs-wrapper::-webkit-scrollbar { display: none; }
 
         .tab {
             background: transparent;
-            border: none;
-            padding: 12px 20px;
-            border-radius: calc(var(--radius) - 4px);
-            font-family: inherit;
-            font-size: 9px;
-            font-weight: 600;
-            letter-spacing: 2px;
+            border: 1px solid transparent;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
             color: var(--text-muted);
             cursor: pointer;
-            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-            display: flex;
-            align-items: center;
-            gap: 8px;
             white-space: nowrap;
+            transition: all 0.2s;
+            font-family: inherit;
         }
-
-        .tab:hover {
-            color: var(--text);
-            background: rgba(255, 255, 255, 0.03);
-        }
-
+        .tab:hover { color: var(--text); background: rgba(255,255,255,0.03); }
         .tab.active {
-            background: var(--bg-card);
-            color: var(--text);
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-            border: 1px solid var(--border);
-        }
-
-        .tab .count {
-            font-size: 9px;
-            padding: 3px 8px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 100px;
-            color: var(--text-dim);
-            font-weight: 600;
-        }
-
-        .tab.active .count {
             background: var(--accent-soft);
+            border-color: var(--border);
             color: var(--accent);
         }
 
-        .section-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 18px;
-            margin-top: 36px;
-        }
-
-        .section-title {
+        /* --- List --- */
+        .count-label {
             font-size: 10px;
             font-weight: 700;
             letter-spacing: 3px;
             color: var(--text-muted);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .section-title .hot-badge {
-            background: var(--hot);
-            color: white;
-            font-size: 8px;
-            font-weight: 700;
-            padding: 4px 10px;
-            border-radius: 100px;
-            letter-spacing: 1px;
-        }
-
-        .featured-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 14px;
-        }
-
-        .featured-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 18px;
-            text-decoration: none;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            position: relative;
-            overflow: hidden;
-            backdrop-filter: blur(12px);
-        }
-
-        .featured-card::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, transparent 0%, var(--accent-soft) 100%);
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-        .featured-card:hover {
-            border-color: var(--border-hover);
-            transform: translateY(-4px);
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px var(--border-hover);
-        }
-
-        .featured-card:hover::before {
-            opacity: 1;
-        }
-
-        .featured-emoji {
-            width: 48px;
-            height: 48px;
-            background: rgba(0, 0, 0, 0.4);
-            border-radius: var(--radius-sm);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            flex-shrink: 0;
-            position: relative;
-            z-index: 1;
-        }
-
-        .featured-info {
-            flex: 1;
-            min-width: 0;
-            position: relative;
-            z-index: 1;
-        }
-
-        .featured-title {
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 1.5px;
-            color: var(--text);
-            margin-bottom: 4px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .featured-tag {
-            font-size: 9px;
-            font-weight: 500;
-            letter-spacing: 1px;
-            color: var(--text-dim);
-        }
-
-        .recent-chips {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-bottom: 10px;
-        }
-
-        .recent-chip {
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid var(--border);
-            padding: 10px 16px;
-            border-radius: 100px;
-            font-size: 9px;
-            font-weight: 600;
-            letter-spacing: 1.5px;
-            color: var(--text);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            transition: all 0.2s;
-            backdrop-filter: blur(12px);
-        }
-
-        .recent-chip:hover {
-            border-color: var(--accent);
-            color: var(--accent);
+            margin-bottom: 16px;
+            padding-left: 2px;
         }
 
         .games-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 14px;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 10px;
         }
 
         .game-card {
             background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 18px 22px;
-            display: flex;
-            align-items: center;
-            gap: 18px;
+            border-radius: 10px;
+            padding: 14px 18px;
             text-decoration: none;
             color: var(--text);
-            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            transition: all 0.2s;
             position: relative;
             overflow: hidden;
-            backdrop-filter: blur(12px);
         }
 
-        .game-card::after {
+        .game-card::before {
             content: '';
             position: absolute;
-            right: 0;
+            left: 0;
             top: 0;
             bottom: 0;
             width: 3px;
             background: var(--accent);
             transform: scaleY(0);
-            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: transform 0.2s;
         }
-
+        
         .game-card:hover {
             border-color: var(--border-hover);
-            background: var(--bg-elevated);
-            transform: translateY(-3px);
-            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+            transform: translateY(-2px);
+            background: rgba(20, 25, 35, 0.9);
         }
+        .game-card:hover::before { transform: scaleY(1); }
+        .game-card:active { transform: translateY(0); }
 
-        .game-card:hover::after {
-            transform: scaleY(1);
+        .game-emoji {
+            font-size: 18px;
+            transition: transform 0.2s;
         }
+        .game-card:hover .game-emoji { transform: scale(1.2); }
 
-        .game-card:hover .card-emoji {
-            transform: scale(1.15) rotate(5deg);
-        }
-
-        .game-card:active {
-            transform: translateY(0);
-            background: var(--bg);
-        }
-
-        .card-emoji {
-            width: 52px;
-            height: 52px;
-            background: rgba(0, 0, 0, 0.4);
-            border-radius: var(--radius-sm);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 26px;
-            flex-shrink: 0;
-            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .card-content {
-            flex: 1;
-            min-width: 0;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .card-title {
+        .game-title {
             font-size: 12px;
             font-weight: 700;
-            letter-spacing: 1.5px;
-            color: var(--text);
+            letter-spacing: 1px;
+            white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            white-space: nowrap;
         }
 
         .empty-state {
-            grid-column: 1 / -1;
             text-align: center;
-            padding: 80px 24px;
+            padding: 80px 20px;
             color: var(--text-dim);
-            background: var(--bg-card);
-            border-radius: var(--radius);
-            border: 1px dashed var(--border);
-        }
-
-        .empty-state-icon {
-            font-size: 56px;
-            margin-bottom: 20px;
-            opacity: 0.4;
-        }
-
-        .toast {
-            position: fixed;
-            bottom: 28px;
-            left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background: var(--bg-card);
-            border: 1px solid var(--accent);
-            color: var(--text);
-            padding: 14px 24px;
-            border-radius: var(--radius);
-            font-size: 10px;
-            font-weight: 600;
+            font-size: 11px;
             letter-spacing: 2px;
-            opacity: 0;
-            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-            pointer-events: none;
-            z-index: 1000;
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px var(--accent);
-            backdrop-filter: blur(12px);
+            grid-column: 1 / -1;
         }
 
-        .toast.show {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-        }
-
-        .back-btn {
-            position: fixed;
-            top: 28px;
-            left: 28px;
-            width: 48px;
-            height: 48px;
-            border-radius: 14px;
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid var(--border);
-            color: var(--text);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-            backdrop-filter: blur(12px);
-            z-index: 100;
-        }
-
-        .back-btn svg {
-            width: 20px;
-            height: 20px;
-            stroke-width: 2px;
-        }
-
-        .back-btn:hover {
-            border-color: rgba(255, 255, 255, 0.3);
-            background: rgba(255, 255, 255, 0.08);
-            transform: scale(1.08) translateY(-2px);
-            box-shadow: 0 12px 25px -10px rgba(0, 0, 0, 0.5);
-            color: #fff;
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(24px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .animate-in {
-            animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--border);
-            border-radius: 3px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--text-dim);
-        }
-
-        @media (max-width: 768px) {
-            #app {
-                padding: 0 18px 70px;
-            }
-
-            header {
-                padding: 22px 0 18px;
-                margin-bottom: 22px;
-            }
-
-            .header-top {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 18px;
-            }
-
-            .stats-pill {
-                width: 100%;
-                justify-content: center;
-            }
-
-            .search-section {
-                flex-direction: column;
-            }
-
-            .btn-random {
-                width: 100%;
-                justify-content: center;
-                padding: 16px;
-            }
-
-            .featured-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .games-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .game-card {
-                padding: 16px 18px;
-            }
-
-            .back-btn {
-                top: 18px;
-                left: 18px;
-                width: 42px;
-                height: 42px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .featured-grid {
-                grid-template-columns: 1fr 1fr;
-                gap: 10px;
-            }
-
-            .featured-card {
-                padding: 14px;
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 12px;
-            }
-
-            .featured-emoji {
-                width: 40px;
-                height: 40px;
-                font-size: 20px;
-            }
-
-            .featured-title {
-                font-size: 10px;
-            }
-
-            .tabs {
-                width: 100%;
-            }
-
-            .tab {
-                flex: 1;
-                justify-content: center;
-                padding: 12px 14px;
-            }
-
-            .tab .count {
-                display: none;
-            }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            *, *::before, *::after {
-                animation-duration: 0.01ms !important;
-                transition-duration: 0.01ms !important;
-            }
+        /* --- Responsive --- */
+        @media (max-width: 600px) {
+            #app { padding: 0 16px 60px; }
+            .header { padding: 16px 0; }
+            .games-grid { grid-template-columns: 1fr; }
+            .header-row { margin-bottom: 12px; }
         }
     </style>
 </head>
 <body>
-    <div id="loader">
-        <div class="load-line">
-            <div id="progress"></div>
-        </div>
-    </div>
-    
+    <div id="loader"><div class="load-line"><div id="progress"></div></div></div>
+
     <div class="ambient-bg" id="bg"></div>
     <div class="overlay-dim"></div>
     <canvas id="webgl-canvas"></canvas>
 
-    <button class="back-btn" onclick="window.parent.postMessage('close', '*')">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="m15 18-6-6 6-6"/>
-        </svg>
-    </button>
-
     <div id="app">
-        <header>
-            <div class="header-top">
-                <div class="logo">
-                    <div class="logo-mark">H</div>
-                    <div class="logo-text">HRN <span>Games</span></div>
-                </div>
-                <div class="stats-pill">
-                    <span><strong id="count-text">0</strong> titles</span>
-                    <div class="stats-divider"></div>
-                    <span>session <strong id="uptime">0s</strong></span>
-                </div>
-            </div>
-            <div class="search-section">
+        <div class="header">
+            <div class="header-row">
+                <button class="back-btn" onclick="window.parent.postMessage('close', '*')">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="m15 18-6-6 6-6"/>
+                    </svg>
+                </button>
                 <div class="search-wrapper">
-                    <input type="text" class="search-input" id="search" placeholder="Search games..." autocomplete="off">
-                    <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="11" cy="11" r="8"></circle>
                         <path d="m21 21-4.3-4.3"></path>
                     </svg>
+                    <input type="text" class="search-input" id="search" placeholder="Search..." autocomplete="off">
                 </div>
-                <button class="btn-random" id="random-btn">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <rect width="12" height="12" x="2" y="10" rx="2" ry="2"></rect>
-                        <path d="m17.92 14 3.5-3.5a2.24 2.24 0 0 0 0-3l-5-4.92a2.24 2.24 0 0 0-3 0L10 6"></path>
-                        <path d="M6 18h.01"></path>
-                        <path d="M10 14h.01"></path>
-                    </svg>
-                    I'm Bored
-                </button>
             </div>
-            <div class="tabs-wrapper">
-                <div class="tabs" id="category-tabs"></div>
-            </div>
-        </header>
+            <div class="tabs-wrapper" id="tabs-container"></div>
+        </div>
 
-        <main>
-            <div id="recent-section" style="display:none;">
-                <div class="section-header">
-                    <div class="section-title">Recently Played</div>
-                </div>
-                <div class="recent-chips" id="recent-container"></div>
-            </div>
-
-            <div id="featured-section">
-                <div class="section-header">
-                    <div class="section-title">Start Here <span class="hot-badge">Hot</span></div>
-                </div>
-                <div class="featured-grid" id="featured-container"></div>
-            </div>
-
-            <div class="section-header">
-                <div class="section-title" id="games-label">All Games</div>
-            </div>
-            <div class="games-grid" id="games-container"></div>
-        </main>
-
-        <div id="toast" class="toast"></div>
+        <div class="count-label" id="count">Loading...</div>
+        <div class="games-grid" id="grid"></div>
     </div>
 
     <script id="vs" type="x-shader/x-vertex">
-        attribute vec2 a_pos;
-        attribute float a_size;
-        attribute float a_op;
-        uniform vec2 u_res;
-        uniform float u_time;
-        varying float v_op;
-        void main() {
-            vec2 zeroToOne = a_pos / u_res;
-            vec2 clipSpace = (zeroToOne * 2.0) - 1.0;
-            gl_Position = vec4(clipSpace * vec2(1.0, -1.0), 0.0, 1.0);
-            float pulse = 0.85 + (sin(u_time * 1.5 + a_op * 10.0) * 0.15);
-            gl_PointSize = a_size * 1.5 * pulse;
-            v_op = a_op;
-        }
+        attribute vec2 a_pos;attribute float a_size;attribute float a_op;uniform vec2 u_res;uniform float u_time;varying float v_op;
+        void main(){vec2 zeroToOne=a_pos/u_res;vec2 clipSpace=(zeroToOne*2.0)-1.0;gl_Position=vec4(clipSpace*vec2(1.0,-1.0),0.0,1.0);float pulse=0.85+(sin(u_time*1.5+a_op*10.0)*0.15);gl_PointSize=a_size*1.5*pulse;v_op=a_op;}
     </script>
-    
     <script id="fs" type="x-shader/x-fragment">
-        precision mediump float;
-        uniform vec3 u_color;
-        varying float v_op;
-        void main() {
-            float dist = distance(gl_PointCoord, vec2(0.5));
-            if (dist > 0.5) discard;
-            gl_FragColor = vec4(u_color, (v_op * 1.3) * (1.0 - dist * 2.0));
-        }
+        precision mediump float;uniform vec3 u_color;varying float v_op;
+        void main(){float dist=distance(gl_PointCoord,vec2(0.5));if(dist>0.5)discard;gl_FragColor=vec4(u_color,(v_op*1.3)*(1.0-dist*2.0));}
     </script>
 
     <script type="module">
-        const FEATURED_GAMES = [
-            { id: 'subway-surfers', emoji: '🏃', tag: 'Endless Runner' },
-            { id: 'slope', emoji: '🔺', tag: '3D Arcade' },
-            { id: 'run-3-space', emoji: '🌌', tag: 'Platformer' },
-            { id: 'temple-run-2', emoji: '🏛️', tag: 'Endless Runner' },
-            { id: 'stickman-hook', emoji: '🎣', tag: 'Swing' },
-            { id: 'bitlife', emoji: '👶', tag: 'Life Sim' },
-            { id: 'cookie-clicker', emoji: '🍪', tag: 'Idle' },
-            { id: 'minecraft-classic', emoji: '⛏️', tag: 'Sandbox' },
-            { id: 'happy-wheels', emoji: '🚲', tag: 'Physics' },
-            { id: 'getting-over-it', emoji: '🏔️', tag: 'Challenge' },
-            { id: '1v1-lol', emoji: '🎯', tag: 'Shooter' },
-            { id: 'moto-x3m', emoji: '🏍️', tag: 'Racing' }
-        ];
-
         const CATEGORIES = {
-            all: { name: 'All', icon: '▦' },
-            popular: { name: 'Popular', icon: '★' },
-            action: { name: 'Action', icon: '⚔️', games: ['bullet-force', 'gun-mayhem', 'gun-mayhem-2', 'gun-mayhem-redux', '1v1-lol', 'masked-forces', 'strike-force-heroes', 'smash-karts', 'skibidi-strike', 'bacon-may-die', 'iron-snout', 'leader-strike', 'soldier-legend', 'stick-merge', 'worlds-hardest-game', 'worlds-hardest-game-2', 'stick-archers', 'stick-duel-battle', 'getaway-shootout', 'rooftop-snipers', 'house-of-hazards'] },
-            racing: { name: 'Racing', icon: '🏎️', games: ['drift-hunters', 'drift-hunters-2', 'drift-hunters-pro', 'moto-x3m', 'moto-x3m-pool', 'moto-x3m-spooky', 'moto-x3m-winter', 'moto-x3m-2', 'slope', 'slope-2', 'slope-3', 'slope-ball', 'slope-city', 'slope-run', 'slope-tunnel', 'madalin-stunt-cars-2', 'madalin-stunt-cars-3', 'retro-bowl', 'crazy-cars', 'burnin-rubber-5xs', 'cluster-rush', 'death-car', 'drift-boss', 'drift-dudes', 'drive-mad', 'earn-to-die', 'eggy-car', 'endless-truck', 'mad-truck-challenge', 'monster-truck-destroyer', 'monster-truck-zombie', 'racing-monster-truck', 'snow-rider-3d', 'stock-car-hero', 'tanuki-sunset'] },
-            idle: { name: 'Idle', icon: '⏳', games: ['cookie-clicker', 'capybara-clicker', 'capybara-clicker-2', 'capybara-clicker-pro', 'clicker-heroes', 'idle-breakout', 'idle-light-city', 'idle-mining', 'idle-restaurants', 'idle-tree-city', 'particle-clicker', 'bitcoin-clicker', 'csgo-clicker', 'dogeminer', 'space-company', 'nut-simulator'] },
-            puzzle: { name: 'Puzzle', icon: '🧩', games: ['2048', '2048-multitask', 'doge-2048', 'meme-2048', 'cubes-2048', 'cut-the-rope', 'cut-the-rope-holiday-gift', 'cut-the-rope-time-travel', 'bloxorz', 'hextris', 'minesweeper', 'wordle', 'wordle-unlimited', 'wood-block-puzzle', 'connect-3', 'ball-sort-puzzle', 'ball-sort-halloween', 'ball-sort-soccer', 'hex-empire', 'super-hexbee-merger', 'woodventure', 'word-slide'] },
-            casual: { name: 'Casual', icon: '🎮', games: ['among-us', 'flappy-bird', 'doodle-jump', 'fruit-ninja', 'crossy-road', 'paper-io-2', 'hole-io', 'snake-io-war', 'aquapark-io', 'archers-io', 'dots-io', 'trains-io', 'sumos', 'hide-and-smash', 'tag', 'basket-random', 'boxing-random', 'soccer-random', 'volley-random', 'penalty-shooters-2', 'football-strike', 'basketball-stars', 'head-soccer', 'soccer-skills', 'tetris', 'flash-tetris', 'twitch-tetris'] },
-            adventure: { name: 'Adventure', icon: '🗺️', games: ['minecraft-classic', 'minecraft-1-5', 'minecraft-1-8', 'paper-minecraft', 'mineblocks', 'craftmine', 'terraria', 'pokemon-emerald', 'pokemon-emerald-2', 'pokemon-firered', 'super-mario-wonder', 'mario', 'mario-bros', 'super-mario-64', 'super-mario-construct', 'subway-surfers', 'subway-surfers-ny', 'temple-run-2', 'vex-3', 'vex-4', 'vex-5', 'vex-6', 'vex-7', 'vex-8', 'ovo', 'ovo-2', 'ovo-dimensions', 'fireboy-watergirl-forest-temple'] },
-            weird: { name: 'Weird', icon: '🤪', games: ['whack-your-boss', 'elastic-face', 'eel-slap', 'getting-over-it', 'there-is-no-game', 'fake-virus', 'trump-the-puppet-game', 'trollface-quest-horror-2', 'weavesilk', 'sandboxels', 'webgl-fluid-simulation'] },
-            classic: { name: 'Classic', icon: '👾', games: ['pacman', 'galaga', 'snake', 'google-feud', 'impossible-quiz', 'achievement-unlocked', 'fancy-pants-2', 'fancy-pants-3', 'fancy-pants-adventures', 'alien-hominid', 'baldis-basics', 'fnaf', 'fnaw'] }
+            all: { name: 'All' },
+            popular: { name: 'Hot', games: ['subway-surfers', 'slope', 'temple-run-2', 'bitlife', 'stickman-hook', 'minecraft-classic', '1v1-lol'] },
+            action: { name: 'Action', games: ['bullet-force', 'gun-mayhem', '1v1-lol', 'masked-forces', 'smash-karts', 'bacon-may-die', 'iron-snout', 'worlds-hardest-game', 'getaway-shootout', 'rooftop-snipers'] },
+            racing: { name: 'Racing', games: ['drift-hunters', 'moto-x3m', 'slope', 'madalin-stunt-cars-2', 'retro-bowl', 'cluster-rush', 'drift-boss', 'drive-mad', 'eggy-car', 'snow-rider-3d'] },
+            idle: { name: 'Idle', games: ['cookie-clicker', 'capybara-clicker', 'clicker-heroes', 'idle-breakout', 'dogeminer', 'idle-mining'] },
+            puzzle: { name: 'Puzzle', games: ['2048', 'cut-the-rope', 'bloxorz', 'minesweeper', 'wordle', 'ball-sort-puzzle'] },
+            casual: { name: 'Casual', games: ['among-us', 'flappy-bird', 'doodle-jump', 'fruit-ninja', 'paper-io-2', 'hole-io', 'basket-random', 'tetris'] },
+            adventure: { name: 'Adventure', games: ['minecraft-classic', 'paper-minecraft', 'terraria', 'pokemon-emerald', 'mario', 'super-mario-64', 'subway-surfers', 'vex-7', 'ovo'] },
+            classic: { name: 'Classic', games: ['pacman', 'galaga', 'snake', 'google-feud', 'impossible-quiz', 'fnaf'] }
         };
 
-        const GAME_EMOJIS = {
-            'subway-surfers': '🏃', 'subway-surfers-ny': '🏃',
-            'temple-run-2': '🏛️', 'slope': '🔺', 'slope-2': '🔺', 'slope-3': '🔺',
-            'slope-ball': '🔺', 'slope-city': '🔺', 'slope-run': '🔺', 'slope-tunnel': '🔺',
-            'run-3-space': '🌌', 'run-2': '🌌',
-            'stickman-hook': '🎣', 'stickman-boost': '🎣',
-            'bitlife': '👶', 'cookie-clicker': '🍪', 'capybara-clicker': '🦫',
-            'capybara-clicker-2': '🦫', 'capybara-clicker-pro': '🦫',
-            'minecraft-classic': '⛏️', 'minecraft-1-5': '⛏️', 'minecraft-1-8': '⛏️',
-            'paper-minecraft': '⛏️', 'mineblocks': '⛏️', 'craftmine': '⛏️',
-            'happy-wheels': '🚲', 'getting-over-it': '🏔️', '1v1-lol': '🎯',
-            'moto-x3m': '🏍️', 'moto-x3m-pool': '🏍️', 'moto-x3m-spooky': '🏍️',
-            'moto-x3m-winter': '🏍️', 'moto-x3m-2': '🏍️',
-            'drift-hunters': '🏎️', 'drift-hunters-2': '🏎️', 'drift-hunters-pro': '🏎️',
-            'retro-bowl': '🏈', 'retro-bowl-college': '🏈',
-            'bullet-force': '🔫', 'gun-mayhem': '🔫', 'gun-mayhem-2': '🔫',
-            'gun-mayhem-redux': '🔫', 'masked-forces': '🔫',
-            'flappy-bird': '🐦', 'doodle-jump': '🐸', 'crossy-road': '🐔',
-            'fruit-ninja': '🍊', '2048': '🔢', 'doge-2048': '🐕', 'meme-2048': '😂',
-            'cut-the-rope': '🍬', 'bloxorz': '📦', 'minesweeper': '💣',
-            'wordle': '📝', 'wordle-unlimited': '📝',
-            'among-us': '👥', 'paper-io-2': '📄', 'hole-io': '⚫',
-            'whack-your-boss': '😤', 'elastic-face': '😜', 'eel-slap': '🐟',
-            'there-is-no-game': '🚫', 'weavesilk': '✨',
-            'pacman': '👾', 'galaga': '👾', 'tetris': '🧱', 'flash-tetris': '🧱', 'twitch-tetris': '🧱',
-            'pokemon-emerald': '🎮', 'pokemon-emerald-2': '🎮', 'pokemon-firered': '🎮',
-            'mario': '🍄', 'mario-bros': '🍄', 'super-mario-64': '🍄', 'super-mario-wonder': '🍄',
-            'vex-3': '🏃', 'vex-4': '🏃', 'vex-5': '🏃', 'vex-6': '🏃', 'vex-7': '🏃', 'vex-8': '🏃',
-            'ovo': '⚪', 'ovo-2': '⚪', 'ovo-dimensions': '⚪',
-            'fireboy-watergirl-forest-temple': '🔥',
-            'fnaf': '🐻', 'fnaw': '🐻',
-            'geometry-dash': '📐', 'geodash': '📐', 'glitch-dash': '📐',
-            'smash-karts': '🛒', 'skibidi-strike': '🚽',
-            'bacon-may-die': '🥓', 'iron-snout': '🐷',
-            'basketball-stars': '🏀', 'basket-random': '🏀',
-            'football-strike': '⚽', 'soccer-skills': '⚽', 'penalty-shooters-2': '⚽',
-            'burrito-bison': '🦘', 'learn-to-fly': '🐧', 'learn-to-fly-2': '🐧',
-            'papas-bakeria': '🧁', 'papas-burgeria': '🍔', 'papas-pizzaria': '🍕',
-            'papas-freezeria': '🍦', 'papas-cheeseria': '🧀',
-            'idle-breakout': '🧱', 'clicker-heroes': '⚔️', 'dogeminer': '🐕',
-            'pou': '🟤', 'bottle-flip': '🍾', 'bottle-flip-3d': '🍾',
-            'sandboxels': '🏜️', 'webgl-fluid-simulation': '💧',
-            'backrooms': '😶', 'backrooms-2d': '😶',
-            'terraria': '🌍', 'trimps': '🛡️',
-            'a-dark-room': '🌑', 'champion-island': '🏆',
-            'bad-ice-cream': '🍦', 'bad-ice-cream-2': '🍦', 'bad-ice-cream-3': '🍦',
-            'bloons-tower-defense': '🎈', 'bloons-tower-defense-2': '🎈', 'bloons-tower-defense-4': '🎈',
-            'kingdom-rush': '🏰', 'pandemic-2': '🦠', 'plants-vs-zombies': '🌻',
-            'portal-flash': '🌀', 'riddle-school': '🏫', 'alien-hominid': '👽',
-            'fancy-pants-2': '👖', 'fancy-pants-3': '👖', 'fancy-pants-adventures': '👖',
-            'baldis-basics': '📝', 'impossible-quiz': '❓', 'achievement-unlocked': '🏆',
-            'google-feud': '🔍', 'snake': '🐍', 'tunnel-rush': '🌀', 'tunnel-rush-2': '🌀',
-            'death-run-3d': '💀', 'tall-io': '📏', 'stair-race-3d': '🪜',
-            'tower-crash-3d': '🗼', 'traffic-mania': '🚗', 'parking-fury': '🅿️',
-            'parking-fury-2': '🅿️', 'parking-fury-3': '🅿️', 'granny': '👵',
-            'catapult-quest': '🎯', 'adventure-drivers': '🚙', 'axis-football-league': '🏈',
-            'big-shot-boxing': '🥊', 'super-liquid-soccer': '⚽',
-            'crazy-cars': '🚘', 'burnin-rubber-5xs': '🔥', 'cluster-rush': '🚌',
-            'death-car': '💀', 'drift-boss': '🚗', 'drift-dudes': '🚙',
-            'drive-mad': '🚛', 'earn-to-die': '🧟', 'eggy-car': '🥚',
-            'endless-truck': '🚚', 'mad-truck-challenge': '🛻',
-            'monster-truck-destroyer': '🚜', 'monster-truck-zombie': '🧟',
-            'racing-monster-truck': '🚛', 'snow-rider-3d': '🛷',
-            'stock-car-hero': '🏁', 'tanuki-sunset': '🦝',
-            'madalin-stunt-cars-2': '🚀', 'madalin-stunt-cars-3': '🏎️',
-            'strike-force-heroes': '🎖️', 'leader-strike': '🎯',
-            'soldier-legend': '⚔️', 'stick-merge': '🔗',
-            'worlds-hardest-game': '😤', 'worlds-hardest-game-2': '😠',
-            'stick-archers': '🏹', 'stick-duel-battle': '⚔️',
-            'getaway-shootout': '🏃', 'rooftop-snipers': '🎯',
-            'house-of-hazards': '🏠', '2048-multitask': '🧠',
-            'cubes-2048': '🎲', 'cut-the-rope-holiday-gift': '🎁',
-            'cut-the-rope-time-travel': '⏰', 'hextris': '⬡',
-            'wood-block-puzzle': '🪵', 'connect-3': '🔗',
-            'ball-sort-puzzle': '🔵', 'ball-sort-halloween': '🎃',
-            'ball-sort-soccer': '⚽', 'hex-empire': '🏰',
-            'super-hexbee-merger': '⬡', 'woodventure': '🌲',
-            'word-slide': '📝', 'doodle-jump': '🐸',
-            'snake-io-war': '🐍', 'aquapark-io': '🏊',
-            'archers-io': '🏹', 'dots-io': '⚪',
-            'trains-io': '🚂', 'sumos': '🤼',
-            'hide-and-smash': '🙈', 'tag': '🏃',
-            'boxing-random': '🥊', 'soccer-random': '⚽',
-            'volley-random': '🏐', 'head-soccer': '⚽',
-            'super-mario-construct': '🛠️', 'fake-virus': '🦠',
-            'trump-the-puppet-game': '🎭', 'trollface-quest-horror-2': '😈',
-            'capybara-clicker': '🦫', 'capybara-clicker-2': '🦫',
-            'capybara-clicker-pro': '🦫', 'idle-light-city': '💡',
-            'idle-mining': '⛏️', 'idle-restaurants': '🍽️',
-            'idle-tree-city': '🌳', 'particle-clicker': '⚛️',
-            'bitcoin-clicker': '₿', 'csgo-clicker': '🔫',
-            'space-company': '🚀', 'nut-simulator': '🥜'
-        };
+        const EMOJIS = ['🎮', '🕹️', '👾', '🚀', '⚡', '🔥', '💎', '🌟', '🎲', '🎯', '🏆', '💥', '✨', '🔷', '🟣', '🟢'];
+        const defaultBg = "https://img.freepik.com/free-vector/black-background-with-wavy-lines_52683-76524.jpg";
 
-        const container = document.getElementById('games-container');
-        const featuredContainer = document.getElementById('featured-container');
-        const recentContainer = document.getElementById('recent-container');
-        const recentSection = document.getElementById('recent-section');
-        const featuredSection = document.getElementById('featured-section');
-        const categoryTabs = document.getElementById('category-tabs');
-        const gamesLabel = document.getElementById('games-label');
+        const grid = document.getElementById('grid');
+        const countEl = document.getElementById('count');
         const searchInput = document.getElementById('search');
-        const gameCountEl = document.getElementById('count-text');
-        const randomBtn = document.getElementById('random-btn');
-        const uptimeEl = document.getElementById('uptime');
-        const toast = document.getElementById('toast');
+        const tabsContainer = document.getElementById('tabs-container');
         const bgLayer = document.getElementById('bg');
         const app = document.getElementById('app');
-
         const canvas = document.getElementById('webgl-canvas');
         const gl = canvas.getContext('webgl', { antialias: true, alpha: true });
 
-        let particles = [];
-        let pAmount = 0;
-        let pEnabled = true;
-        let program, posAttr, sizeAttr, opAttr, resUni, colUni, timeUni;
-        let posBuffer, sizeBuffer, opBuffer;
-        let startTime = Date.now();
-
-        const defaultBg = "https://img.freepik.com/free-vector/black-background-with-wavy-lines_52683-76524.jpg";
-
-        async function getData() {
-            const res = await fetch("/games.json");
-            return await res.json();
-        }
-
-        let NEW_GAME_DATA = {};
         let allGames = [];
         let currentCategory = 'all';
+        let particles = [], pAmount = 0, program, posAttr, sizeAttr, opAttr, resUni, colUni, timeUni, posBuffer, sizeBuffer, opBuffer, startTime = Date.now();
 
-        function createShader(gl, type, source) {
-            const s = gl.createShader(type);
-            gl.shaderSource(s, source);
-            gl.compileShader(s);
-            return s;
-        }
+        function createShader(gl, type, source) { const s = gl.createShader(type); gl.shaderSource(s, source); gl.compileShader(s); return s; }
 
         function initGL() {
             if (!gl) return;
             const vS = createShader(gl, gl.VERTEX_SHADER, document.getElementById('vs').textContent);
             const fS = createShader(gl, gl.FRAGMENT_SHADER, document.getElementById('fs').textContent);
-            program = gl.createProgram();
-            gl.attachShader(program, vS);
-            gl.attachShader(program, fS);
-            gl.linkProgram(program);
-            gl.useProgram(program);
-
-            posAttr = gl.getAttribLocation(program, "a_pos");
-            sizeAttr = gl.getAttribLocation(program, "a_size");
-            opAttr = gl.getAttribLocation(program, "a_op");
-            resUni = gl.getUniformLocation(program, "u_res");
-            colUni = gl.getUniformLocation(program, "u_color");
-            timeUni = gl.getUniformLocation(program, "u_time");
-
-            posBuffer = gl.createBuffer();
-            sizeBuffer = gl.createBuffer();
-            opBuffer = gl.createBuffer();
-
-            gl.enable(gl.BLEND);
-            gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+            program = gl.createProgram(); gl.attachShader(program, vS); gl.attachShader(program, fS); gl.linkProgram(program); gl.useProgram(program);
+            posAttr = gl.getAttribLocation(program, "a_pos"); sizeAttr = gl.getAttribLocation(program, "a_size"); opAttr = gl.getAttribLocation(program, "a_op");
+            resUni = gl.getUniformLocation(program, "u_res"); colUni = gl.getUniformLocation(program, "u_color"); timeUni = gl.getUniformLocation(program, "u_time");
+            posBuffer = gl.createBuffer(); sizeBuffer = gl.createBuffer(); opBuffer = gl.createBuffer();
+            gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
         }
 
         function applySettings() {
@@ -1071,311 +369,81 @@
             const density = parseFloat(localStorage.getItem('hrn_int')) || 1.1;
             const area = (window.innerWidth * window.innerHeight) / 10000;
             const newpAmount = Math.floor(area * density);
-            pEnabled = localStorage.getItem('hrn_part') !== 'false';
-
-            const r = parseInt(c.slice(1, 3), 16) / 255;
-            const g = parseInt(c.slice(3, 5), 16) / 255;
-            const b = parseInt(c.slice(5, 7), 16) / 255;
-
+            const pEnabled = localStorage.getItem('hrn_part') !== 'false';
+            const r = parseInt(c.slice(1, 3), 16) / 255, g = parseInt(c.slice(3, 5), 16) / 255, b = parseInt(c.slice(5, 7), 16) / 255;
             if (program && gl) gl.uniform3f(colUni, r, g, b);
-
             document.documentElement.style.setProperty('--accent', c);
-            document.documentElement.style.setProperty('--accent-rgb', `${parseInt(c.slice(1, 3), 16)}, ${parseInt(c.slice(3, 5), 16)}, ${parseInt(c.slice(5, 7), 16)}`);
-
-            if (pAmount !== newpAmount) {
-                const old = particles.slice();
-                particles = [];
-                pAmount = newpAmount;
-                for (let i = 0; i < pAmount; i++) {
-                    if (i < old.length) {
-                        particles.push(old[i]);
-                    } else {
-                        particles.push({
-                            x: Math.random() * window.innerWidth,
-                            y: Math.random() * window.innerHeight,
-                            s: Math.random() * 4 + 2.5,
-                            vx: (Math.random() - 0.5) * 0.4,
-                            vy: (Math.random() - 0.5) * 0.4,
-                            o: o * (Math.random() * 0.5 + 0.5)
-                        });
-                    }
-                }
-                if (particles.length > pAmount) particles.length = pAmount;
-            }
-
-            for (let i = 0; i < particles.length; i++) {
-                particles[i].o = o * (Math.random() * 0.5 + 0.5);
-            }
-
-            const storedBg = localStorage.getItem('hrn_bg');
-            if (storedBg) {
-                bgLayer.style.backgroundImage = `url('${storedBg}')`;
-            } else {
-                bgLayer.style.backgroundImage = `url('${defaultBg}')`;
-            }
-            bgLayer.classList.add('loaded');
+            if (!pEnabled) { pAmount = 0; return; }
+            if (pAmount !== newpAmount) { particles = []; pAmount = newpAmount; for (let i = 0; i < pAmount; i++) particles.push({ x: Math.random() * window.innerWidth, y: Math.random() * window.innerHeight, s: Math.random() * 4 + 2.5, vx: (Math.random() - 0.5) * 0.4, vy: (Math.random() - 0.5) * 0.4, o: o * (Math.random() * 0.5 + 0.5) }); }
+            bgLayer.style.backgroundImage = `url('${localStorage.getItem('hrn_bg') || defaultBg}')`; bgLayer.classList.add('loaded');
         }
 
         function render() {
-            if (!gl || !program) {
-                requestAnimationFrame(render);
-                return;
-            }
-
-            if (!pEnabled || pAmount === 0) {
-                gl.clear(gl.COLOR_BUFFER_BIT);
-                requestAnimationFrame(render);
-                return;
-            }
-
+            if (!gl || !program || pAmount === 0) { if (gl) gl.clear(gl.COLOR_BUFFER_BIT); requestAnimationFrame(render); return; }
             const elapsed = (Date.now() - startTime) / 1000;
-            const posData = new Float32Array(pAmount * 2);
-            const sizeData = new Float32Array(pAmount);
-            const opData = new Float32Array(pAmount);
-
-            for (let i = 0; i < pAmount; i++) {
-                const p = particles[i];
-                p.x += p.vx;
-                p.y += p.vy;
-
-                if (p.x < 0) p.x = window.innerWidth;
-                if (p.x > window.innerWidth) p.x = 0;
-                if (p.y < 0) p.y = window.innerHeight;
-                if (p.y > window.innerHeight) p.y = 0;
-
-                posData[i * 2] = p.x;
-                posData[i * 2 + 1] = p.y;
-                sizeData[i] = p.s;
-                opData[i] = p.o;
-            }
-
-            gl.clear(gl.COLOR_BUFFER_BIT);
-            gl.useProgram(program);
-            gl.uniform2f(resUni, window.innerWidth, window.innerHeight);
-            gl.uniform1f(timeUni, elapsed);
-
-            gl.bindBuffer(gl.ARRAY_BUFFER, posBuffer);
-            gl.bufferData(gl.ARRAY_BUFFER, posData, gl.DYNAMIC_DRAW);
-            gl.enableVertexAttribArray(posAttr);
-            gl.vertexAttribPointer(posAttr, 2, gl.FLOAT, false, 0, 0);
-
-            gl.bindBuffer(gl.ARRAY_BUFFER, sizeBuffer);
-            gl.bufferData(gl.ARRAY_BUFFER, sizeData, gl.DYNAMIC_DRAW);
-            gl.enableVertexAttribArray(sizeAttr);
-            gl.vertexAttribPointer(sizeAttr, 1, gl.FLOAT, false, 0, 0);
-
-            gl.bindBuffer(gl.ARRAY_BUFFER, opBuffer);
-            gl.bufferData(gl.ARRAY_BUFFER, opData, gl.DYNAMIC_DRAW);
-            gl.enableVertexAttribArray(opAttr);
-            gl.vertexAttribPointer(opAttr, 1, gl.FLOAT, false, 0, 0);
-
-            gl.drawArrays(gl.POINTS, 0, pAmount);
-            requestAnimationFrame(render);
+            const posData = new Float32Array(pAmount * 2), sizeData = new Float32Array(pAmount), opData = new Float32Array(pAmount);
+            for (let i = 0; i < pAmount; i++) { const p = particles[i]; p.x += p.vx; p.y += p.vy; if (p.x < 0) p.x = window.innerWidth; if (p.x > window.innerWidth) p.x = 0; if (p.y < 0) p.y = window.innerHeight; if (p.y > window.innerHeight) p.y = 0; posData[i * 2] = p.x; posData[i * 2 + 1] = p.y; sizeData[i] = p.s; opData[i] = p.o; }
+            gl.clear(gl.COLOR_BUFFER_BIT); gl.useProgram(program); gl.uniform2f(resUni, window.innerWidth, window.innerHeight); gl.uniform1f(timeUni, elapsed);
+            gl.bindBuffer(gl.ARRAY_BUFFER, posBuffer); gl.bufferData(gl.ARRAY_BUFFER, posData, gl.DYNAMIC_DRAW); gl.enableVertexAttribArray(posAttr); gl.vertexAttribPointer(posAttr, 2, gl.FLOAT, false, 0, 0);
+            gl.bindBuffer(gl.ARRAY_BUFFER, sizeBuffer); gl.bufferData(gl.ARRAY_BUFFER, sizeData, gl.DYNAMIC_DRAW); gl.enableVertexAttribArray(sizeAttr); gl.vertexAttribPointer(sizeAttr, 1, gl.FLOAT, false, 0, 0);
+            gl.bindBuffer(gl.ARRAY_BUFFER, opBuffer); gl.bufferData(gl.ARRAY_BUFFER, opData, gl.DYNAMIC_DRAW); gl.enableVertexAttribArray(opAttr); gl.vertexAttribPointer(opAttr, 1, gl.FLOAT, false, 0, 0);
+            gl.drawArrays(gl.POINTS, 0, pAmount); requestAnimationFrame(render);
         }
 
-        setInterval(() => {
-            let s = Math.floor((Date.now() - startTime) / 1000);
-            uptimeEl.textContent = s < 60 ? `${s}s` : `${Math.floor(s / 60)}m`;
-        }, 1000);
-
-        function formatName(name) {
-            return name.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-        }
-
-        function getGameEmoji(gameId) {
-            if (GAME_EMOJIS[gameId]) return GAME_EMOJIS[gameId];
-            for (const [, catData] of Object.entries(CATEGORIES)) {
-                if (catData.games?.includes(gameId)) return catData.icon || '🎮';
-            }
-            return '🎮';
-        }
-
-        function showToast(msg) {
-            toast.textContent = msg;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 2500);
-        }
-
-        function saveRecent(game) {
-            let recent = JSON.parse(localStorage.getItem('recentGames') || '[]');
-            recent = [game, ...recent.filter(g => g !== game)].slice(0, 6);
-            localStorage.setItem('recentGames', JSON.stringify(recent));
-            renderRecent();
-        }
-
-        function renderCategoryTabs() {
-            categoryTabs.innerHTML = '';
-            Object.keys(CATEGORIES).forEach(key => {
-                const cat = CATEGORIES[key];
-                const count = key === 'all' ? allGames.length :
-                    key === 'popular' ? FEATURED_GAMES.length :
-                    (cat.games?.filter(g => allGames.includes(g)).length || 0);
-                const btn = document.createElement('button');
-                btn.className = `tab ${currentCategory === key ? 'active' : ''}`;
-                btn.innerHTML = `${cat.icon} ${cat.name}<span class="count">${count}</span>`;
-                btn.onclick = () => {
-                    currentCategory = key;
-                    renderCategoryTabs();
-                    renderGames(getFilteredGames());
-                    featuredSection.style.display = (key === 'all') ? 'block' : 'none';
-                    gamesLabel.textContent = key === 'all' ? 'All Games' : cat.name;
-                };
-                categoryTabs.appendChild(btn);
-            });
-        }
+        function formatName(id) { return id.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()); }
+        function getEmoji(id) { let hash = 0; for (let i = 0; i < id.length; i++) hash = id.charCodeAt(i) + ((hash << 5) - hash); return EMOJIS[Math.abs(hash) % EMOJIS.length]; }
 
         function getFilteredGames() {
-            if (currentCategory === 'all') return allGames;
-            if (currentCategory === 'popular') return FEATURED_GAMES.map(f => f.id).filter(g => allGames.includes(g));
-            if (CATEGORIES[currentCategory]?.games) {
-                return CATEGORIES[currentCategory].games.filter(g => allGames.includes(g));
+            let list = allGames;
+            if (currentCategory !== 'all' && CATEGORIES[currentCategory]?.games) {
+                list = CATEGORIES[currentCategory].games.filter(g => allGames.includes(g));
             }
-            return allGames;
+            return list;
         }
 
-        function renderFeatured() {
-            featuredContainer.innerHTML = '';
-            FEATURED_GAMES.forEach((f, i) => {
-                if (!allGames.includes(f.id)) return;
-                const card = document.createElement('a');
-                card.className = 'featured-card animate-in';
-                card.style.animationDelay = `${i * 0.05}s`;
-                card.href = `./game/${f.id}`;
-                card.onclick = () => saveRecent(f.id);
-                card.innerHTML = `
-                    <div class="featured-emoji">${f.emoji}</div>
-                    <div class="featured-info">
-                        <div class="featured-title">${formatName(f.id)}</div>
-                        <div class="featured-tag">${f.tag}</div>
-                    </div>
-                `;
-                featuredContainer.appendChild(card);
+        function renderTabs() {
+            tabsContainer.innerHTML = '';
+            Object.keys(CATEGORIES).forEach(key => {
+                const cat = CATEGORIES[key];
+                const btn = document.createElement('button');
+                btn.className = `tab ${currentCategory === key ? 'active' : ''}`;
+                btn.textContent = cat.name;
+                btn.onclick = () => {
+                    currentCategory = key;
+                    renderTabs();
+                    handleRender();
+                };
+                tabsContainer.appendChild(btn);
             });
         }
 
-        function renderRecent() {
-            const recent = JSON.parse(localStorage.getItem('recentGames') || '[]');
-            recentSection.style.display = recent.length ? 'block' : 'none';
-            recentContainer.innerHTML = '';
-            recent.forEach(game => {
-                if (!allGames.includes(game)) return;
-                const chip = document.createElement('a');
-                chip.className = 'recent-chip';
-                chip.href = `./game/${game}`;
-                chip.onclick = () => saveRecent(game);
-                chip.innerHTML = `<span>${getGameEmoji(game)}</span> ${formatName(game)}`;
-                recentContainer.appendChild(chip);
-            });
-        }
-
-        function createCard(game, index) {
-            const card = document.createElement('a');
-            card.className = 'game-card animate-in';
-            card.style.animationDelay = `${Math.min(index * 0.02, 0.5)}s`;
-            card.href = `./game/${game}`;
-
-            card.onclick = () => saveRecent(game);
-
-            const emoji = getGameEmoji(game);
-
-            card.innerHTML = `
-                <div class="card-emoji">${emoji}</div>
-                <div class="card-content">
-                    <div class="card-title">${formatName(game)}</div>
-                </div>
-            `;
-            return card;
+        function handleRender() {
+            const query = searchInput.value.toLowerCase().trim();
+            let baseGames = getFilteredGames();
+            let games = query ? baseGames.filter(g => formatName(g).toLowerCase().includes(query)) : baseGames;
+            renderGames(games);
         }
 
         function renderGames(games) {
-            container.innerHTML = '';
-            if (!games.length) {
-                container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🔍</div>No games found</div>';
-                return;
-            }
-            games.forEach((g, i) => container.appendChild(createCard(g, i)));
+            if (!games.length) { grid.innerHTML = '<div class="empty-state">No games found</div>'; countEl.textContent = '0 titles'; return; }
+            countEl.textContent = `${games.length} titles`;
+            grid.innerHTML = games.map(g => `<a href="./game/${g}" class="game-card"><span class="game-emoji">${getEmoji(g)}</span><span class="game-title">${formatName(g)}</span></a>`).join('');
         }
 
         async function init() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
             if (gl) gl.viewport(0, 0, canvas.width, canvas.height);
-
-            initGL();
-            applySettings();
-            render();
-
-            const progress = document.getElementById('progress');
-            progress.style.width = '20%';
-
-            try {
-                NEW_GAME_DATA = await getData();
-                progress.style.width = '60%';
-            } catch (e) {
-                NEW_GAME_DATA = {};
-            }
-
-            allGames = Object.values(NEW_GAME_DATA).flat();
-            gameCountEl.textContent = allGames.length;
-
-            progress.style.width = '80%';
-
-            renderCategoryTabs();
-            renderFeatured();
-            renderGames(allGames);
-            renderRecent();
-
-            progress.style.width = '100%';
-
-            setTimeout(() => {
-                const loader = document.getElementById('loader');
-                loader.style.opacity = '0';
-                setTimeout(() => {
-                    loader.style.display = 'none';
-                    app.classList.add('active');
-                }, 800);
-            }, 400);
+            initGL(); applySettings(); render();
+            const progress = document.getElementById('progress'); progress.style.width = '30%';
+            try { const res = await fetch('/games.json'); const data = await res.json(); allGames = Object.values(data).flat(); progress.style.width = '100%'; } catch (e) { console.error(e); }
+            renderTabs();
+            handleRender();
+            setTimeout(() => { document.getElementById('loader').style.opacity = '0'; setTimeout(() => { document.getElementById('loader').style.display = 'none'; app.classList.add('active'); }, 600); }, 400);
         }
 
-        searchInput.addEventListener('input', (e) => {
-            const query = e.target.value.toLowerCase().trim();
-            const baseGames = getFilteredGames();
-            if (!query) {
-                renderGames(baseGames);
-                featuredSection.style.display = currentCategory === 'all' ? 'block' : 'none';
-                return;
-            }
-            const filtered = baseGames.filter(gameId =>
-                formatName(gameId).toLowerCase().includes(query)
-            );
-            renderGames(filtered);
-            featuredSection.style.display = 'none';
-        });
-
-        randomBtn.addEventListener('click', () => {
-            if (!allGames.length) return;
-            const game = allGames[Math.floor(Math.random() * allGames.length)];
-            saveRecent(game);
-            showToast(`Loading ${formatName(game)}...`);
-            setTimeout(() => window.location.href = `./game/${game}`, 350);
-        });
-
-        window.addEventListener('storage', (e) => {
-            if (e.key === 'hrn_clr' || e.key === 'hrn_op' || e.key === 'hrn_int' || e.key === 'hrn_part' || e.key === 'hrn_bg') {
-                applySettings();
-            }
-        });
-
-        window.onresize = () => {
-            if (gl) {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-                gl.viewport(0, 0, canvas.width, canvas.height);
-            }
-            applySettings();
-        };
-
+        searchInput.addEventListener('input', handleRender);
+        window.onresize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; if (gl) gl.viewport(0, 0, canvas.width, canvas.height); applySettings(); };
+        window.addEventListener('storage', applySettings);
         init();
     </script>
 </body>
