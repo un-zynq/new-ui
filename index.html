@@ -292,7 +292,7 @@
                 pages.map(async p=>{
                     try{
                         // Cache busting fetch request
-                        const r=await fetch(p+'.html?v='+cacheVersion);
+                        const r=await fetch(p+'?v='+cacheVersion);
                         cache[p]=await r.text();
                     }catch(e){
                         cache[p]='<h1 style="color:#fff;text-align:center;padding:50px">Page not found</h1>';
