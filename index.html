@@ -126,7 +126,7 @@
             border: 1px solid var(--ui-border);
             padding: 11px 28px;
             border-radius: 100px;
-            backdrop-filter: blur(12px);
+            backdrop-filter: blur(4px); /* Subtiele blur */
             font-size: 9px;
             font-weight: 900;
             letter-spacing: 2.5px;
@@ -218,7 +218,7 @@
             justify-content: center;
             cursor: pointer;
             transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-            backdrop-filter: blur(8px);
+            backdrop-filter: blur(4px); /* Minder harde blur op de knoppen */
         }
 
         .btn svg { 
@@ -230,7 +230,6 @@
 
         .btn:active { transform: scale(0.96); }
 
-        /* Subtiele Hover */
         .btn:hover {
             color: #fff;
             background: rgba(var(--accent-rgb), 0.08);
@@ -379,13 +378,26 @@
             });
         }
 
-        async function updateBg(val) {
-            const bgLayer = $('bg');
-            let displayUrl = defaultBg;
-            if (val instanceof Blob) displayUrl = URL.createObjectURL(val);
-            else if (typeof val === 'string' && val.length > 0) displayUrl = val;
-            bgLayer.style.backgroundImage = `url('${displayUrl}')`;
-            bgLayer.classList.add('loaded');
+        function updateBg(val) {
+            return new Promise(resolve => {
+                const bgLayer = $('bg');
+                let displayUrl = defaultBg;
+                if (val instanceof Blob) displayUrl = URL.createObjectURL(val);
+                else if (typeof val === 'string' && val.length > 0) displayUrl = val;
+
+                const img = new Image();
+                img.src = displayUrl;
+                img.onload = () => {
+                    bgLayer.style.backgroundImage = `url('${displayUrl}')`;
+                    bgLayer.classList.add('loaded');
+                    resolve();
+                };
+                img.onerror = () => {
+                    bgLayer.style.backgroundImage = `url('${defaultBg}')`;
+                    bgLayer.classList.add('loaded');
+                    resolve();
+                };
+            });
         }
 
         function createShader(gl, type, source) {
@@ -540,17 +552,20 @@
             initGL();
             await initDB();
             
-            $('progress').style.width = '10%';
+            $('progress').style.width = '20%';
+            
             try {
                 const r = await fetch('pages.txt?v=' + cacheVersion);
                 const text = await r.text();
                 const regex = /\/:(\w+):\/\s*([\s\S]*?)(?=\/:\w+:\/|$)/g;
                 let m; cache = {};
                 while ((m = regex.exec(text)) !== null) { cache[m[1]] = m[2].trim(); }
-                $('progress').style.width = '100%';
-            } catch (e) { $('progress').style.width = '100%'; }
+                $('progress').style.width = '60%';
+            } catch (e) { console.error("Cache load failed"); }
 
             await applyAllSettings();
+            
+            $('progress').style.width = '100%';
             render();
 
             if (window.location.hash.slice(1)) checkHash();
@@ -562,7 +577,7 @@
                     $('ui').classList.add('active');
                     $('tagline').classList.add('show');
                 }, 800);
-            }, 600);
+            }, 400);
         }
 
         function setHash(n) { window.location.hash = n; }
